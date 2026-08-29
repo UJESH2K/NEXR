@@ -1,0 +1,189 @@
+@import 'tailwindcss';
+
+/* Design tokens ported from the previous global.css so the visual language
+   survives the Tailwind migration. Available as bg-ink, text-lime, etc. */
+@theme {
+  --color-void: #000000;
+  --color-ink: #111611;
+  --color-abyss: #080b0d;
+  --color-paper: #e8e5da;
+  --color-bone: #f4f3ec;
+  --color-moss: #25342a;
+  --color-sand: #d4d0bf;
+  --color-lime: #d8f35d;
+  --color-olive: #637500;
+
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-dm-mono), ui-monospace, monospace;
+  --font-display: var(--font-playfair), Georgia, serif;
+
+  /* Stacking contract: canvas sits at the bottom, DOM overlays above it,
+     route content above that, chrome on top. */
+  --z-canvas: 0;
+  --z-overlay: 10;
+  --z-page: 20;
+  --z-chrome: 30;
+}
+
+@layer base {
+  html {
+    /* Lenis owns smooth scrolling; native smooth would double-animate it. */
+    scroll-behavior: auto;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-void);
+    color: var(--color-bone);
+    font-family: var(--font-sans);
+    font-synthesis: none;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: none;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* Lenis requirement: without this the wheel handler and the native
+     scrollbar disagree about position. */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+}
+
+@layer components {
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-lime);
+  }
+
+  .display {
+    font-weight: 500;
+    line-height: 0.91;
+    letter-spacing: -0.075em;
+  }
+
+  .serif-accent {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 500;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 30px;
+    padding: 15px 18px;
+    border: 1px solid rgb(255 255 255 / 0.8);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: background-color 0.25s, color 0.25s, border-color 0.25s;
+  }
+
+  .btn:hover {
+    background: var(--color-lime);
+    border-color: var(--color-lime);
+    color: var(--color-ink);
+  }
+
+  .btn-dark {
+    border-color: var(--color-ink);
+    color: var(--color-ink);
+  }
+}
+
+/* The overlay plane must not swallow pointer events meant for the canvas —
+   only its interactive children opt back in. */
+.overlay-layer {
+  pointer-events: none;
+}
+
+.overlay-layer :is(a, button) {
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Act I's scattered fragments. The anchor comes from custom properties because
+   the positions are per-shard data and responsive, and Tailwind cannot generate
+   utilities from runtime values. GSAP writes transform on top of this, so the
+   two never fight: layout here, motion there. */
+.scatter-shard {
+  position: absolute;
+  left: var(--shard-mx);
+  top: var(--shard-my);
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .scatter-shard {
+    left: var(--shard-x);
+    top: var(--shard-y);
+  }
+}
+
+/* Short viewports are the one case a fixed band cannot satisfy. Act 0's headline
+   is sized from viewport *width* — clamp(2.6rem, 6.5vw, 5.25rem) — so as the
+   window gets shorter the block does not shrink, it grows upward as a fraction of
+   the screen and eats into this band from below.
+
+   Measured at 1440 wide, which is the worst case (the h1 font caps at 5.25rem and
+   max-w-[34rem] caps the wrapping, so the block stops growing past that width):
+   eyebrow 32px + h1 4×76.4px + accent 88px + scroll 56px = 482px, sitting
+   10svh off the bottom. Its top edge is at y 36% at 900px tall, y 31% at 820,
+   y 27% at 760, y 21% at 700. Each threshold below is where the next row would
+   meet it, so rows drop off the bottom of the band one at a time rather than
+   colliding. The header — 71px, fixed — is what bounds row 1 and sets the point
+   where the band stops being viable at all.
+
+   data-row keeps this pure CSS with no second source of position data, and these
+   win over the rules above on specificity, not source order. */
+@media (max-height: 820px) {
+  .scatter-shard[data-row='4'] {
+    display: none;
+  }
+}
+
+@media (max-height: 760px) {
+  .scatter-shard[data-row='3'] {
+    display: none;
+  }
+}
+
+@media (max-height: 700px) {
+  .scatter-shard[data-row='2'] {
+    display: none;
+  }
+}
+
+/* Below this the headline alone needs the whole screen — landscape phones, and
+   the point where row 1 would meet the header. */
+@media (max-height: 680px) {
+  .scatter-shard {
+    display: none;
+  }
+}
