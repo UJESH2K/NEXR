@@ -17,6 +17,8 @@ export type NexrCard = {
   /** Served from public/. Falls back to a generated gradient if absent. */
   image: string
   route: string
+  /** Optional video URL — clicking the thumbnail opens this. */
+  videoUrl?: string
   /** Two-stop gradient used for the fallback texture and the card's edge glow. */
   tint: [string, string]
 }
@@ -28,7 +30,7 @@ export const CARDS: NexrCard[] = [
     title: 'The Gap',
     blurb:
       'Organisations invest more in wellbeing than ever. Yet burnout rises and programmes go unused.',
-    image: '/cards/01.jpg',
+    image: '/models/imgs/gap.png',
     route: '/approach#gap',
     tint: ['#2a2f26', '#0b0d0a'],
   },
@@ -37,7 +39,7 @@ export const CARDS: NexrCard[] = [
     eyebrow: '02 / Our belief',
     title: 'Our Belief',
     blurb: 'Stop making people fit wellbeing. Make wellbeing fit people.',
-    image: '/cards/02.jpg',
+    image: '/models/imgs/OurApproach.png',
     route: '/approach#belief',
     tint: ['#3b4426', '#0d0f0a'],
   },
@@ -47,7 +49,7 @@ export const CARDS: NexrCard[] = [
     title: 'MeloWorld',
     blurb:
       'A private, avatar-led space where employees can take a first step without being recognised.',
-    image: '/cards/03.jpg',
+    image: '/models/imgs/meloworld.png',
     route: '/platform/meloworld',
     tint: ['#52665a', '#101815'],
   },
@@ -57,7 +59,7 @@ export const CARDS: NexrCard[] = [
     title: 'VR Wellness',
     blurb:
       'Guided immersive experiences that help people work through challenges at their own pace.',
-    image: '/cards/04.jpg',
+    image: '/models/imgs/vrworld.png',
     route: '/platform/vr-wellness',
     tint: ['#4a4270', '#0e0c17'],
   },
@@ -67,7 +69,7 @@ export const CARDS: NexrCard[] = [
     title: 'Clinically Grounded',
     blurb:
       'Built with psychologists, tested in clinical practice, used in hospital contexts.',
-    image: '/cards/05.jpg',
+    image: '/models/imgs/clinicallygrounded.png',
     route: '/trust',
     tint: ['#1f3a3a', '#080e0e'],
   },
@@ -77,7 +79,7 @@ export const CARDS: NexrCard[] = [
     title: "Let's Talk",
     blurb:
       'Healthier organisations begin with people who feel safe enough to seek support.',
-    image: '/cards/06.jpg',
+    image: '/models/imgs/letsconnect.png',
     route: '/contact',
     tint: ['#6b7a2e', '#12150a'],
   },
@@ -86,4 +88,4 @@ export const CARDS: NexrCard[] = [
 // Bump this whenever the prepared GLB is replaced. GLTFLoader caches by URL,
 // and a stable public-file URL can otherwise leave an already-open site showing
 // the previous character.
-export const MODEL_URL = '/models/nexr-character.glb?v=20260827-untitled2'
+export const MODEL_URL = '/models/girl.glb?v=20260831'

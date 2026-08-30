@@ -1,164 +1,178 @@
 'use client'
 
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ACT } from '@/lib/scrollStore'
 
 /**
- * Act I's scattered typographic fragments — the barriers named in
- * NEXR_STRATEGY.md §2.
+ * Vertical word carousel on the RIGHT side of the screen.
  *
- * The layout is dictated, not decorative. Three other things share the screen
- * during act I and every number below is chosen to miss them:
+ * Before the user scrolls: words auto-rotate in an infinite loop, each word
+ * blurring into the next (like a slot machine / marquee).
  *
- *   Header      — fixed, top, roughly 74px tall. Nothing above y≈12.
- *   Act 0 copy  — ActOverlays' headline block, bottom-left, x 1.7–39% and
- *                 reaching up to about y 34 at 1440×900. Nothing below y≈30.
- *   Act 1 copy  — centred, appears at progress 0.16. The fragments converge into
- *                 that exact space, so they are fully faded before it exists.
- *
- * The band is therefore four rows between y 13 and y 29.5. Verified pairwise
- * non-overlapping at 1440, 1024 and 768 wide; the rows carry `data-row` so
- * globals.css can thin the band out on short viewports, where the headline block
- * grows upward into it.
+ * Once scrolling begins: the loop pauses, the current word fades out, and
+ * the whole component disappears before act 1 arrives.
  */
-type Shard = {
-  text: string
-  /** Anchor point in viewport percentages, from md upwards. */
-  x: number
-  y: number
-  /** Which row this belongs to, for the short-viewport rules in globals.css. */
-  row: 1 | 2 | 3 | 4
-  /** Anchor below md. Omitted means the shard is hidden on small screens — ten
-   *  of these do not fit a phone at a legible size, six do. */
-  mx?: number
-  my?: number
-  size: string
-}
 
-const SHARDS: Shard[] = [
-  // Row 1
-  { text: 'Anxiety', row: 1, x: 9, y: 13, mx: 82, my: 13, size: 'text-[11px] md:text-sm' },
-  { text: 'Fear of judgement', row: 1, x: 40, y: 13, mx: 34, my: 13, size: 'text-[11px] md:text-sm' },
-  { text: 'Stigma', row: 1, x: 78, y: 13, mx: 78, my: 31, size: 'text-xs md:text-base' },
-  // Row 2
-  { text: 'Work pressure', row: 2, x: 24, y: 18.5, size: 'text-[11px] md:text-xs' },
-  { text: 'Nobody noticed', row: 2, x: 66, y: 18.5, mx: 62, my: 22, size: 'text-[11px] md:text-sm' },
-  { text: 'Adjustment', row: 2, x: 89, y: 18.5, size: 'text-[11px] md:text-xs' },
-  // Row 3
-  { text: 'Low utilisation', row: 3, x: 14, y: 24, size: 'text-[11px] md:text-xs' },
-  { text: 'Staying quiet', row: 3, x: 52, y: 24, mx: 30, my: 31, size: 'text-[11px] md:text-sm' },
-  { text: 'Burnout', row: 3, x: 84, y: 24, mx: 18, my: 22, size: 'text-xs md:text-base' },
-  // Row 4
-  { text: 'A need to talk', row: 4, x: 70, y: 29.5, size: 'text-[11px] md:text-xs' },
+const WORDS = [
+  'Anxiety',
+  'Fear of judgement',
+  'Stigma',
+  'Work pressure',
+  'Nobody noticed',
+  'Adjustment',
+  'Low utilisation',
+  'Staying quiet',
+  'Burnout',
+  'A need to talk',
 ]
 
-/** How far toward centre the fragments travel, as a fraction of the viewport. */
-const CONVERGE = 0.55
+const ITEM_HEIGHT = 56
+/** Speed of the auto-rotation (pixels per frame at 60fps). */
+const AUTO_SPEED = 0.8
 
 export function ScatterText() {
-  const root = useRef<HTMLDivElement>(null)
+  const rootRef = useRef<HTMLDivElement>(null)
+  const trackRef = useRef<HTMLDivElement>(null)
+  const wordsRef = useRef<(HTMLDivElement | null)[]>([])
+  const [hasScrolled, setHasScrolled] = useState(false)
 
+  // ── Auto-rotation loop ───────────────────────────────────────────────
+  useEffect(() => {
+    let y = 0
+    let raf: number
+    const totalH = WORDS.length * ITEM_HEIGHT
+
+    const tick = () => {
+      if (hasScrolled) return // stop once the user scrolls
+
+      y += AUTO_SPEED
+      if (y >= totalH) y -= totalH
+
+      if (trackRef.current) {
+        trackRef.current.style.transform = `translateY(${-y}px)`
+      }
+
+      // Per-word blur based on distance from viewport centre
+      const vh = window.innerHeight
+      const centre = vh * 0.5
+      wordsRef.current.forEach((el) => {
+        if (!el) return
+        const label = el.querySelector('[data-wl]') as HTMLElement
+        const arrow = el.querySelector('[data-wa]') as HTMLElement
+        if (!label) return
+
+        const rect = el.getBoundingClientRect()
+        // Account for the track offset
+        const wordCentre = rect.top + rect.height / 2
+        const dist = Math.abs(wordCentre - centre)
+        const maxDist = vh * 0.3
+        const t = Math.min(dist / maxDist, 1)
+
+        label.style.filter = `blur(${t * 6}px)`
+        label.style.opacity = String(1 - t * 0.85)
+
+        if (arrow) {
+          const active = t < 0.12
+          arrow.style.opacity = active ? '1' : '0'
+          arrow.style.color = active ? 'var(--color-lime, #d8f35d)' : 'transparent'
+        }
+      })
+
+      raf = requestAnimationFrame(tick)
+    }
+
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [hasScrolled])
+
+  // ── Detect first scroll → freeze and fade out ────────────────────────
+  useGSAP(() => {
+    const onScroll = () => {
+      if (window.scrollY > 40 && !hasScrolled) {
+        setHasScrolled(true)
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  })
+
+  // ── Fade-out animation when hasScrolled becomes true ─────────────────
   useGSAP(
     () => {
-      const element = root.current
-      if (!element) return
-
-      const shards = gsap.utils.toArray<HTMLElement>('[data-shard]', element)
-
-      // Centre each fragment on its anchor rather than hanging it off the left
-      // edge. Two things depend on this: a long label near x=89 stays on screen,
-      // and offsetLeft/offsetTop below then *are* the visual centre, which is
-      // what makes the convergence targets exact.
-      gsap.set(shards, { xPercent: -50, yPercent: -50 })
-
-      const timeline = gsap.timeline({
-        scrollTrigger: {
-          trigger: '#home-track',
-          start: 'top top',
-          // Resolved inside act I, not at the end of the approach. The centred
-          // act 1 headline occupies the space these words converge into, so they
-          // have to be gone before it arrives rather than crossfading with it.
-          end: () => {
-            const track = document.getElementById('home-track')
-            const scrollable = (track?.clientHeight ?? 0) - window.innerHeight
-            return `+=${Math.max(1, scrollable * ACT.distantEnd)}`
+      if (hasScrolled && rootRef.current) {
+        gsap.to(rootRef.current, {
+          opacity: 0,
+          duration: 0.6,
+          ease: 'power2.inOut',
+          onComplete: () => {
+            if (rootRef.current) rootRef.current.style.display = 'none'
           },
-          scrub: true,
-          // Function-based values above must be recomputed on resize — which is
-          // also when the breakpoints below swap each shard's anchor.
-          invalidateOnRefresh: true,
-        },
-      })
-
-      shards.forEach((shard, index) => {
-        // Slight stagger so they don't collapse as one rigid block.
-        const at = index * 0.02
-
-        timeline.to(
-          shard,
-          {
-            // Read from layout, not from the data above: the anchor differs
-            // between breakpoints, and offsetLeft/offsetTop are unaffected by the
-            // transform GSAP is writing, so they stay correct on every refresh.
-            x: () => (window.innerWidth * 0.5 - shard.offsetLeft) * CONVERGE,
-            y: () => (window.innerHeight * 0.5 - shard.offsetTop) * CONVERGE,
-            scale: 0.72,
-            // Required for scrubbed animations: any ease would desynchronise the
-            // frame from the scrollbar position.
-            ease: 'none',
-            duration: 1,
-          },
-          at,
-        )
-
-        // Opacity runs on its own shorter tween, finishing well before the
-        // position does. Fading out early is what keeps the pile-up at the centre
-        // from ever being visible.
-        timeline.to(shard, { opacity: 0, ease: 'none', duration: 0.5 }, at + 0.28)
-      })
-
-      return () => {
-        timeline.scrollTrigger?.kill()
-        timeline.kill()
+        })
       }
     },
-    { scope: root },
+    { dependencies: [hasScrolled] },
   )
 
   return (
     <div
-      ref={root}
-      className="overlay-layer fixed inset-0"
-      style={{ zIndex: 'var(--z-overlay)' }}
+      ref={rootRef}
+      className="overlay-layer fixed right-[4vw] top-0 z-[var(--z-overlay)] h-screen w-[40vw] max-w-[380px] select-none md:right-[5vw]"
       aria-hidden="true"
+      style={{ overflow: 'hidden' }}
     >
-      {SHARDS.map((shard) => (
-        <span
-          key={shard.text}
-          data-shard
-          data-row={shard.row}
-          className={`scatter-shard font-mono uppercase tracking-[0.18em] text-bone/45 ${shard.size} ${
-            shard.mx === undefined ? 'hidden md:block' : ''
-          }`}
-          // Positions go through custom properties because they are per-shard
-          // data and responsive, and Tailwind cannot generate utilities from
-          // runtime values. globals.css picks the small pair below md and the
-          // wide pair above.
-          style={
-            {
-              '--shard-x': `${shard.x}%`,
-              '--shard-y': `${shard.y}%`,
-              '--shard-mx': `${shard.mx ?? shard.x}%`,
-              '--shard-my': `${shard.my ?? shard.y}%`,
-              willChange: 'transform, opacity',
-            } as React.CSSProperties
-          }
-        >
-          {shard.text}
-        </span>
-      ))}
+      {/* Fade mask — sharp at centre, transparent at top/bottom */}
+      <div
+        className="pointer-events-none absolute inset-0 z-10"
+        style={{
+          maskImage:
+            'linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%)',
+          WebkitMaskImage:
+            'linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%)',
+        }}
+      />
+
+      {/* Scrolling track */}
+      <div
+        ref={trackRef}
+        className="flex flex-col items-start pt-[42vh]"
+      >
+        {WORDS.map((word, i) => (
+          <div
+            key={word}
+            ref={(el) => { wordsRef.current[i] = el }}
+            className="flex w-full items-center gap-4"
+            style={{ height: ITEM_HEIGHT }}
+          >
+            <span
+              data-wa
+              className="text-2xl font-light"
+              style={{ color: 'transparent', opacity: 0 }}
+            >
+              &rarr;
+            </span>
+            <span
+              data-wl
+              className="font-display text-[clamp(1.6rem,3.5vw,2.6rem)] font-semibold tracking-tight text-bone"
+              style={{ filter: 'blur(6px)', opacity: 0.15 }}
+            >
+              {word}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Centre highlight line */}
+      <div
+        className="pointer-events-none absolute left-0 right-0 z-20"
+        style={{
+          top: '48%',
+          height: '2px',
+          background:
+            'linear-gradient(to right, transparent, rgba(216,243,93,0.2), transparent)',
+        }}
+      />
     </div>
   )
 }

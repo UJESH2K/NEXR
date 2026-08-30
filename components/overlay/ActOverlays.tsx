@@ -4,17 +4,6 @@ import { AnimatePresence, motion, type Transition } from 'framer-motion'
 import Link from 'next/link'
 import { useScrollSnapshot } from '@/lib/useScrollSnapshot'
 
-/**
- * Per-act headline copy, straight from NEXR_STRATEGY.md §"Home Page: Approved
- * Narrative & Copy".
- *
- * Driven by the discrete `act` value from the scroll snapshot, so this
- * re-renders four times across the entire page rather than once per frame.
- * Only opacity and transform are animated — never layout properties.
- */
-
-// Annotated rather than inferred: a bezier array only type-checks against
-// framer-motion's BezierDefinition tuple when it has that contextual type.
 const TRANSITION: Transition = { duration: 0.7, ease: [0.16, 1, 0.3, 1] }
 
 const ENTER = {
@@ -26,7 +15,6 @@ const ENTER = {
 export function ActOverlays() {
   const { act, mode } = useScrollSnapshot()
 
-  // While a card is filling the frame, all home copy gets out of the way.
   const hidden = mode === 'transition'
 
   return (

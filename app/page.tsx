@@ -1,37 +1,47 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { ActOverlays } from '@/components/overlay/ActOverlays'
-import { CardHotspots } from '@/components/overlay/CardHotspots'
+import { CardOverlays } from '@/components/overlay/CardOverlays'
+import { FallingText } from '@/components/overlay/FallingText'
 import { HomeScrollDriver } from '@/components/overlay/HomeScrollDriver'
-import { ParticleDebugPanel } from '@/components/overlay/ParticleDebugPanel'
-import { ScatterText } from '@/components/overlay/ScatterText'
 import { ScrollHud } from '@/components/overlay/ScrollHud'
 import { StaticHome } from '@/components/site/StaticHome'
 import { useReducedMotion } from '@/lib/useReducedMotion'
 import { useWebGLSupport } from '@/lib/useWebGLSupport'
 
 /**
- * Home is the 3D scene. This component contributes only the scroll track and
- * the DOM layers that sit over the canvas — the canvas itself lives in the root
- * layout so it survives navigation.
+ * Home is the 3D scene. FallingText replaces ScatterText — physics-driven
+ * words on the right that vanish as the user scrolls into act 1.
  */
 export default function HomePage() {
   const reduced = useReducedMotion()
   const webgl = useWebGLSupport()
 
-  // webgl === null means the probe hasn't run yet (first client paint). Holding
-  // the static version until then avoids mounting the scroll track and then
-  // immediately tearing it down.
+  // Fade progress for FallingText: 0 = fully visible, 1 = gone
+  const [fade, setFade] = useState(0)
+
+  useEffect(() => {
+    const onScroll = () => {
+      const vh = window.innerHeight
+      const scrollY = window.scrollY
+      // Start fading after 20% of viewport scroll, fully gone at 60%
+      const progress = Math.min(Math.max((scrollY - vh * 0.2) / (vh * 0.4), 0), 1)
+      setFade(progress)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   if (reduced || webgl !== true) return <StaticHome />
 
   return (
     <>
       <HomeScrollDriver />
-      <ScatterText />
+      <FallingText fadeProgress={fade} />
       <ActOverlays />
-      <CardHotspots />
+      <CardOverlays />
       <ScrollHud />
-      <ParticleDebugPanel />
     </>
   )
 }

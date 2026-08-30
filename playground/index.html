@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEXR Playground</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #111; color: #fff; font-family: monospace; display: flex; height: 100vh; overflow: hidden; }
+    #viewport { flex: 1; position: relative; }
+    #panel { width: 300px; background: #0a0a0a; border-left: 1px solid #333; padding: 16px; overflow-y: auto; font-size: 11px; }
+    h1 { color: #d8f35d; font-size: 13px; letter-spacing: 3px; margin-bottom: 16px; }
+    h2 { color: #666; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; margin: 16px 0 8px; border-top: 1px solid #222; padding-top: 12px; }
+    .row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    .row label { color: #888; flex: 1; }
+    .row input[type=range] { flex: 2; margin: 0 8px; accent-color: #d8f35d; }
+    .row .val { color: #d8f35d; width: 50px; text-align: right; font-variant-numeric: tabular-nums; }
+    button { width: 100%; padding: 8px; border: 1px solid #444; background: transparent; color: #aaa; font-family: monospace; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; margin-bottom: 6px; border-radius: 3px; }
+    button:hover { border-color: #d8f35d; color: #d8f35d; }
+    button.primary { background: #d8f35d; color: #000; border-color: #d8f35d; font-weight: bold; }
+    button.primary:hover { background: #c8e34d; }
+    button.active { background: #d8f35d22; border-color: #d8f35d; color: #d8f35d; }
+    #output { margin-top: 12px; background: #1a1a1a; border: 1px solid #333; padding: 8px; font-size: 10px; color: #888; white-space: pre-wrap; word-break: break-all; max-height: 200px; overflow-y: auto; border-radius: 3px; }
+    .row-full { margin-bottom: 10px; }
+    .row-full label { display: block; color: #888; margin-bottom: 4px; }
+    .row-full input[type=range] { width: 100%; accent-color: #d8f35d; }
+  </style>
+</head>
+<body>
+  <div id="viewport"></div>
+  <div id="panel">
+    <h1>PLAYGROUND</h1>
+
+    <h2>Character</h2>
+    <div class="row-full">
+      <label>Scale</label>
+      <input type="range" id="scale" min="1" max="3000" step="1" value="100" />
+    </div>
+    <div class="row-full">
+      <label>Position X</label>
+      <input type="range" id="posX" min="-20" max="20" step="0.1" value="0" />
+    </div>
+    <div class="row-full">
+      <label>Position Y</label>
+      <input type="range" id="posY" min="-20" max="20" step="0.1" value="0" />
+    </div>
+    <div class="row-full">
+      <label>Position Z</label>
+      <input type="range" id="posZ" min="-20" max="20" step="0.1" value="0" />
+    </div>
+
+    <h2>Camera</h2>
+    <div class="row-full">
+      <label>Distance</label>
+      <input type="range" id="camRadius" min="1" max="80" step="0.5" value="10" />
+    </div>
+    <div class="row-full">
+      <label>Height</label>
+      <input type="range" id="camHeight" min="-10" max="20" step="0.1" value="2" />
+    </div>
+    <div class="row-full">
+      <label>FOV</label>
+      <input type="range" id="camFov" min="10" max="120" step="1" value="40" />
+    </div>
+    <div class="row-full">
+      <label>Look At Y</label>
+      <input type="range" id="camLookY" min="-10" max="20" step="0.1" value="3" />
+    </div>
+
+    <h2>Animation</h2>
+    <div class="row-full">
+      <label>Scrub</label>
+      <input type="range" id="animTime" min="0" max="0.25" step="0.001" value="0" />
+    </div>
+    <div style="display:flex;gap:6px">
+      <button id="btnPlay">Play</button>
+      <button id="btnReset">Reset</button>
+    </div>
+
+    <h2>Export</h2>
+    <button id="btnExport" class="primary">Copy JSON to Clipboard</button>
+    <div id="output"></div>
+  </div>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

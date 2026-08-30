@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { DM_Mono, Manrope, Playfair_Display } from 'next/font/google'
 import { CanvasHost } from '@/components/r3f/CanvasHost'
+import { VantaBackground } from '@/components/r3f/VantaBackground'
 import { Header } from '@/components/site/Header'
 import { ScrollProvider } from '@/lib/ScrollProvider'
 import './globals.css'
@@ -52,6 +53,7 @@ export default function RootLayout({
         <ScrollProvider>
           {/* Mounted once, above the routes, and never unmounted on navigation
               — a remount would drop the WebGL context and flash white. */}
+          <VantaBackground />
           <CanvasHost />
           <Header />
           {/* pointer-events-none is load-bearing: on the home route this element
