@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import Link from 'next/link'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, useAnimationFrame } from 'framer-motion'
 import { CARDS } from '@/lib/cards'
 import { useScrollSnapshot } from '@/lib/useScrollSnapshot'
 import { TextGenerateEffect } from './TextGenerateEffect'
@@ -77,9 +77,9 @@ export function CardOverlays() {
 
             {/* ── Video panel: always at the far edge ──────────── */}
             <motion.div
-              initial={{ opacity: 0, x: textOnLeft ? 60 : -60, rotateY: textOnLeft ? -10 : 10 }}
-              animate={{ opacity: 1, x: 0, rotateY: 0 }}
-              exit={{ opacity: 0, x: textOnLeft ? 40 : -40, rotateY: textOnLeft ? 6 : -6 }}
+              initial={{ opacity: 0, x: textOnLeft ? 60 : -60 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: textOnLeft ? 40 : -40 }}
               transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
               className="absolute top-1/2 -translate-y-1/2"
               style={{
@@ -98,6 +98,52 @@ export function CardOverlays() {
   )
 }
 
+// ── Chaos border lines ─────────────────────────────────────────────────────
+
+function ChaosBorder({ color }: { color: string }) {
+  const line1Ref = useRef<HTMLDivElement>(null)
+  const line2Ref = useRef<HTMLDivElement>(null)
+  const offset = 6
+  const range = 0.5
+
+  useAnimationFrame((time) => {
+    const t = time / 1000
+    if (line1Ref.current) {
+      line1Ref.current.style.transform =
+        `translate(${Math.sin(t * 1.3) * range}px, ${Math.cos(t * 0.9) * range}px) rotate(${Math.sin(t * 0.7) * 0.15}deg)`
+    }
+    if (line2Ref.current) {
+      line2Ref.current.style.transform =
+        `translate(${Math.cos(t * 1.5) * range}px, ${Math.sin(t * 1.1) * range}px) rotate(${Math.cos(t * 0.8) * 0.15}deg)`
+    }
+  })
+
+  return (
+    <>
+      <div
+        ref={line1Ref}
+        className="pointer-events-none absolute"
+        style={{
+          inset: `-${offset}px`,
+          border: `1px solid ${color}88`,
+          borderRadius: '12px',
+          zIndex: 1,
+        }}
+      />
+      <div
+        ref={line2Ref}
+        className="pointer-events-none absolute"
+        style={{
+          inset: `-${offset + 4}px`,
+          border: `1px solid ${color}55`,
+          borderRadius: '14px',
+          zIndex: 1,
+        }}
+      />
+    </>
+  )
+}
+
 // ── Video thumbnail sub-component ─────────────────────────────────────────
 
 function VideoThumbnail({
@@ -110,6 +156,11 @@ function VideoThumbnail({
   const [hovered, setHovered] = useState(false)
   const href = card.videoUrl || card.route
 
+  // Both sides use the same rotateY sign. scaleX(-1) on the <a> element
+  // flips left-side thumbnails visually, reversing the tilt direction.
+  const tiltY = -6
+  const tiltYHover = -10
+
   return (
     <a
       href={href}
@@ -121,26 +172,39 @@ function VideoThumbnail({
       aria-label={`Play ${card.title} video`}
       style={mirror ? { transform: 'scaleX(-1)' } : undefined}
     >
-      {/* 3D frame */}
+      {/* 3D frame — no overflow-hidden so chaos borders can extend outside */}
       <div
-        className="relative overflow-hidden rounded-xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+        className="relative rounded-xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
         style={{
           transform: hovered
-            ? 'perspective(1200px) rotateY(-4deg) rotateX(2deg) scale(1.03)'
-            : 'perspective(1200px) rotateY(-2deg) rotateX(1deg) scale(1)',
+            ? `rotateY(${tiltYHover}deg) rotateX(3deg) scale(1.04)`
+            : `rotateY(${tiltY}deg) rotateX(1.5deg) scale(1)`,
           boxShadow: hovered
-            ? `0 0 50px ${card.tint[0]}40, 0 35px 90px rgba(0,0,0,0.7)`
-            : `0 0 25px ${card.tint[0]}20, 0 20px 60px rgba(0,0,0,0.55)`,
+            ? `0 0 60px ${card.tint[0]}55, 0 0 120px ${card.tint[0]}25, 0 35px 90px rgba(0,0,0,0.7)`
+            : `0 0 30px ${card.tint[0]}30, 0 20px 60px rgba(0,0,0,0.55)`,
         }}
       >
+        {/* Glossy highlight overlay */}
+        <div
+          className="pointer-events-none absolute inset-0 rounded-xl transition-opacity duration-500"
+          style={{
+            background: `linear-gradient(135deg, ${card.tint[0]}30 0%, transparent 45%, ${card.tint[0]}18 100%)`,
+            opacity: hovered ? 1 : 0.6,
+          }}
+        />
+
         {/* Glow border */}
         <div
           className="pointer-events-none absolute inset-0 rounded-xl transition-opacity duration-500"
           style={{
-            border: `1px solid ${card.tint[0]}55`,
-            opacity: hovered ? 1 : 0.4,
+            border: `1px solid ${card.tint[0]}66`,
+            opacity: hovered ? 1 : 0.5,
           }}
         />
+
+        {/* Chaos border lines — positioned absolute with negative inset,
+            visible because the parent has no overflow-hidden */}
+        <ChaosBorder color={card.tint[0]} />
 
         {/* Thumbnail — 16:9 */}
         <div

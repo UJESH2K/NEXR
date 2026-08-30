@@ -48,6 +48,7 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${manrope.variable} ${dmMono.variable} ${playfair.variable}`}
+      suppressHydrationWarning
     >
       <body>
         <ScrollProvider>

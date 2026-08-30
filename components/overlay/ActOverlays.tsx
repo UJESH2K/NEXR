@@ -65,10 +65,7 @@ export function ActOverlays() {
             transition={TRANSITION}
             className="absolute top-[8svh] left-1/2 -translate-x-1/2 text-center"
           >
-            <p className="eyebrow text-lime">Different ways in</p>
-            <p className="mt-2 font-display text-xl text-bone/70 md:text-2xl">
-              One way forward.
-            </p>
+            
           </motion.div>
         ) : (
           <motion.div
