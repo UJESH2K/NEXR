@@ -1,35 +1,35 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
-/**
- * Vanta.js TRUNK background. Loads p5 + TRUNK dynamically on mount
- * (both are browser-only). Cleans up on unmount.
- */
+function loadScript(src: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${src}"]`)) { resolve(); return }
+    const s = document.createElement('script')
+    s.src = src
+    s.onload = () => resolve()
+    s.onerror = reject
+    document.head.appendChild(s)
+  })
+}
+
 export function VantaBackground() {
   const containerRef = useRef<HTMLDivElement>(null)
   const effectRef = useRef<any>(null)
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => { setReady(true) }, [])
 
   useEffect(() => {
+    if (!ready || !containerRef.current) return
     let cancelled = false
 
     const init = async () => {
-      if (!containerRef.current) return
-
-      // Dynamic imports — p5 and vanta are browser-only.
-      const [{ default: p5 }, trunkModule] = await Promise.all([
-        import('p5'),
-        import('vanta/src/vanta.trunk.js'),
-      ])
-
-      const TRUNK = trunkModule.default || trunkModule
-
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js')
+      const vantaSrc = (await import('vanta/src/vanta.trunk.js')).default
       if (cancelled || !containerRef.current) return
 
-      // TRUNK expects `window.p5` to exist.
-      ;(window as any).p5 = p5
-
-      effectRef.current = TRUNK({
+      effectRef.current = vantaSrc({
         el: containerRef.current,
         mouseControls: true,
         touchControls: true,
@@ -39,9 +39,9 @@ export function VantaBackground() {
         scale: 1.0,
         scaleMobile: 1.0,
         color: 0xe00c4f,
-        backgroundColor: 0x312e31,
-        spacing: 10.0,
-        chaos: 0.5,
+        backgroundColor: 0x000000,
+        spacing: 0.0,
+        chaos: 1.0,
       })
     }
 
@@ -49,12 +49,12 @@ export function VantaBackground() {
 
     return () => {
       cancelled = true
-      if (effectRef.current) {
-        effectRef.current.destroy()
-        effectRef.current = null
-      }
+      effectRef.current?.destroy()
+      effectRef.current = null
     }
-  }, [])
+  }, [ready])
+
+  if (!ready) return <div style={{ position: 'fixed', inset: 0, zIndex: 0, background: '#000000' }} />
 
   return (
     <div

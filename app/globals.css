@@ -33,7 +33,7 @@
 
   body {
     margin: 0;
-    background: var(--color-void);
+    background: #000000;
     color: var(--color-bone);
     font-family: var(--font-sans);
     font-synthesis: none;

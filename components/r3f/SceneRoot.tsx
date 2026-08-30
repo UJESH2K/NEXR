@@ -27,13 +27,13 @@ export default function SceneRoot() {
   }, [pathname])
 
   return (
-    <div className="fixed inset-0 z-0 bg-void" aria-hidden="true">
+    <div className="fixed inset-0 z-[1]" aria-hidden="true">
       <Canvas
         frameloop={rendering ? 'always' : 'never'}
         dpr={[1, 2]}
-        gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
+        gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
         camera={{ position: [0, 2, 80], fov: 43, near: 0.1, far: 500 }}
-        onCreated={({ gl }) => gl.setClearColor('#000000', 1)}
+        onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
       >
         <Lighting />
         <CameraRig reduced={reduced} />
