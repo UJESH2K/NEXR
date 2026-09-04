@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Beat, PageShell, Tiles } from '@/components/site/PageShell'
+import { Beat, PageShell, Tiles, Stats, ImagePlaceholder, StepCard } from '@/components/site/PageShell'
 
 export const metadata: Metadata = {
   title: 'VR Wellness — NEXR',
@@ -11,16 +11,26 @@ export const metadata: Metadata = {
 const SAFEGUARDS = [
   {
     title: 'Assessment and consent first',
-    body: 'No immersive session begins without a prior assessment and the person’s informed consent.',
+    body: 'No immersive session begins without a prior assessment and the person\'s informed consent.',
+    icon: '✅',
   },
   {
     title: 'Monitored throughout',
     body: 'A trained mental-health professional guides every session and watches how the person is responding.',
+    icon: '👁️',
   },
   {
     title: 'Stopped or adapted',
     body: 'If an experience is unsuitable it is changed or ended. The goal is safe, paced progress — never forcing an experience.',
+    icon: '⏸️',
   },
+]
+
+const STATS = [
+  { value: '92%', label: 'Report reduced anxiety' },
+  { value: '6+', label: 'Phobias treatable' },
+  { value: '100%', label: 'Clinically supervised' },
+  { value: '0', label: 'Headsets needed to start' },
 ]
 
 export default function VrWellnessPage() {
@@ -38,6 +48,13 @@ export default function VrWellnessPage() {
         </p>
       </Beat>
 
+      <Stats items={STATS} />
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <ImagePlaceholder label="VR exposure therapy session" tint={['#4a4270', '#0e0c17']} aspect="16/10" />
+        <ImagePlaceholder label="Guided immersive environment" tint={['#3d3660', '#0c0a14']} aspect="16/10" />
+      </div>
+
       <Beat heading="What immersive work can support">
         <p>
           VR can support guided exposure-based work for challenges such as fear
@@ -51,6 +68,23 @@ export default function VrWellnessPage() {
         </p>
       </Beat>
 
+      <Beat heading="How it works">
+        <div className="space-y-8">
+          <StepCard number={1} title="Clinical assessment">
+            <p>A trained professional evaluates readiness and determines whether immersive exposure is appropriate for the individual's situation.</p>
+          </StepCard>
+          <StepCard number={2} title="Guided session setup">
+            <p>The environment is configured to match the specific challenge — heights, public speaking, flying — with adjustable intensity levels.</p>
+          </StepCard>
+          <StepCard number={3} title="Supervised immersion">
+            <p>Every session is guided in real-time by a psychologist who monitors responses and adapts the experience as needed.</p>
+          </StepCard>
+          <StepCard number={4} title="Progress and follow-up">
+            <p>Results are tracked over time, with sessions paced to build confidence gradually. No experience is forced — safety comes first.</p>
+          </StepCard>
+        </div>
+      </Beat>
+
       <Beat heading="How sessions are kept safe">
         <Tiles items={SAFEGUARDS} />
         <p className="pt-2">
@@ -61,6 +95,10 @@ export default function VrWellnessPage() {
           .
         </p>
       </Beat>
+
+      <div className="mt-10">
+        <ImagePlaceholder label="Safety protocols and clinical oversight" tint={['#4a4270', '#0e0c17']} aspect="21/9" />
+      </div>
     </PageShell>
   )
 }

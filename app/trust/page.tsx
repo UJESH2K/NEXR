@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Beat, PageShell, Tiles } from '@/components/site/PageShell'
+import { Beat, PageShell, Tiles, Stats, ImagePlaceholder } from '@/components/site/PageShell'
 
 export const metadata: Metadata = {
   title: 'Trust Centre — NEXR',
@@ -11,15 +11,25 @@ const CREDIBILITY = [
   {
     title: 'Developed with mental health professionals',
     body: 'The team includes experienced psychologists and mental-health professionals, with workplace insight from HR leadership.',
+    icon: '🏥',
   },
   {
     title: 'Tested in clinical practice',
     body: 'The approaches use established psychological practices and have been used in hospital contexts, including Spandan Hospital.',
+    icon: '🔬',
   },
   {
     title: 'Designed for modern workplaces',
     body: 'Built for engagement, burnout, retention and psychological safety — not as another generic EAP or meditation product.',
+    icon: '🏢',
   },
+]
+
+const STATS = [
+  { value: '15+', label: 'Years clinical research' },
+  { value: '100%', label: 'Professional-led' },
+  { value: '0', label: 'Data sold to third parties' },
+  { value: 'HIPAA', label: 'Compliant framework' },
 ]
 
 export default function TrustPage() {
@@ -33,12 +43,20 @@ export default function TrustPage() {
         <Tiles items={CREDIBILITY} />
       </Beat>
 
+      <Stats items={STATS} />
+
+      <div className="grid gap-6 lg:grid-cols-3">
+        <ImagePlaceholder label="Clinical team" tint={['#1f3a3a', '#080e0e']} aspect="1/1" />
+        <ImagePlaceholder label="Hospital partnership" tint={['#1a3333', '#060b0b']} aspect="1/1" />
+        <ImagePlaceholder label="Research publications" tint={['#243f3f', '#0a1111']} aspect="1/1" />
+      </div>
+
       <Beat heading="Clinical and safety basis">
         <p>
           Sessions are handled by trained psychologists and mental-health
           professionals able to identify and respond to serious situations
           through appropriate clinical protocols. The psychologist responds as
-          they would in a physical clinic — while the person’s identity remains
+          they would in a physical clinic — while the person's identity remains
           protected from their employer.
         </p>
         <p>
@@ -56,6 +74,10 @@ export default function TrustPage() {
           the individual and their psychologist.
         </p>
       </Beat>
+
+      <div className="mt-10">
+        <ImagePlaceholder label="Privacy and anonymity architecture" tint={['#1f3a3a', '#080e0e']} aspect="21/9" />
+      </div>
 
       <Beat heading="Why not an existing therapy app">
         <p>

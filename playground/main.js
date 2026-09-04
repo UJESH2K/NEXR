@@ -39,7 +39,7 @@ let modelRoot = null
 // ── Load model ─────────────────────────────────────────────────────────────
 const loader = new GLTFLoader()
 loader.load(
-  '/models/girl.glb',
+  '/models/final-character.glb',
   (gltf) => {
     modelRoot = new THREE.Group()
     modelRoot.add(gltf.scene)

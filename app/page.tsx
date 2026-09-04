@@ -1,47 +1,46 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { ActOverlays } from '@/components/overlay/ActOverlays'
-import { CardOverlays } from '@/components/overlay/CardOverlays'
-import { FallingText } from '@/components/overlay/FallingText'
 import { HomeScrollDriver } from '@/components/overlay/HomeScrollDriver'
-import { ScrollHud } from '@/components/overlay/ScrollHud'
+import { IdleHints } from '@/components/overlay/IdleHints'
+import { PanelDetail } from '@/components/overlay/PanelDetail'
+import { SceneHud } from '@/components/overlay/SceneHud'
+import { StoryOverlay } from '@/components/overlay/StoryOverlay'
+import { Preloader } from '@/components/site/Preloader'
 import { StaticHome } from '@/components/site/StaticHome'
+import { useAmbience } from '@/lib/useAmbience'
 import { useReducedMotion } from '@/lib/useReducedMotion'
 import { useWebGLSupport } from '@/lib/useWebGLSupport'
 
-/**
- * Home is the 3D scene. FallingText replaces ScatterText — physics-driven
- * words on the right that vanish as the user scrolls into act 1.
- */
 export default function HomePage() {
   const reduced = useReducedMotion()
   const webgl = useWebGLSupport()
+  const ambience = useAmbience()
 
-  // Fade progress for FallingText: 0 = fully visible, 1 = gone
-  const [fade, setFade] = useState(0)
-
-  useEffect(() => {
-    const onScroll = () => {
-      const vh = window.innerHeight
-      const scrollY = window.scrollY
-      // Start fading after 20% of viewport scroll, fully gone at 60%
-      const progress = Math.min(Math.max((scrollY - vh * 0.2) / (vh * 0.4), 0), 1)
-      setFade(progress)
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
-  if (reduced || webgl !== true) return <StaticHome />
+  // `null` means the WebGL probe has not run yet — it needs an effect, so it is
+  // never resolved on the very first render. Committing to the DOM fallback
+  // during that window is what used to make the old static page flash on every
+  // refresh before the scene took over. Rendering nothing but the curtain is
+  // the fix: the curtain is opaque, so the decision happens out of sight.
+  const immersive = webgl === true && !reduced
 
   return (
     <>
-      <HomeScrollDriver />
-      <FallingText fadeProgress={fade} />
-      <ActOverlays />
-      <CardOverlays />
-      <ScrollHud />
+      {/* Always mounted, and always the first child: keeping it in the same
+          position across both branches means the probe resolving does not
+          unmount and restart the curtain halfway through its own count. */}
+      <Preloader waitForAssets={immersive} />
+
+      {webgl === null ? null : !immersive ? (
+        <StaticHome />
+      ) : (
+        <>
+          <HomeScrollDriver />
+          <StoryOverlay />
+          <IdleHints />
+          <SceneHud audioOn={ambience.on} onToggleAudio={ambience.toggle} />
+          <PanelDetail />
+        </>
+      )}
     </>
   )
 }

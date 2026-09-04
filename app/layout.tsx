@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from 'next'
 import { DM_Mono, Manrope, Playfair_Display } from 'next/font/google'
 import { CanvasHost } from '@/components/r3f/CanvasHost'
-import { VantaBackground } from '@/components/r3f/VantaBackground'
+import { CursorFollower } from '@/components/ui/cursor-follower'
 import { Header } from '@/components/site/Header'
+import { SkipLink } from '@/components/site/SkipLink'
+import { SiteGuide } from '@/components/site/SiteGuide'
 import { ScrollProvider } from '@/lib/ScrollProvider'
 import './globals.css'
 
@@ -35,7 +37,7 @@ export const metadata: Metadata = {
 
 // themeColor lives here rather than in metadata — Next moved it in v14.
 export const viewport: Viewport = {
-  themeColor: '#000000',
+  themeColor: '#12180f',
   colorScheme: 'dark',
 }
 
@@ -50,18 +52,42 @@ export default function RootLayout({
       className={`${manrope.variable} ${dmMono.variable} ${playfair.variable}`}
       suppressHydrationWarning
     >
+      {/* The background here matters: it is what fills the frame between the
+          first byte and React mounting, and it matches the load curtain so that
+          gap reads as part of the design rather than as a flash. */}
       <body>
+        {/*
+          Runs before anything else on the page, and it has to.
+
+          Browsers restore the previous scroll offset on reload, and this page
+          is eighteen viewports tall — so a refresh taken anywhere past the
+          opening frame reopened the site midway through a beat, with the held
+          intro and its Explore control already scrolled away. Lenis cannot
+          prevent that: restoration happens around the load event, well after
+          React has mounted, so anything done in an effect is racing it.
+
+          Opting out has to be synchronous and early, which means an inline
+          script rather than a component. The scrollTo covers the case where the
+          browser had already moved before this line ran.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{history.scrollRestoration='manual'}catch(e){}window.scrollTo(0,0)",
+          }}
+        />
+        <SkipLink />
+        <CursorFollower />
         <ScrollProvider>
-          {/* Mounted once, above the routes, and never unmounted on navigation
-              — a remount would drop the WebGL context and flash white. */}
-          <VantaBackground />
           <CanvasHost />
           <Header />
+          <SiteGuide />
           {/* pointer-events-none is load-bearing: on the home route this element
               stretches over the whole canvas, and with default hit testing it
-              would swallow every click aimed at a 3D card. Content that wants
+              would swallow every click aimed at a 3D panel. Content that wants
               clicks opts back in (PageShell, StaticHome, overlay links). */}
           <main
+            id="main"
             className="relative pointer-events-none"
             style={{ zIndex: 'var(--z-page)' }}
           >

@@ -17,12 +17,16 @@
   --font-mono: var(--font-dm-mono), ui-monospace, monospace;
   --font-display: var(--font-playfair), Georgia, serif;
 
-  /* Stacking contract: canvas sits at the bottom, DOM overlays above it,
-     route content above that, chrome on top. */
+  /* Stacking contract, bottom to top: the canvas, the DOM overlays drawn on
+     it, route content, fixed chrome, the expanded sheet, the load curtain, and
+     the cursor above everything because it must never be occluded. */
   --z-canvas: 0;
   --z-overlay: 10;
   --z-page: 20;
   --z-chrome: 30;
+  --z-sheet: 45;
+  --z-curtain: 60;
+  --z-cursor: 90;
 }
 
 @layer base {
@@ -33,7 +37,9 @@
 
   body {
     margin: 0;
-    background: #000000;
+    /* Matches the load curtain, so the pre-hydration frame is the same colour
+       as the first thing the visitor actually sees. */
+    background: #12180f;
     color: var(--color-bone);
     font-family: var(--font-sans);
     font-synthesis: none;
@@ -44,6 +50,28 @@
   a {
     color: inherit;
     text-decoration: none;
+  }
+
+  /* The custom cursor only runs on devices with a real pointer, so the native
+     one is only hidden there. Hiding it unconditionally left hybrid devices
+     with no cursor at all when the follower bailed out. */
+  @media (pointer: fine) {
+    body,
+    body * {
+      cursor: none;
+    }
+  }
+
+  /* Focus must stay visible even with the cursor hidden — it is the only
+     affordance a keyboard user has. */
+  :focus-visible {
+    outline: 2px solid var(--color-lime);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: var(--color-lime);
+    color: var(--color-ink);
   }
 
   /* Lenis requirement: without this the wheel handler and the native
@@ -185,5 +213,318 @@
 @media (max-height: 680px) {
   .scatter-shard {
     display: none;
+  }
+}
+
+/* ── GSAP animation helpers ────────────────────────────────────────────── */
+
+/* Smooth will-change hints for GSAP-animated elements */
+[data-route-beat],
+[data-static-card],
+[data-beat-item] {
+  will-change: transform, opacity;
+}
+
+/* Hover glow effect on interactive cards */
+.glow-hover {
+  position: relative;
+}
+.glow-hover::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(216, 243, 93, 0.06), transparent 40%);
+  pointer-events: none;
+}
+.glow-hover:hover::after {
+  opacity: 1;
+}
+
+/* Decorative separator line */
+.divider-glow {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(216, 243, 93, 0.3), transparent);
+}
+
+
+/* ── load curtain ──────────────────────────────────────────────────────── */
+
+/* A slow drifting wash behind the curtain copy. Two offset radial gradients on
+   one element, so it costs a single composited layer rather than an animation
+   per blob. */
+.preloader-wash {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(38% 42% at 30% 35%, rgba(216, 243, 93, 0.10), transparent 70%),
+    radial-gradient(42% 46% at 72% 68%, rgba(122, 168, 132, 0.14), transparent 72%);
+  filter: blur(30px);
+  animation: wash 14s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes wash {
+  from { transform: translate3d(-3%, -2%, 0) scale(1); }
+  to   { transform: translate3d(3%, 2%, 0) scale(1.08); }
+}
+
+/* ── HUD ───────────────────────────────────────────────────────────────── */
+
+/* The three bars in the sound toggle. Height rather than scaleY so each bar
+   stays anchored to the baseline the others sit on. */
+.sound-bar {
+  animation: sound-bar 1.05s ease-in-out infinite alternate;
+}
+
+@keyframes sound-bar {
+  from { height: 3px; }
+  to   { height: 13px; }
+}
+
+/* The scroll hint's travelling tick. */
+.scroll-hint {
+  transform-origin: top;
+  animation: scroll-hint 1.9s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+@keyframes scroll-hint {
+  0%   { transform: scaleY(0); opacity: 0; }
+  35%  { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(1) translateY(100%); opacity: 0; }
+}
+
+/* ── accessibility ─────────────────────────────────────────────────────── */
+
+.skip-link {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -120%);
+  z-index: var(--z-cursor);
+  padding: 12px 20px;
+  background: var(--color-lime);
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transition: transform 0.25s ease;
+}
+
+.skip-link:focus-visible {
+  transform: translate(-50%, 0);
+}
+
+/* Reduced motion gets the DOM home page rather than the scene, but the curtain
+   and the HUD still render, so their looping animations have to stop too. */
+@media (prefers-reduced-motion: reduce) {
+  .preloader-wash,
+  .sound-bar,
+  .scroll-hint {
+    animation: none !important;
+  }
+}
+
+/* ── keeping the character clear ────────────────────────────────────────── */
+
+/*
+ * The figure is the subject, and nothing is allowed to cross it. Its size on
+ * screen is not a design choice, it is geometry, so the clearance can be
+ * derived rather than guessed:
+ *
+ *   - the camera sits 80 world units back with a 43° vertical field of view,
+ *     so half the viewport height maps to 80 · tan(21.5°) = 31.5 world units;
+ *   - the model measures 20.4 units across at its widest pose, so its half
+ *     width is 10.2 / 31.5 = 0.324 of half the viewport height;
+ *   - that is 16.2vh wide in total, centred — call it ±8.1vh from the middle.
+ *
+ * --char-half carries that number, with a margin folded in. Every flanking
+ * column sizes itself from it, so the clearance survives any window shape and
+ * there is no breakpoint to keep in sync. If the camera distance or field of
+ * view in CameraRig changes, this is the one value to recompute.
+ */
+:root {
+  --char-half: 11vh;
+  --gutter: clamp(20px, 3vw, 72px);
+}
+
+.story-col {
+  width: min(28rem, calc(50vw - var(--char-half) - var(--gutter) - 1.5rem));
+}
+
+/*
+ * Below this the figure and two side columns cannot all fit, so the copy drops
+ * to a full-width block along the bottom. CameraRig pushes the camera back and
+ * lifts the framing on narrow viewports to open that space up, which is what
+ * keeps the block clear of the figure rather than merely beside it.
+ */
+@media (max-width: 1023px) {
+  .story-col {
+    position: absolute;
+    inset-inline: var(--gutter);
+    top: auto;
+    /* Low enough to clear the lifted figure. CameraRig drops the look target by
+       up to 10 world units on narrow viewports, which puts the base of the rock
+       at roughly 70% of the frame height — this block starts just below it. */
+    bottom: 9vh;
+    width: auto;
+    max-width: 34rem;
+    transform: none;
+  }
+}
+
+/* ── buttons ───────────────────────────────────────────────────────────── */
+
+/*
+ * One primary button, shared by Explore, the header's call to action and the
+ * expanded panel.
+ *
+ * The palette is taken straight off the opening frame rather than invented: the
+ * fill is the room's own deep green (#1b2419, the sky's zenith) over the horizon
+ * green, and the border is a desaturated sage lifted from the lit side of that
+ * gradient. A white border sat on top of the scene like a sticker; these sit in
+ * it. Hover goes *darker* and picks up the lime, which is the one accent the
+ * rest of the page already uses, so the control recedes into the room as it
+ * lights up rather than flashing white.
+ *
+ * Fully rounded, because every other edge in the layout is a hard rule — the
+ * pill is what separates "this is a control" from "this is a panel".
+ */
+.btn-primary {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem 1.6rem;
+  overflow: hidden;
+  border: 1px solid rgb(190 209 168 / 0.34);
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgb(63 79 56 / 0.5), rgb(27 36 25 / 0.62));
+  color: var(--color-bone);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  backdrop-filter: blur(6px);
+  box-shadow: inset 0 1px 0 rgb(232 229 218 / 0.08);
+  transition:
+    background 0.45s ease,
+    border-color 0.45s ease,
+    color 0.45s ease,
+    box-shadow 0.45s ease;
+}
+
+.btn-primary:hover {
+  border-color: rgb(216 243 93 / 0.55);
+  background:
+    linear-gradient(180deg, rgb(37 52 42 / 0.92), rgb(15 22 15 / 0.95));
+  color: var(--color-lime);
+  box-shadow:
+    inset 0 1px 0 rgb(232 229 218 / 0.1),
+    0 10px 34px rgb(9 14 9 / 0.5);
+}
+
+/* No transform in the hover state, deliberately: the Explore button's magnet
+   writes `transform` inline, and a CSS lift would simply be overridden. */
+.explore-button {
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.45s ease,
+    border-color 0.45s ease,
+    color 0.45s ease,
+    box-shadow 0.45s ease;
+}
+
+/* Light crossing the button while the hints are up. */
+.explore-sheen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgb(216 243 93 / 0.22) 50%,
+    transparent 80%
+  );
+  animation: explore-sheen 3s ease-in-out infinite;
+}
+
+@keyframes explore-sheen {
+  0% { transform: translateX(-130%); }
+  55%, 100% { transform: translateX(130%); }
+}
+
+/* ── idle annotations ──────────────────────────────────────────────────── */
+
+/*
+ * The hand-drawn arrows.
+ *
+ * Both paths carry a dash the length of the path itself, so animating the
+ * offset traces them as if by hand. The head is held back until the line is
+ * nearly finished, which is what makes the two shapes read as one gesture
+ * instead of two elements arriving at once. Then the whole thing fades and
+ * redraws, so it keeps signalling without ever sitting still and becoming
+ * furniture.
+ */
+.doodle .doodle-line {
+  stroke-dasharray: 130;
+  stroke-dashoffset: 130;
+  animation: doodle-draw 3.6s ease-in-out infinite;
+}
+
+@keyframes doodle-draw {
+  0% { stroke-dashoffset: 130; opacity: 0; }
+  12% { opacity: 1; }
+  48%, 84% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+.doodle .doodle-head {
+  stroke-dasharray: 34;
+  stroke-dashoffset: 34;
+  animation: doodle-head 3.6s ease-in-out infinite;
+}
+
+@keyframes doodle-head {
+  0%, 40% { stroke-dashoffset: 34; opacity: 0; }
+  56%, 84% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+/* A slow drift on the whole annotation, so it reads as a held gesture rather
+   than a fixed label. */
+.hint-float {
+  animation: hint-float 3.4s ease-in-out infinite;
+}
+
+@keyframes hint-float {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-4px, 2px); }
+}
+
+.hint-label {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1;
+  color: rgb(216 243 93 / 0.85);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .explore-sheen {
+    display: none;
+  }
+  .hint-float,
+  .doodle .doodle-line,
+  .doodle .doodle-head {
+    animation: none !important;
+    stroke-dashoffset: 0 !important;
+    opacity: 1 !important;
   }
 }

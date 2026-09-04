@@ -19,5 +19,5 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "src", "tessst", "dist", "vite.config.ts", "particles-archive"]
+  "exclude": ["node_modules", "src", "tessst", "dist", "vite.config.ts", "particles-archive", "components/ui/ShaderBackground.tsx"]
 }

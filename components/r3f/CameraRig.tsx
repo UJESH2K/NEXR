@@ -2,76 +2,114 @@
 
 import { useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import { MathUtils, type PerspectiveCamera } from 'three'
-import { ACT, easeInOutCubic, lerp, remap, scroll } from '@/lib/scrollStore'
+import { MathUtils, Vector3, type PerspectiveCamera } from 'three'
+import { SECTION_COUNT } from '@/lib/sections'
+import { damp, scroll } from '@/lib/scrollStore'
 
-/** Camera look-at Y. Character sits at Y=-14; camera at Y=2, lookAt Y=3
- *  puts the character's upper body in the lower-centre of the frame. */
+/** World-space point the camera holds in frame: the character's upper chest. */
 export const LOOK_Y = 3
 
-const SMOOTHING = 4
+/** Rest pose. Everything below is expressed as an offset from these. */
+const BASE_RADIUS = 80
+const BASE_HEIGHT = 2
+const BASE_FOV = 43
 
-type Pose = { radius: number; height: number; fov: number }
+/**
+ * Total azimuth swept across the page, in radians. Small on purpose — this is
+ * the camera drifting around a figure that is standing still, not an orbit.
+ * Push it past ~0.5 and the panels authored for the front of the room start
+ * sliding out of frame.
+ */
+const SWEEP = 0.34
 
-function poseFor(progress: number): Pose {
-  if (progress < ACT.distantEnd) {
-    return { radius: 80, height: 2, fov: 43 }
-  }
+/** How far the pointer can push the camera off its rail. */
+const PARALLAX_X = 3.4
+const PARALLAX_Y = 2.2
 
-  if (progress < ACT.approachEnd) {
-    const t = easeInOutCubic(remap(progress, ACT.distantEnd, ACT.approachEnd))
-    return {
-      radius: 80,
-      height: 2,
-      fov: lerp(43, 33, t),
-    }
-  }
+const _look = new Vector3()
 
-  if (progress < ACT.orbitEnd) {
-    return { radius: 80, height: 2, fov: 33 }
-  }
-
-  const t = easeInOutCubic(remap(progress, ACT.orbitEnd, 1))
-  return {
-    radius: lerp(80, 100, t),
-    height: lerp(2, 3, t),
-    fov: lerp(33, 38, t),
-  }
-}
-
+/**
+ * The camera.
+ *
+ * Three motions are layered and each answers a different question:
+ *   - scroll drives a slow arc and a dolly, so progress through the page is
+ *     legible as movement through space;
+ *   - a per-section push-in tightens the frame during each dwell and releases
+ *     it during the travel, which gives the beats a breath;
+ *   - the pointer adds parallax, which is the whole reason a still frame here
+ *     still feels alive.
+ *
+ * All three are damped rather than assigned, so a fast scroll or a flicked
+ * mouse eases rather than snaps.
+ */
 export function CameraRig({ reduced = false }: { reduced?: boolean }) {
-  const camera = useThree((state) => state.camera) as PerspectiveCamera
-  const pose = useRef<Pose>({ radius: 80, height: 2, fov: 43 })
-  const primed = useRef(false)
+  const camera = useThree((s) => s.camera) as PerspectiveCamera
+  const state = useRef({
+    azimuth: 0,
+    radius: BASE_RADIUS,
+    height: BASE_HEIGHT,
+    fov: BASE_FOV,
+    px: 0,
+    py: 0,
+  })
 
   useFrame((_, delta) => {
-    const target = reduced
-      ? { radius: 80, height: 2, fov: 43 }
-      : poseFor(scroll.homeProgress)
+    const dt = Math.min(delta, 0.1)
+    const cur = state.current
+    const p = scroll.homeProgress
 
-    const current = pose.current
+    // Dwell is high in the middle of a section and drops to zero on the
+    // boundaries, so the push-in peaks exactly where the copy is readable.
+    const within = scroll.sectionFloat - Math.floor(scroll.sectionFloat)
+    const dwell = Math.sin(Math.min(within / 0.55, 1) * Math.PI * 0.5) *
+      (1 - Math.max(0, (within - 0.62) / 0.38))
 
-    if (!primed.current) {
-      Object.assign(current, target)
-      primed.current = true
-    }
+    // On a narrow window the figure eats the frame, leaving no room beside it
+    // for a card or a column of copy. Backing the camera off shrinks it, and
+    // lowering the look target lifts it in frame, which is what opens the strip
+    // along the bottom that the stacked mobile layout uses.
+    const narrow = MathUtils.clamp((1.5 - camera.aspect) / 0.7, 0, 1)
+    const fit = 1 + narrow * 0.42
 
-    current.radius = MathUtils.damp(current.radius, target.radius, SMOOTHING, delta)
-    current.height = MathUtils.damp(current.height, target.height, SMOOTHING, delta)
-    current.fov = MathUtils.damp(current.fov, target.fov, SMOOTHING, delta)
+    const azimuthTarget = reduced ? 0 : Math.sin(p * Math.PI) * SWEEP
+    const radiusTarget =
+      (reduced ? BASE_RADIUS : BASE_RADIUS - dwell * 7 - Math.sin(p * Math.PI * 2) * 3) *
+      fit
+    const heightTarget = reduced ? BASE_HEIGHT : BASE_HEIGHT + p * 4.5
+    const fovTarget = reduced ? BASE_FOV : BASE_FOV - dwell * 1.6
 
-    camera.position.set(0, current.height, current.radius)
-    camera.lookAt(0, LOOK_Y, 0)
+    cur.azimuth = damp(cur.azimuth, azimuthTarget, 2.2, dt)
+    cur.radius = damp(cur.radius, radiusTarget, 2.4, dt)
+    cur.height = damp(cur.height, heightTarget, 2.4, dt)
+    cur.fov = damp(cur.fov, fovTarget, 3, dt)
 
-    if (Math.abs(camera.fov - current.fov) > 0.001) {
-      camera.fov = current.fov
+    cur.px = damp(cur.px, reduced ? 0 : scroll.pointerX * PARALLAX_X, 3, dt)
+    cur.py = damp(cur.py, reduced ? 0 : -scroll.pointerY * PARALLAX_Y, 3, dt)
+
+    camera.position.set(
+      Math.sin(cur.azimuth) * cur.radius + cur.px,
+      cur.height + cur.py,
+      Math.cos(cur.azimuth) * cur.radius,
+    )
+
+    // The look target trails the pointer by a fraction of the camera's own
+    // shift. Matching it exactly would cancel the parallax out entirely.
+    _look.set(cur.px * 0.35, LOOK_Y - narrow * 10 + cur.py * 0.3, 0)
+    camera.lookAt(_look)
+
+    if (Math.abs(camera.fov - cur.fov) > 0.001) {
+      camera.fov = cur.fov
       camera.updateProjectionMatrix()
     }
 
-    scroll.camAzimuth = 0
-    scroll.camRadius = current.radius
-    scroll.camFov = current.fov
+    scroll.camAzimuth = cur.azimuth
+    scroll.camRadius = cur.radius
+    scroll.camFov = cur.fov
   })
 
   return null
 }
+
+/** Exported for the panel field, which distributes work across the same span. */
+export const CAMERA_SWEEP = SWEEP
+export const SECTIONS_IN_SWEEP = SECTION_COUNT

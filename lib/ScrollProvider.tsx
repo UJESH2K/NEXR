@@ -16,6 +16,7 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { CARDS } from './cards'
 import { clamp01, resetScrollState, scroll, scrollCommands, syncSnapshot } from './scrollStore'
+import { usePointer } from './usePointer'
 import { useReducedMotion } from './useReducedMotion'
 
 // Registered at module scope so it is guaranteed to have run before any tween
@@ -34,12 +35,18 @@ type ScrollApi = {
   lenis: Lenis | null
   armCard: (index: number) => void
   disarm: () => void
+  /** Scroll to a beat's dwell. Used by the HUD rail. */
+  goToSection: (index: number) => void
+  /** Unlock scrolling and move to the first beat. Bound to Explore. */
+  start: () => void
 }
 
 const ScrollContext = createContext<ScrollApi>({
   lenis: null,
   armCard: () => {},
   disarm: () => {},
+  goToSection: () => {},
+  start: () => {},
 })
 
 export const useScrollApi = () => useContext(ScrollContext)
@@ -50,6 +57,15 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
   const navigatedRef = useRef(false)
+  // scroll.started lives on the mutable store, which React cannot observe. This
+  // counter is bumped alongside it purely so the lock effect below re-runs and
+  // detaches its key handler once the page is unlocked.
+  const [startedTick, setStartedTick] = useState(0)
+
+  // One global pointer source for the camera, sky, panels and cursor. Mounted
+  // here because this provider already wraps everything that reads it, and
+  // because the smoothing has to share the gsap ticker that drives Lenis.
+  usePointer(!reduced)
 
   // ── Lenis, driven by the GSAP ticker ─────────────────────────────────────
   // One clock for both libraries. Running Lenis on its own requestAnimationFrame
@@ -58,7 +74,17 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (reduced) return
 
-    const instance = new Lenis({ lerp: 0.09, smoothWheel: true, autoRaf: false })
+    const instance = new Lenis({
+      // Heavier than the Lenis default on purpose: this page is one long
+      // camera move, and a light lerp makes the scene feel twitchy under a
+      // trackpad. 0.075 is the point where a flick still arrives quickly but
+      // the sky and the pose changes read as continuous.
+      lerp: 0.075,
+      smoothWheel: true,
+      wheelMultiplier: 0.9,
+      touchMultiplier: 1.4,
+      autoRaf: false,
+    })
     instance.on('scroll', ScrollTrigger.update)
 
     // gsap.ticker reports seconds; Lenis.raf expects milliseconds.
@@ -159,6 +185,7 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
       // Returning home (including via the back button) resumes the orbit.
       disarm()
       resetScrollState()
+      setStartedTick((n) => n + 1)
       lenis?.scrollTo(0, { immediate: true })
       ScrollTrigger.refresh()
       return
@@ -189,21 +216,112 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname, lenis])
 
-  const api = useMemo<ScrollApi>(
-    () => ({ lenis, armCard, disarm }),
-    [lenis, armCard, disarm],
+  /**
+   * Jump to a beat's dwell.
+   *
+   * The target is 55% into the section rather than its start: that is past the
+   * pose change and inside the hold, so the landing is a settled frame with the
+   * copy already in place instead of the middle of a transition.
+   */
+  const goToSection = useCallback(
+    (index: number) => {
+      const span =
+        document.documentElement.scrollHeight - window.innerHeight
+      if (span <= 0) return
+      const target = ((index + 0.55) / CARDS.length) * span
+      lenis?.scrollTo(target, { duration: 1.6 })
+    },
+    [lenis],
   )
 
-  // Publish the same two commands to the store so meshes inside the canvas can
-  // call them directly.
+  const start = useCallback(() => {
+    if (scroll.started) return
+    scroll.started = true
+    syncSnapshot()
+    setStartedTick((n) => n + 1)
+    lenis?.start()
+    // A beat's pause before moving, so the unlock is felt as a release rather
+    // than as the button yanking the page.
+    window.setTimeout(() => goToSection(0), 120)
+  }, [lenis, goToSection])
+
+  /**
+   * Hold the page still until Explore is pressed.
+   *
+   * Lenis.stop() swallows wheel and touch, but not the keyboard, the scrollbar
+   * or a programmatic jump — and a browser restoring scroll position on reload
+   * would drop the visitor into the middle of a beat they never chose. So the
+   * keys are blocked here too, and the position is pinned to the top.
+   */
+  useEffect(() => {
+    if (reduced || !lenis) return
+    if (scroll.started || pathname !== '/') return
+
+    lenis.stop()
+    lenis.scrollTo(0, { immediate: true, force: true })
+
+    /**
+     * Hold position every frame, not just once.
+     *
+     * The inline script in the root layout turns off the browser's own scroll
+     * restoration, which is the real fix. This is the backstop for everything
+     * that runs after it: an extension, a focus jump into an offscreen element,
+     * a bfcache restore, or simply a browser that restored before the script
+     * parsed. One comparison per frame, and it stops the moment Explore is
+     * pressed, so it costs nothing for the rest of the visit.
+     */
+    const pin = () => {
+      if (scroll.started) return
+      if (window.scrollY !== 0) lenis.scrollTo(0, { immediate: true, force: true })
+    }
+
+    gsap.ticker.add(pin)
+
+    const KEYS = new Set([
+      ' ',
+      'PageDown',
+      'PageUp',
+      'ArrowDown',
+      'ArrowUp',
+      'Home',
+      'End',
+    ])
+
+    const onKey = (event: KeyboardEvent) => {
+      if (scroll.started) return
+      // Never swallow keys aimed at a control — Explore itself is a button, and
+      // Space is how a keyboard user presses it.
+      const target = event.target as HTMLElement | null
+      if (target?.closest('button, a, input, textarea, select')) return
+      if (KEYS.has(event.key)) event.preventDefault()
+    }
+
+    window.addEventListener('keydown', onKey, { passive: false })
+    return () => {
+      gsap.ticker.remove(pin)
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [reduced, lenis, pathname, startedTick])
+
+  const api = useMemo<ScrollApi>(
+    () => ({ lenis, armCard, disarm, goToSection, start }),
+    [lenis, armCard, disarm, goToSection, start],
+  )
+
+  // Publish the commands to the store so meshes inside the canvas, which render
+  // through a separate reconciler, can call them without React context.
   useEffect(() => {
     scrollCommands.armCard = armCard
     scrollCommands.disarm = disarm
+    scrollCommands.goToSection = goToSection
+    scrollCommands.start = start
     return () => {
       scrollCommands.armCard = () => {}
       scrollCommands.disarm = () => {}
+      scrollCommands.goToSection = () => {}
+      scrollCommands.start = () => {}
     }
-  }, [armCard, disarm])
+  }, [armCard, disarm, goToSection, start])
 
   return <ScrollContext.Provider value={api}>{children}</ScrollContext.Provider>
 }
