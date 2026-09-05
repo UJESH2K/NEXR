@@ -1,6 +1,10 @@
 /**
  * The six destinations, used by the DOM pages and the route transition.
  *
+ * Each card opens the matching explore room rather than a product page: the
+ * room is the designed read for that beat and links on to the product page from
+ * there, so there is one route into a subject rather than two.
+ *
  * The home experience does not read this — it reads lib/sections.ts, which
  * carries the same six beats plus the palette, pose and layout data the scene
  * needs. This file stays because the static fallback home and the interior
@@ -32,9 +36,9 @@ export const CARDS: NexrCard[] = [
     eyebrow: '01 / The workplace wellbeing gap',
     title: 'The Gap',
     blurb:
-      'Organisations invest more in wellbeing than ever. Yet burnout rises and programmes go unused.',
+      'Organisations invest more in wellbeing than ever. Yet burnout rises, programmes go unused and people hesitate.',
     image: '/models/imgs/gap.webp',
-    route: '/approach#gap',
+    route: '/explore/gap',
     tint: ['#2a2f26', '#0b0d0a'],
   },
   {
@@ -43,7 +47,7 @@ export const CARDS: NexrCard[] = [
     title: 'Our Belief',
     blurb: 'Stop making people fit wellbeing. Make wellbeing fit people.',
     image: '/models/imgs/OurApproach.webp',
-    route: '/approach#belief',
+    route: '/explore/belief',
     tint: ['#3b4426', '#0d0f0a'],
   },
   {
@@ -51,9 +55,9 @@ export const CARDS: NexrCard[] = [
     eyebrow: '03 / MeloWorld',
     title: 'MeloWorld',
     blurb:
-      'A private, avatar-led space where employees can take a first step without being recognised.',
+      'A private, anonymous space where employees can take their first step towards support comfortably.',
     image: '/models/imgs/meloworld.webp',
-    route: '/platform/meloworld',
+    route: '/explore/meloworld',
     tint: ['#52665a', '#101815'],
   },
   {
@@ -61,19 +65,19 @@ export const CARDS: NexrCard[] = [
     eyebrow: '04 / VR Wellness',
     title: 'VR Wellness',
     blurb:
-      'Guided immersive experiences that help people work through challenges at their own pace.',
+      'Immersive, guided experiences that help people work through challenges and build resilience at their own pace.',
     image: '/models/imgs/vrworld.webp',
-    route: '/platform/vr-wellness',
+    route: '/explore/vr-wellness',
     tint: ['#4a4270', '#0e0c17'],
   },
   {
     id: 'clinical',
-    eyebrow: '05 / Clinically grounded',
+    eyebrow: '05 / Psychologically safer workplaces',
     title: 'Clinically Grounded',
     blurb:
-      'Built with psychologists, tested in clinical practice, used in hospital contexts.',
+      'Developed with mental health professionals, tested in clinical practice, designed for modern workplaces.',
     image: '/models/imgs/clinicallygrounded.webp',
-    route: '/trust',
+    route: '/explore/clinical',
     tint: ['#1f3a3a', '#080e0e'],
   },
   {
@@ -81,9 +85,9 @@ export const CARDS: NexrCard[] = [
     eyebrow: '06 / Start the conversation',
     title: "Let's Talk",
     blurb:
-      'Healthier organisations begin with people who feel safe enough to seek support.',
+      'The next way into wellbeing starts here. We will shape the right entry point for your people.',
     image: '/models/imgs/letsconnect.webp',
-    route: '/contact',
+    route: '/explore/contact',
     tint: ['#6b7a2e', '#12150a'],
   },
 ]

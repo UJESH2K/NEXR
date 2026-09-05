@@ -135,7 +135,7 @@ export function Preloader({ waitForAssets = true }: { waitForAssets?: boolean })
             <div className="mt-2 flex w-[min(46vw,320px)] flex-col gap-3">
               <div className="h-px w-full overflow-hidden bg-bone/15">
                 <div
-                  className="h-full origin-left bg-lime"
+                  className="h-full origin-left bg-ember"
                   style={{
                     transform: `scaleX(${shown / 100})`,
                     transition: 'transform 120ms linear',
@@ -144,7 +144,7 @@ export function Preloader({ waitForAssets = true }: { waitForAssets?: boolean })
               </div>
               <div className="flex items-baseline justify-between font-mono text-[10px] tracking-[0.24em] text-bone/45">
                 <span>LOADING THE ROOM</span>
-                <span className="tabular-nums text-lime">
+                <span className="tabular-nums text-ember">
                   {String(shown).padStart(3, '0')}
                 </span>
               </div>

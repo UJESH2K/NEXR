@@ -37,8 +37,8 @@ export default function ContactPage() {
   return (
     <PageShell
       eyebrow="06 / Contact"
-      title="Healthier organisations begin with people who feel safe enough to seek support."
-      lede="Let's start the conversation."
+      title="The next way into wellbeing starts here."
+      lede="‘Healthier organisations begin with people who feel safe enough to seek support.’ Tell us about your organisation and we will shape the right way in for your people."
     >
       <Beat heading="How can we help?">
         <ul className="grid gap-4 sm:grid-cols-3">
@@ -46,7 +46,7 @@ export default function ContactPage() {
             <li
               key={route.title}
               data-beat-item
-              className="group relative overflow-hidden rounded-lg border border-bone/12 bg-ink/60 p-6 transition-all duration-500 hover:border-lime/30 hover:bg-ink/80 hover:shadow-lg hover:shadow-lime/5"
+              className="group relative overflow-hidden rounded-lg border border-bone/12 bg-ink/60 p-6 transition-all duration-500 hover:border-ember/30 hover:bg-ink/80 hover:shadow-lg hover:shadow-ember/5"
             >
               {/* Gradient background on hover */}
               <div
@@ -56,16 +56,16 @@ export default function ContactPage() {
                 }}
               />
               <div className="relative">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-lime/10 text-xl">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-ember/10 text-xl">
                   {route.icon}
                 </div>
-                <h3 className="font-display text-xl text-bone transition-colors group-hover:text-lime">{route.title}</h3>
+                <h3 className="font-display text-xl text-bone transition-colors group-hover:text-ember">{route.title}</h3>
                 <p className="mt-3 text-sm leading-relaxed text-sand/70">
                   {route.body}
                 </p>
                 <a
                   href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(route.subject)}`}
-                  className="mt-6 inline-block font-mono text-[11px] uppercase tracking-[0.24em] text-bone/60 transition-colors hover:text-lime"
+                  className="mt-6 inline-block font-mono text-[11px] uppercase tracking-[0.24em] text-bone/60 transition-colors hover:text-ember"
                 >
                   Email us &rarr;
                 </a>
@@ -85,7 +85,7 @@ export default function ContactPage() {
         <p>
           <a
             href={`mailto:${CONTACT_EMAIL}`}
-            className="text-lime underline decoration-lime/40 underline-offset-4"
+            className="text-ember underline decoration-ember/40 underline-offset-4"
           >
             {CONTACT_EMAIL}
           </a>

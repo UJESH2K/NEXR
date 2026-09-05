@@ -89,7 +89,7 @@ export default function VrWellnessPage() {
         <Tiles items={SAFEGUARDS} />
         <p className="pt-2">
           The clinical basis behind all of this is set out in the{' '}
-          <Link href="/trust" className="text-lime underline decoration-lime/40 underline-offset-4">
+          <Link href="/trust" className="text-ember underline decoration-ember/40 underline-offset-4">
             Trust Centre
           </Link>
           .

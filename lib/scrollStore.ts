@@ -61,8 +61,6 @@ export const scroll = {
    * the composition gets on its own.
    */
   started: false,
-  /** Ambient audio toggle, driven by the HUD button. */
-  audioOn: false,
 
   /** Written by CameraRig each frame so overlays can match the projection. */
   camAzimuth: 0,

@@ -69,7 +69,7 @@ export function Lighting({ reduced = false }: { reduced?: boolean }) {
       <directionalLight ref={key} position={[4, 6, 6]} intensity={1.5} color="#fff6e8" />
 
       {/* Accent rim from behind. Carries the beat's colour. */}
-      <directionalLight ref={warmRim} position={[-5, 3, -6]} intensity={1.25} color="#d8f35d" />
+      <directionalLight ref={warmRim} position={[-5, 3, -6]} intensity={1.25} color="#ff7901" />
 
       {/* Cool counter-rim on the opposite side for separation on the turn. */}
       <directionalLight ref={coolRim} position={[6, 1.5, -5]} intensity={0.75} color="#9fc4d4" />
@@ -87,7 +87,7 @@ export function Lighting({ reduced = false }: { reduced?: boolean }) {
         // switched off.
         intensity={900}
         distance={110}
-        color="#d8f35d"
+        color="#ff7901"
       />
 
       {/* Soft underlight so the legs do not fall to black against the rock. */}

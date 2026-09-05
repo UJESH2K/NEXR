@@ -48,14 +48,14 @@ export function GuideNavigator() {
       className="pointer-events-auto fixed bottom-5 right-5 z-[35] w-[min(22rem,calc(100vw-2.5rem))] md:bottom-8 md:right-8"
     >
       <div className="relative overflow-hidden rounded-2xl border border-white/15 bg-[#090b09]/85 p-4 shadow-2xl shadow-black/40 backdrop-blur-xl">
-        <div className="absolute right-0 top-0 h-20 w-20 rounded-full bg-lime/10 blur-2xl" />
+        <div className="absolute right-0 top-0 h-20 w-20 rounded-full bg-ember/10 blur-2xl" />
         <div className="relative flex items-start gap-3">
-          <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-lime/50 text-lime">
+          <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-ember/50 text-ember">
             <Compass size={16} strokeWidth={1.5} />
           </div>
           <div className="min-w-0">
             <div className="flex items-center justify-between gap-3">
-              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-lime">{guide.step}</p>
+              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-ember">{guide.step}</p>
               <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-bone/35">Navigator</span>
             </div>
             <h2 className="mt-2 font-display text-xl text-bone">{guide.label}</h2>
@@ -64,7 +64,7 @@ export function GuideNavigator() {
         </div>
         <div className="relative mt-4 flex items-center justify-between border-t border-white/10 pt-3">
           <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-bone/35">Keep moving</span>
-          <span className="flex items-center gap-1 text-lime/80" aria-hidden="true">
+          <span className="flex items-center gap-1 text-ember/80" aria-hidden="true">
             <ArrowUp size={12} />
             <ArrowDown size={12} />
           </span>

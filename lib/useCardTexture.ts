@@ -44,7 +44,7 @@ function gradientTexture(tint: [string, string], label: string): Texture {
 
     // A faint frame and caption, so a placeholder is obviously a placeholder
     // rather than looking like an intentional flat colour.
-    ctx.strokeStyle = 'rgba(216, 243, 93, 0.3)'
+    ctx.strokeStyle = 'rgba(255, 121, 1, 0.3)'
     ctx.lineWidth = 2
     ctx.strokeRect(14, 14, canvas.width - 28, canvas.height - 28)
 

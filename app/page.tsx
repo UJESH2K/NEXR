@@ -7,14 +7,12 @@ import { SceneHud } from '@/components/overlay/SceneHud'
 import { StoryOverlay } from '@/components/overlay/StoryOverlay'
 import { Preloader } from '@/components/site/Preloader'
 import { StaticHome } from '@/components/site/StaticHome'
-import { useAmbience } from '@/lib/useAmbience'
 import { useReducedMotion } from '@/lib/useReducedMotion'
 import { useWebGLSupport } from '@/lib/useWebGLSupport'
 
 export default function HomePage() {
   const reduced = useReducedMotion()
   const webgl = useWebGLSupport()
-  const ambience = useAmbience()
 
   // `null` means the WebGL probe has not run yet — it needs an effect, so it is
   // never resolved on the very first render. Committing to the DOM fallback
@@ -37,7 +35,7 @@ export default function HomePage() {
           <HomeScrollDriver />
           <StoryOverlay />
           <IdleHints />
-          <SceneHud audioOn={ambience.on} onToggleAudio={ambience.toggle} />
+          <SceneHud />
           <PanelDetail />
         </>
       )}

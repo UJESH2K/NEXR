@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { DM_Mono, Manrope, Playfair_Display } from 'next/font/google'
+import { Chakra_Petch, DM_Mono, Manrope, Playfair_Display } from 'next/font/google'
 import { CanvasHost } from '@/components/r3f/CanvasHost'
 import { CursorFollower } from '@/components/ui/cursor-follower'
 import { Header } from '@/components/site/Header'
@@ -19,6 +19,23 @@ const dmMono = DM_Mono({
   subsets: ['latin'],
   weight: ['400', '500'],
   variable: '--font-dm-mono',
+  display: 'swap',
+})
+
+/**
+ * The numerals.
+ *
+ * Every index on the site — the beat counters, the chapter numbers, the rail
+ * ends — used to be set in the body mono at 10px, which is a thin, wide face.
+ * At that weight the brand orange had nothing to sit on and the numbers read as
+ * faint marks rather than as part of the design. Chakra Petch is squared,
+ * technical and heavy at 700 while staying narrow, so the same slot holds a
+ * number with enough mass for the colour and its highlight to register.
+ */
+const chakra = Chakra_Petch({
+  subsets: ['latin'],
+  weight: ['600', '700'],
+  variable: '--font-chakra',
   display: 'swap',
 })
 
@@ -49,7 +66,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${manrope.variable} ${dmMono.variable} ${playfair.variable}`}
+      className={`${manrope.variable} ${dmMono.variable} ${playfair.variable} ${chakra.variable}`}
       suppressHydrationWarning
     >
       {/* The background here matters: it is what fills the frame between the

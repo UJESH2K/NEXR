@@ -74,13 +74,16 @@ export function GsapRouteMotion({ children }: { children: ReactNode }) {
         const items = beat.querySelectorAll<HTMLElement>('[data-beat-item]')
         const accent = beat.querySelector<HTMLElement>('[data-beat-accent]')
 
+        // toggleActions, never `once` — see the note in ExploreExperience:
+        // a trigger that kills itself during another trigger's refresh
+        // corrupts the array ScrollTrigger is walking.
         const beatTl = gsap.timeline({
           scrollTrigger: {
             trigger: beat,
             start: 'top 80%',
             end: 'top 30%',
             scrub: false,
-            once: true,
+            toggleActions: 'play none none none',
           },
         })
 
@@ -132,7 +135,7 @@ export function GsapRouteMotion({ children }: { children: ReactNode }) {
           scrollTrigger: {
             trigger: p,
             start: 'top 88%',
-            once: true,
+            toggleActions: 'play none none none',
           },
         })
       })
@@ -157,7 +160,7 @@ export function GsapRouteMotion({ children }: { children: ReactNode }) {
           scrollTrigger: {
             trigger: footer,
             start: 'top 92%',
-            once: true,
+            toggleActions: 'play none none none',
           },
         })
       }
@@ -170,7 +173,7 @@ export function GsapRouteMotion({ children }: { children: ReactNode }) {
   return (
     <div ref={root} className="relative">
       <div className="pointer-events-none fixed inset-x-0 top-[4.6rem] z-[31] h-px bg-white/10">
-        <div ref={progress} className="h-full origin-left scale-x-0 bg-lime" />
+        <div ref={progress} className="h-full origin-left scale-x-0 bg-ember" />
       </div>
       {children}
     </div>

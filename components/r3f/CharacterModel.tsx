@@ -212,7 +212,7 @@ function Placeholder() {
     <group ref={spin} position={[0, 2, 0]}>
       <mesh>
         <icosahedronGeometry args={[3.2, 1]} />
-        <meshBasicMaterial color="#d8f35d" wireframe opacity={0.22} transparent />
+        <meshBasicMaterial color="#ff7901" wireframe opacity={0.22} transparent />
       </mesh>
     </group>
   )

@@ -7,8 +7,11 @@
  * and the HUD rail draws one tick per entry. Adding a seventh beat means adding
  * one object here and nothing else.
  *
- * Copy is lifted from NEXR_STRATEGY.md — this file is the runtime mirror of the
- * approved home narrative, so edits there belong here too.
+ * The narrative the script hands us has eight blocks — hero, problem, belief,
+ * ecosystem, products, audience, credibility, call to action — and the scene has
+ * six poses. The hero lives in StoryOverlay rather than here, the ecosystem line
+ * rides in as the kicker on the MeloWorld beat, and the audience statement is
+ * the kicker on the credibility beat. Nothing from the script is dropped.
  */
 
 export type Section = {
@@ -17,8 +20,17 @@ export type Section = {
   index: string
   /** The large serif word pinned to the bottom of the frame. */
   word: string
+  /**
+   * The quieter line that sets up the headline. The script writes several beats
+   * as a small line followed by a large one, and this is the small one.
+   */
+  kicker?: string
   headline: string
   body: string
+  /** Short statements drawn as a stack of tiles under the body. */
+  tiles?: string[]
+  /** Pull quote set beside the beat, used to close the page. */
+  quote?: string
   cta: { label: string; route: string }
   /** Panel artwork drawn around the character during this beat. */
   images: string[]
@@ -47,36 +59,39 @@ export const SECTIONS: Section[] = [
     id: 'gap',
     index: '01',
     word: 'The Gap',
-    headline: 'The barrier isn’t always the support. It’s the way in.',
+    kicker: 'The barrier isn’t always the support.',
+    headline: 'It’s the way in.',
     body:
-      'Organisations invest more in wellbeing than ever. Yet burnout rises, programmes go unused, and people hesitate because of stigma, judgement and privacy.',
-    cta: { label: 'See the gap', route: '/approach#gap' },
+      'Organisations today invest more in employee wellbeing than ever before. Yet burnout continues to rise, wellbeing programmes remain underused, and many employees hesitate to seek support because of stigma, fear of judgement or concerns around privacy.',
+    cta: { label: 'Explore the gap', route: '/explore/gap' },
     images: ['/models/imgs/gap.webp'],
     sky: ['#59684f', '#1b2419'],
     fog: '#4a5843',
-    accent: '#d8f35d',
+    accent: '#ff7901',
   },
   {
     id: 'belief',
     index: '02',
     word: 'Belief',
-    headline: 'Stop making people fit wellbeing. Make wellbeing fit people.',
+    kicker: 'Stop making people fit wellbeing.',
+    headline: 'Make wellbeing fit people.',
     body:
-      'Support should feel natural, private and engaging. Designed around people instead of processes, it becomes something they actually begin.',
-    cta: { label: 'Read the manifesto', route: '/approach#belief' },
+      'At NEXR, we believe workplace wellbeing should feel natural, private and engaging. When support is designed around people instead of processes, organisations create healthier cultures and employees are more likely to begin their wellbeing journey.',
+    cta: { label: 'Explore our belief', route: '/explore/belief' },
     images: ['/models/imgs/OurApproach.webp'],
     sky: ['#6d7a55', '#20281b'],
     fog: '#5b6749',
-    accent: '#e4f78a',
+    accent: '#ffa863',
   },
   {
     id: 'meloworld',
     index: '03',
     word: 'MeloWorld',
-    headline: 'A private first step, taken as someone nobody can recognise.',
+    kicker: 'Different ways in. One way forward.',
+    headline: 'A private space where the first step feels easy.',
     body:
-      'An anonymous, avatar-led space where employees meet psychologists without meeting judgement. Every person gets an ID, never a name.',
-    cta: { label: 'Enter MeloWorld', route: '/platform/meloworld' },
+      'MeloWorld creates a private, anonymous space where employees can take their first step towards support comfortably. It is one half of a connected ecosystem designed for modern workplaces.',
+    cta: { label: 'Explore MeloWorld', route: '/explore/meloworld' },
     images: ['/models/imgs/meloworld.webp'],
     mark: '/brand/meloworld-mark.webp',
     sky: ['#4f6f66', '#131f1c'],
@@ -87,10 +102,11 @@ export const SECTIONS: Section[] = [
     id: 'vr-wellness',
     index: '04',
     word: 'VR Wellness',
-    headline: 'Guided immersion, paced by a clinician, never by a headset.',
+    kicker: 'The other way in.',
+    headline: 'Immersive experiences, taken at your own pace.',
     body:
-      'Exposure work for heights, flying, speaking and social anxiety — assessed, consented, monitored, and stopped the moment it should be.',
-    cta: { label: 'See VR Wellness', route: '/platform/vr-wellness' },
+      'VR Wellness offers immersive, guided experiences that help people work through challenges and build resilience at their own pace. Together with MeloWorld, it forms one connected wellbeing ecosystem.',
+    cta: { label: 'Explore VR Wellness', route: '/explore/vr-wellness' },
     images: ['/models/imgs/vrworld.webp'],
     sky: ['#5b5a7d', '#16151f'],
     fog: '#4a4a68',
@@ -100,10 +116,16 @@ export const SECTIONS: Section[] = [
     id: 'clinical',
     index: '05',
     word: 'Clinical',
+    kicker: 'Creating psychologically safer workplaces.',
     headline: 'Where clinical expertise meets immersive technology.',
     body:
-      'Built with mental health professionals, tested in clinical practice, and used in hospital contexts. Technology is the how, never the headline.',
-    cta: { label: 'Open the trust centre', route: '/trust' },
+      'Whether you are supporting employees across an enterprise or students within an educational institution, NEXR helps create psychologically safer environments where wellbeing becomes approachable, engaging and accessible.',
+    tiles: [
+      'Developed with mental health professionals.',
+      'Tested in clinical practice.',
+      'Designed for the realities of modern workplaces.',
+    ],
+    cta: { label: 'Explore the evidence', route: '/explore/clinical' },
     images: ['/models/imgs/clinicallygrounded.webp'],
     sky: ['#4c6a6b', '#121b1c'],
     fog: '#3d5657',
@@ -113,15 +135,17 @@ export const SECTIONS: Section[] = [
     id: 'contact',
     index: '06',
     word: 'Let’s Talk',
-    headline:
-      'Healthier organisations begin with people who feel safe enough to seek support.',
+    kicker: 'One connected ecosystem.',
+    headline: 'The next way into wellbeing starts here.',
     body:
-      'Bring the way in to your people. We will shape the right entry point for your workplace or campus.',
+      'Bring the way in to your people. We will shape the right entry point for your workplace or campus, and show you the whole ecosystem in a live walkthrough.',
+    quote:
+      'Healthier organisations begin with people who feel safe enough to seek support.',
     cta: { label: 'Book a demo', route: '/contact' },
     images: ['/models/imgs/letsconnect.webp'],
     sky: ['#78834a', '#232717'],
     fog: '#646e3e',
-    accent: '#e8ff7a',
+    accent: '#ffb589',
   },
 ]
 

@@ -16,14 +16,14 @@ export default function NotFound() {
         Try the orbit on the{' '}
         <a
           href="/"
-          className="text-lime underline decoration-lime/40 underline-offset-4"
+          className="text-ember underline decoration-ember/40 underline-offset-4"
         >
           home page
         </a>
         , or head straight to the{' '}
         <a
           href="/trust"
-          className="text-lime underline decoration-lime/40 underline-offset-4"
+          className="text-ember underline decoration-ember/40 underline-offset-4"
         >
           Trust Centre
         </a>

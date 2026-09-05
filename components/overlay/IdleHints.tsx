@@ -113,7 +113,7 @@ export function IdleHints() {
                 <DoodleArrow
                   direction="up-right"
                   width={104}
-                  className="doodle text-lime/80"
+                  className="doodle text-ember-soft/90"
                 />
               </div>
             </motion.div>
@@ -132,7 +132,7 @@ export function IdleHints() {
                 <DoodleArrow
                   direction="down-right"
                   width={104}
-                  className="doodle text-lime/80"
+                  className="doodle text-ember-soft/90"
                 />
               </div>
             </motion.div>

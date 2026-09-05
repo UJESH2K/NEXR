@@ -14,5 +14,8 @@ import { GuideNavigator } from './GuideNavigator'
 export function SiteGuide() {
   const pathname = usePathname()
   if (pathname === '/') return null
+  // The explore rooms run their own chapter rail down the left and their own
+  // prev/next pair in the footer, and the card lands on top of the second one.
+  if (pathname.startsWith('/explore')) return null
   return <GuideNavigator />
 }

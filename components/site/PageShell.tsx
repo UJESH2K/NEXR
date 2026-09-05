@@ -85,9 +85,9 @@ export function PageShell({
             backgroundSize: '60px 60px',
           }} />
           {/* Corner accent line */}
-          <div className="absolute bottom-0 left-0 h-px w-1/3 bg-gradient-to-r from-lime/50 to-transparent" />
-          <div className="absolute bottom-0 left-0 h-1/3 w-px bg-gradient-to-t from-lime/50 to-transparent" />
-          <div className="absolute bottom-5 left-5 font-mono text-[10px] uppercase tracking-[0.25em] text-lime/80 md:bottom-8 md:left-8">
+          <div className="absolute bottom-0 left-0 h-px w-1/3 bg-gradient-to-r from-ember/50 to-transparent" />
+          <div className="absolute bottom-0 left-0 h-1/3 w-px bg-gradient-to-t from-ember/50 to-transparent" />
+          <div className="absolute bottom-5 left-5 font-mono text-[10px] uppercase tracking-[0.25em] text-ember/80 md:bottom-8 md:left-8">
             NEXR / {title}
           </div>
         </div>
@@ -97,14 +97,14 @@ export function PageShell({
         <footer className="mx-auto mt-24 flex max-w-4xl items-center justify-between border-t border-bone/12 pt-8">
           <Link
             href="/"
-            className="group inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.24em] text-bone/55 transition-colors hover:text-lime"
+            className="group inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.24em] text-bone/55 transition-colors hover:text-ember"
           >
             <span className="inline-block transition-transform group-hover:-translate-x-1">&larr;</span>
             Back to the experience
           </Link>
           <Link
             href="/contact"
-            className="group inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.24em] text-bone/55 transition-colors hover:text-lime"
+            className="group inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.24em] text-bone/55 transition-colors hover:text-ember"
           >
             Book a Demo
             <span className="inline-block transition-transform group-hover:translate-x-1">&rarr;</span>
@@ -138,7 +138,7 @@ export function Beat({
         {heading}
       </h2>
       {accent ? (
-        <p data-beat-accent className="mt-4 font-display text-xl italic text-lime/90">
+        <p data-beat-accent className="mt-4 font-display text-xl italic text-ember/90">
           {accent}
         </p>
       ) : null}
@@ -157,14 +157,14 @@ export function Tiles({ items }: { items: { title: string; body: string; icon?: 
         <li
           key={item.title}
           data-beat-item
-          className="group rounded-lg border border-bone/12 bg-ink/60 p-6 transition-all duration-500 hover:border-lime/30 hover:bg-ink/80 hover:shadow-lg hover:shadow-lime/5"
+          className="group rounded-lg border border-bone/12 bg-ink/60 p-6 transition-all duration-500 hover:border-ember/30 hover:bg-ink/80 hover:shadow-lg hover:shadow-ember/5"
         >
           {item.icon ? (
-            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-lime/10 text-lime">
+            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-ember/10 text-ember">
               <span className="text-lg">{item.icon}</span>
             </div>
           ) : null}
-          <h3 className="font-display text-xl text-bone transition-colors group-hover:text-lime">{item.title}</h3>
+          <h3 className="font-display text-xl text-bone transition-colors group-hover:text-ember">{item.title}</h3>
           <p className="mt-3 text-sm leading-relaxed text-sand/70">
             {item.body}
           </p>
@@ -184,7 +184,7 @@ export function Stats({ items }: { items: { value: string; label: string }[] }) 
           data-beat-item
           className="text-center"
         >
-          <p className="font-display text-4xl text-lime md:text-5xl">{item.value}</p>
+          <p className="numeral numeral--lg text-4xl md:text-5xl">{item.value}</p>
           <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.2em] text-sand/60">{item.label}</p>
         </div>
       ))}
@@ -220,7 +220,7 @@ export function ImagePlaceholder({
       <div className="absolute inset-0 bg-gradient-to-t from-void/50 to-transparent" />
       {label ? (
         <div className="absolute bottom-4 left-4 right-4">
-          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-lime/60">{label}</p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-ember/60">{label}</p>
         </div>
       ) : null}
       {/* Image icon placeholder */}
@@ -245,8 +245,8 @@ export function StepCard({
 }) {
   return (
     <div data-beat-item className="relative flex gap-5">
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-lime/30 font-display text-lg text-lime">
-        {number}
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-ember/30">
+        <span className="numeral text-lg">{number}</span>
       </div>
       <div>
         <h3 className="font-display text-xl text-bone">{title}</h3>

@@ -90,7 +90,7 @@ export default function MeloWorldPage() {
         <p>
           MeloWorld is the entry point to one connected ecosystem. For people who
           want to go further, guided immersive work is available through{' '}
-          <Link href="/platform/vr-wellness" className="text-lime underline decoration-lime/40 underline-offset-4">
+          <Link href="/platform/vr-wellness" className="text-ember underline decoration-ember/40 underline-offset-4">
             VR Wellness
           </Link>
           , introduced later in the journey rather than as the headline.

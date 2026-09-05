@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 /* Design tokens ported from the previous global.css so the visual language
-   survives the Tailwind migration. Available as bg-ink, text-lime, etc. */
+   survives the Tailwind migration. Available as bg-ink, text-ember, etc. */
 @theme {
   --color-void: #000000;
   --color-ink: #111611;
@@ -10,12 +10,21 @@
   --color-bone: #f4f3ec;
   --color-moss: #25342a;
   --color-sand: #d4d0bf;
-  --color-lime: #d8f35d;
+  /* The brand orange, sampled straight from the MeloWorld mark (#ff7901). It
+     replaced an acid lime that appeared nowhere else in the identity: the
+     figure, the logo and the marks are all orange and white, so the accent had
+     nothing to resonate with and simply jumped off the frame. */
+  --color-ember: #ff7901;
+  /* The mark's own pale tint, for accents that would shout at full strength —
+     handwritten labels, large italic lines. Also from the logo (#faba92). */
+  --color-ember-soft: #ffc4a2;
   --color-olive: #637500;
 
   --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-dm-mono), ui-monospace, monospace;
   --font-display: var(--font-playfair), Georgia, serif;
+  /* Numerals only — see the .numeral rule near the foot of this file. */
+  --font-numeral: var(--font-chakra), var(--font-dm-mono), ui-monospace, monospace;
 
   /* Stacking contract, bottom to top: the canvas, the DOM overlays drawn on
      it, route content, fixed chrome, the expanded sheet, the load curtain, and
@@ -65,12 +74,12 @@
   /* Focus must stay visible even with the cursor hidden — it is the only
      affordance a keyboard user has. */
   :focus-visible {
-    outline: 2px solid var(--color-lime);
+    outline: 2px solid var(--color-ember);
     outline-offset: 3px;
   }
 
   ::selection {
-    background: var(--color-lime);
+    background: var(--color-ember);
     color: var(--color-ink);
   }
 
@@ -96,7 +105,7 @@
     font-size: 10px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--color-lime);
+    color: var(--color-ember);
   }
 
   .display {
@@ -125,8 +134,8 @@
   }
 
   .btn:hover {
-    background: var(--color-lime);
-    border-color: var(--color-lime);
+    background: var(--color-ember);
+    border-color: var(--color-ember);
     color: var(--color-ink);
   }
 
@@ -237,7 +246,7 @@
   opacity: 0;
   transition: opacity 0.4s ease;
   background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-    rgba(216, 243, 93, 0.06), transparent 40%);
+    rgba(255, 121, 1, 0.06), transparent 40%);
   pointer-events: none;
 }
 .glow-hover:hover::after {
@@ -247,7 +256,7 @@
 /* Decorative separator line */
 .divider-glow {
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(216, 243, 93, 0.3), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 121, 1, 0.3), transparent);
 }
 
 
@@ -260,7 +269,7 @@
   position: absolute;
   inset: -20%;
   background:
-    radial-gradient(38% 42% at 30% 35%, rgba(216, 243, 93, 0.10), transparent 70%),
+    radial-gradient(38% 42% at 30% 35%, rgba(255, 121, 1, 0.10), transparent 70%),
     radial-gradient(42% 46% at 72% 68%, rgba(122, 168, 132, 0.14), transparent 72%);
   filter: blur(30px);
   animation: wash 14s ease-in-out infinite alternate;
@@ -273,17 +282,6 @@
 }
 
 /* ── HUD ───────────────────────────────────────────────────────────────── */
-
-/* The three bars in the sound toggle. Height rather than scaleY so each bar
-   stays anchored to the baseline the others sit on. */
-.sound-bar {
-  animation: sound-bar 1.05s ease-in-out infinite alternate;
-}
-
-@keyframes sound-bar {
-  from { height: 3px; }
-  to   { height: 13px; }
-}
 
 /* The scroll hint's travelling tick. */
 .scroll-hint {
@@ -306,7 +304,7 @@
   transform: translate(-50%, -120%);
   z-index: var(--z-cursor);
   padding: 12px 20px;
-  background: var(--color-lime);
+  background: var(--color-ember);
   color: var(--color-ink);
   font-family: var(--font-mono);
   font-size: 11px;
@@ -323,7 +321,6 @@
    and the HUD still render, so their looping animations have to stop too. */
 @media (prefers-reduced-motion: reduce) {
   .preloader-wash,
-  .sound-bar,
   .scroll-hint {
     animation: none !important;
   }
@@ -387,7 +384,7 @@
  * fill is the room's own deep green (#1b2419, the sky's zenith) over the horizon
  * green, and the border is a desaturated sage lifted from the lit side of that
  * gradient. A white border sat on top of the scene like a sticker; these sit in
- * it. Hover goes *darker* and picks up the lime, which is the one accent the
+ * it. Hover goes *darker* and picks up the ember, which is the one accent the
  * rest of the page already uses, so the control recedes into the room as it
  * lights up rather than flashing white.
  *
@@ -421,10 +418,10 @@
 }
 
 .btn-primary:hover {
-  border-color: rgb(216 243 93 / 0.55);
+  border-color: rgb(255 121 1 / 0.55);
   background:
     linear-gradient(180deg, rgb(37 52 42 / 0.92), rgb(15 22 15 / 0.95));
-  color: var(--color-lime);
+  color: var(--color-ember);
   box-shadow:
     inset 0 1px 0 rgb(232 229 218 / 0.1),
     0 10px 34px rgb(9 14 9 / 0.5);
@@ -448,7 +445,7 @@
   background: linear-gradient(
     100deg,
     transparent 20%,
-    rgb(216 243 93 / 0.22) 50%,
+    rgb(255 121 1 / 0.22) 50%,
     transparent 80%
   );
   animation: explore-sheen 3s ease-in-out infinite;
@@ -512,7 +509,7 @@
   font-style: italic;
   font-size: 15px;
   line-height: 1;
-  color: rgb(216 243 93 / 0.85);
+  color: var(--color-ember-soft);
   white-space: nowrap;
 }
 
@@ -526,5 +523,165 @@
     animation: none !important;
     stroke-dashoffset: 0 !important;
     opacity: 1 !important;
+  }
+}
+
+/* ── the aside cards beside the character ──────────────────────────────── */
+
+/*
+ * Two beats carry more than a headline and a paragraph — the three credibility
+ * statements, and the closing quote with its call to action. Those move to the
+ * empty half of the frame rather than lengthening the copy column, and these
+ * are the surface they sit on.
+ *
+ * The card is glass over the room rather than a solid panel: the sky behind it
+ * is the subject's backdrop, and an opaque tile in that space reads as a UI
+ * pasted over a photograph. The accent is passed in per beat as --tilt-accent,
+ * so the same class serves all six palettes without forking.
+ */
+.beat-card {
+  position: relative;
+  overflow: hidden;
+  padding: 1.05rem 1.15rem 1.05rem 1.25rem;
+  border: 1px solid rgb(244 243 236 / 0.12);
+  border-radius: 18px;
+  background: linear-gradient(160deg, rgb(244 243 236 / 0.07), rgb(12 17 12 / 0.58));
+  backdrop-filter: blur(10px);
+  box-shadow:
+    inset 0 1px 0 rgb(244 243 236 / 0.06),
+    0 18px 40px -28px rgb(0 0 0 / 0.9);
+  transition: border-color 0.5s ease, box-shadow 0.5s ease, background 0.5s ease;
+}
+
+/* The light that follows the pointer across the card. Its position comes from
+   --gx/--gy, written by the tilt handler, so the highlight and the lean are
+   driven by the same gesture. */
+.beat-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s ease;
+  background: radial-gradient(
+    220px circle at var(--gx, 50%) var(--gy, 50%),
+    color-mix(in srgb, var(--tilt-accent, #ff7901) 20%, transparent),
+    transparent 66%
+  );
+}
+
+.beat-card:hover::before {
+  opacity: 1;
+}
+
+.beat-card:hover {
+  border-color: color-mix(in srgb, var(--tilt-accent, #ff7901) 42%, transparent);
+  box-shadow:
+    inset 0 1px 0 rgb(244 243 236 / 0.08),
+    0 26px 60px -30px rgb(0 0 0 / 0.95);
+}
+
+.beat-card--action {
+  padding: 1.5rem 1.4rem 1.5rem 1.55rem;
+}
+
+.beat-card__index {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+}
+
+/* The accent rule down the leading edge, which grows to full height on hover.
+   It is the only part of the card that moves on its own, so the hover reads as
+   one gesture rather than three effects firing together. */
+.beat-card__rule {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: 2px;
+  opacity: 0.45;
+  transform: scaleY(0.32);
+  transform-origin: top;
+  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+}
+
+.beat-card:hover .beat-card__rule {
+  opacity: 1;
+  transform: scaleY(1);
+}
+
+
+/* ── numerals ──────────────────────────────────────────────────────────── */
+
+/*
+ * Every index on the site: the beat counters, the chapter numbers, the rail
+ * ends, the progress readout.
+ *
+ * These were set in the body mono at 10px, and a thin wide face gave the brand
+ * orange nothing to sit on — the colour needs mass before it registers. So the
+ * numerals get their own face, heavy and squared, sized in `em` so each one
+ * still occupies the slot its label gave it rather than pushing the layout
+ * around.
+ *
+ * The finish is a specular band clipped to the glyphs: mostly the accent, with
+ * a white core crossing it. That is what reads as a lit surface rather than as
+ * flat text, and it is one gradient and one background-position animation —
+ * no shadow stack, no duplicated element, nothing that would make a number
+ * expensive to draw. `--numeral-accent` lets a beat pass its own colour in, so
+ * the same class serves all six palettes.
+ */
+.numeral {
+  display: inline-block;
+  font-family: var(--font-numeral);
+  font-weight: 700;
+  font-size: 1.25em;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  font-variant-numeric: tabular-nums;
+  /* The base colour, and what a browser without background-clip:text keeps. */
+  color: var(--numeral-accent, var(--color-ember));
+  background-image: linear-gradient(
+    112deg,
+    var(--numeral-accent, var(--color-ember)) 0%,
+    var(--numeral-accent, var(--color-ember)) 33%,
+    #fff3e8 45%,
+    #ffffff 51%,
+    var(--numeral-accent, var(--color-ember)) 63%,
+    var(--numeral-accent, var(--color-ember)) 100%
+  );
+  background-size: 280% 100%;
+  background-position: 100% 0;
+  /* Lifts the glyph off whatever it is sitting on. Kept to a single shadow:
+     the highlight is doing the work, and stacking more only muddies it. */
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.45));
+  animation: numeral-sheen 9s ease-in-out infinite;
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .numeral {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+/* Slow, and with a long rest at each end: a highlight that sweeps constantly
+   turns into a blinking light. */
+@keyframes numeral-sheen {
+  0%, 18% { background-position: 100% 0; }
+  62%, 100% { background-position: 0 0; }
+}
+
+/* The heavier variant, for numerals that are the largest thing in their block. */
+.numeral--lg {
+  font-size: 1.1em;
+  letter-spacing: 0.01em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .numeral {
+    animation: none;
+    background-position: 62% 0;
   }
 }

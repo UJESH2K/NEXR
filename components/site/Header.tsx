@@ -8,6 +8,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Menu, MoveUpRight } from 'lucide-react'
 
 const NAV = [
+  { label: 'Explore', href: '/explore' },
   { label: 'Approach', href: '/approach' },
   { label: 'MeloWorld', href: '/platform/meloworld' },
   { label: 'VR Wellness', href: '/platform/vr-wellness' },
@@ -76,7 +77,7 @@ export function Header() {
                 <Link
                   href={item.href}
                   className={`font-mono text-[11px] uppercase tracking-[0.2em] transition-colors ${
-                    active ? 'text-lime' : 'text-bone/55 hover:text-bone'
+                    active ? 'text-ember' : 'text-bone/55 hover:text-bone'
                   }`}
                 >
                   {item.label}
@@ -110,7 +111,7 @@ export function Header() {
             <ul className="space-y-1">
               {NAV.map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href} onClick={() => setOpen(false)} className="block rounded-xl px-3 py-3 font-mono text-xs uppercase tracking-[0.2em] text-bone/70 hover:bg-white/5 hover:text-lime">
+                  <Link href={item.href} onClick={() => setOpen(false)} className="block rounded-xl px-3 py-3 font-mono text-xs uppercase tracking-[0.2em] text-bone/70 hover:bg-white/5 hover:text-ember">
                     {item.label}
                   </Link>
                 </li>

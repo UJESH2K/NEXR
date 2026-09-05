@@ -116,7 +116,7 @@ export function ExploreButton({
             style={{ top: '50%', marginTop: -37 }}
             aria-hidden="true"
           >
-            <DoodleArrow direction="left-down" width={112} className="doodle text-lime/80" />
+            <DoodleArrow direction="left-down" width={112} className="doodle text-ember-soft/90" />
             <span className="hint-label mb-8">Start here</span>
           </motion.span>
         ) : null}

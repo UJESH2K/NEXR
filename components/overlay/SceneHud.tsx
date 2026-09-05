@@ -9,8 +9,14 @@ import { useScrollSnapshot } from '@/lib/useScrollSnapshot'
 import { setCursor, resetCursor } from '@/lib/cursorStore'
 
 /**
- * The instrument panel around the frame: wordmark, progress rail, the big word
- * pinned to the bottom, and the sound toggle.
+ * The instrument panel around the frame: the progress rail, the big word pinned
+ * to the bottom, and the corner readouts.
+ *
+ * There is no sound control here any more, because there is no sound. A
+ * synthesised bed was tried twice — a filtered drone, then a reverberant pad
+ * with struck notes — and both read as machine noise over a scene this quiet.
+ * Silence is the better default, and a control for something that does not
+ * exist is worse than no control.
  *
  * Everything continuous in here — the rail fill, the tick highlights — is
  * written straight to the DOM from the gsap ticker rather than through React
@@ -26,13 +32,7 @@ const SOCIALS = [
   { label: 'YT', href: 'https://www.youtube.com', title: 'YouTube' },
 ]
 
-export function SceneHud({
-  audioOn,
-  onToggleAudio,
-}: {
-  audioOn: boolean
-  onToggleAudio: () => void
-}) {
+export function SceneHud() {
   const { activeCard, past } = useScrollSnapshot()
   const fill = useRef<HTMLSpanElement>(null)
   const bar = useRef<HTMLSpanElement>(null)
@@ -74,7 +74,7 @@ export function SceneHud({
     >
       {/* ── progress rail, top centre ────────────────────────────────────── */}
       <div className="absolute left-1/2 top-6 hidden -translate-x-1/2 items-center gap-4 md:flex">
-        <span className="font-mono text-[10px] tracking-[0.28em] text-bone/50">01</span>
+        <span className="numeral text-[10px]">01</span>
 
         <div className="relative h-px w-[min(34vw,340px)] bg-bone/20">
           <span
@@ -96,7 +96,7 @@ export function SceneHud({
               <span
                 className={`block h-1.5 w-1.5 rounded-full transition-all duration-500 ${
                   i === activeCard
-                    ? 'scale-125 bg-lime'
+                    ? 'scale-125 bg-ember'
                     : 'bg-bone/35 group-hover:bg-bone/80'
                 }`}
               />
@@ -104,7 +104,7 @@ export function SceneHud({
           ))}
         </div>
 
-        <span className="font-mono text-[10px] tracking-[0.28em] text-bone/50">
+        <span className="numeral text-[10px]">
           {String(SECTION_COUNT).padStart(2, '0')}
         </span>
       </div>
@@ -123,7 +123,7 @@ export function SceneHud({
             transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
             className="flex flex-col items-center"
           >
-            <span className="font-mono text-[10px] tracking-[0.34em] text-bone/55">
+            <span className="numeral numeral--lg text-[13px]">
               {section.index}
             </span>
             {/* Deliberately smaller than the reference's: the figure's feet
@@ -142,47 +142,19 @@ export function SceneHud({
         <div className="h-[clamp(1.2rem,4vh,3rem)]" />
       </div>
 
-      {/* ── sound toggle, bottom left ────────────────────────────────────── */}
-      <button
-        type="button"
-        onClick={onToggleAudio}
-        {...hoverable}
-        aria-pressed={audioOn}
-        aria-label={audioOn ? 'Mute ambience' : 'Play ambience'}
-        className="group absolute bottom-7 left-6 flex items-center gap-3 md:left-10"
-      >
-        <span className="relative flex h-9 w-9 items-center justify-center rounded-full border border-bone/30 transition-colors group-hover:border-lime">
-          {/* Three bars that animate only while sound is on. */}
-          <span className="flex items-end gap-[3px]">
-            {[0, 1, 2].map((i) => (
-              <span
-                key={i}
-                className={`w-[2px] bg-lime transition-all duration-300 ${
-                  audioOn ? 'sound-bar' : 'h-[3px] opacity-50'
-                }`}
-                style={audioOn ? { animationDelay: `${i * 0.18}s` } : undefined}
-              />
-            ))}
-          </span>
-        </span>
-        <span className="font-mono text-[9px] uppercase tracking-[0.26em] text-bone/45 transition-colors group-hover:text-bone">
-          {audioOn ? 'Sound on' : 'Sound off'}
-        </span>
-      </button>
-
       {/* ── vertical progress + socials, bottom right ─────────────────────── */}
       <div className="absolute bottom-7 right-6 flex flex-col items-end gap-5 md:right-10">
         <div className="relative h-16 w-px bg-bone/20">
           <span
             ref={bar}
-            className="absolute inset-x-0 top-0 h-full origin-top bg-lime"
+            className="absolute inset-x-0 top-0 h-full origin-top bg-ember"
           />
         </div>
 
         <div className="flex items-center gap-5">
           <span
             ref={readout}
-            className="font-mono text-[9px] tabular-nums tracking-[0.2em] text-bone/35"
+            className="numeral text-[9px] opacity-70"
           >
             000
           </span>
@@ -194,7 +166,7 @@ export function SceneHud({
               rel="noreferrer noopener"
               title={s.title}
               {...hoverable}
-              className="font-mono text-[10px] tracking-[0.22em] text-bone/45 transition-colors hover:text-lime"
+              className="font-mono text-[10px] tracking-[0.22em] text-bone/45 transition-colors hover:text-ember"
             >
               {s.label}
             </a>

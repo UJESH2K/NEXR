@@ -87,7 +87,7 @@ export function CursorFollower() {
     <div className="pointer-events-none fixed inset-0" style={{ zIndex: 'var(--z-cursor)' }} aria-hidden="true">
       <div
         ref={dot}
-        className="absolute left-0 top-0 rounded-full bg-lime opacity-0 transition-[width,height,opacity] duration-300"
+        className="absolute left-0 top-0 rounded-full bg-ember opacity-0 transition-[width,height,opacity] duration-300"
         style={{
           width: grown ? '0px' : '6px',
           height: grown ? '0px' : '6px',
@@ -101,7 +101,7 @@ export function CursorFollower() {
           width: label ? '86px' : grown ? '52px' : '30px',
           height: label ? '86px' : grown ? '52px' : '30px',
           borderColor: label ? 'transparent' : 'rgba(232, 229, 218, 0.45)',
-          backgroundColor: label ? 'rgba(216, 243, 93, 0.92)' : 'transparent',
+          backgroundColor: label ? 'rgba(255, 121, 1, 0.92)' : 'transparent',
         }}
       >
         <span
