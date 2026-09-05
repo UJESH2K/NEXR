@@ -370,8 +370,25 @@
  */
 @media (min-width: 1024px) {
   .story-col--mid {
-    top: 50%;
-    transform: translateY(-50%);
+    /*
+     * Centred with auto margins, not with a transform, and not with a
+     * translate either.
+     *
+     * Both of those failed for the same underlying reason: this column is a
+     * Framer Motion element, and Motion writes the entrance animation to the
+     * element's own inline style. An inline value beats a stylesheet one, so
+     * whichever property the centring used, the animation owned it and the
+     * column dropped to the bottom of the frame the moment it played.
+     *
+     * An absolutely positioned box with both edges pinned, an auto height and
+     * auto block margins is centred by the layout algorithm itself. There is
+     * no property left for an animation to overwrite, which is why this is the
+     * version that holds.
+     */
+    top: 0;
+    bottom: 0;
+    height: fit-content;
+    margin-block: auto;
   }
 }
 

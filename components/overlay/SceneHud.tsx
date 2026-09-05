@@ -147,10 +147,17 @@ export function SceneHud() {
             </span>
             {/* Deliberately smaller than the reference's: the figure's feet
                 reach about 86% of the frame height, and at 11vw this word's
-                cap height climbed into the rock and then into the shoes. */}
+                cap height climbed into the rock and then into the shoes.
+
+                Sized against height as well as width, because the collision is
+                a vertical one: on a short laptop window — 1920x935 with browser
+                chrome, say — 7vw is 134px of cap height rising into a rock that
+                has not moved down with it. Taking the smaller of the two keeps
+                the word clear on a short window without shrinking it on a tall
+                one. */}
             <span
               className="font-display leading-[0.8] text-bone/90"
-              style={{ fontSize: 'clamp(2rem, 7vw, 6.5rem)' }}
+              style={{ fontSize: 'clamp(2rem, min(7vw, 11vh), 6.5rem)' }}
             >
               {section.word}
             </span>
