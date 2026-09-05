@@ -29,7 +29,7 @@ export function ExploreIndex() {
   const preview = EXPLORE_TOPICS[hovered]
 
   return (
-    <div className="pointer-events-auto min-h-svh bg-void px-6 pb-24 pt-32 md:px-10">
+    <div className="safe-bottom pointer-events-auto min-h-svh bg-void px-5 pb-20 pt-28 sm:px-6 md:px-10 md:pb-24 md:pt-32">
       <div className="mx-auto max-w-6xl">
         <Link
           href="/"
@@ -59,7 +59,7 @@ export function ExploreIndex() {
           order, or start wherever the question you arrived with lives.
         </motion.p>
 
-        <div className="mt-16 grid gap-12 lg:grid-cols-[1fr_0.72fr] lg:items-start">
+        <div className="mt-10 grid gap-12 md:mt-16 lg:grid-cols-[1fr_0.72fr] lg:items-start">
           <ul className="border-t border-white/10">
             {EXPLORE_TOPICS.map((topic, i) => (
               <motion.li
@@ -74,7 +74,7 @@ export function ExploreIndex() {
                 <Link
                   href={`/explore/${topic.slug}`}
                   {...hoverable}
-                  className="group flex items-center gap-6 py-7"
+                  className="group flex items-center gap-4 py-6 sm:gap-6 sm:py-7"
                 >
                   {/* The accent only lights up on the hovered row, so the
                       column reads as a list with a cursor rather than as six

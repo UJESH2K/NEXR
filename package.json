@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "model:prepare": "node scripts/prepare-model.mjs"
+    "model:prepare": "node scripts/prepare-model.mjs",
+    "clean": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true})\"",
+    "rebuild": "npm run clean && next build"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

@@ -221,7 +221,7 @@ export function ExploreExperience({
       {/* ── hero ─────────────────────────────────────────────────────────── */}
       <header
         data-explore-hero
-        className="relative overflow-hidden px-6 pb-20 pt-32 md:px-10 md:pt-40"
+        className="relative overflow-hidden px-5 pb-14 pt-28 sm:px-6 md:px-10 md:pb-20 md:pt-40"
       >
         {/* Two washes in the beat's own accent. This is what keeps six rooms
             built from one template from looking like one room six times. */}
@@ -270,7 +270,7 @@ export function ExploreExperience({
             </p>
           </motion.div>
 
-          <div className="mt-12 grid gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
+          <div className="mt-8 grid gap-8 md:mt-12 md:gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
             <div>
               {topic.mark ? (
                 <motion.img
@@ -335,7 +335,7 @@ export function ExploreExperience({
             initial={{ opacity: 0, y: 50, filter: 'blur(14px)' }}
             animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
             transition={{ duration: 1.2, ease: EASE, delay: 0.35 }}
-            className="relative mt-16 aspect-[2.3/1] overflow-hidden rounded-3xl border border-white/10 shadow-2xl shadow-black/50"
+            className="relative mt-10 aspect-[16/10] overflow-hidden rounded-3xl border border-white/10 shadow-2xl shadow-black/50 md:mt-16 md:aspect-[2.3/1]"
             style={{
               backgroundImage: `linear-gradient(135deg, ${topic.tint[0]}, ${topic.tint[1]})`,
             }}
@@ -360,7 +360,7 @@ export function ExploreExperience({
       </header>
 
       {/* ── chapters, with the tracking rail ─────────────────────────────── */}
-      <div className="mx-auto grid max-w-6xl gap-16 px-6 pb-24 md:px-10 lg:grid-cols-[220px_1fr] lg:gap-20">
+      <div className="mx-auto grid max-w-6xl gap-16 px-5 pb-20 sm:px-6 md:px-10 md:pb-24 lg:grid-cols-[220px_1fr] lg:gap-20">
         <nav className="hidden lg:block">
           <div className="sticky top-32">
             <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-bone/30">
@@ -418,7 +418,7 @@ export function ExploreExperience({
               key={chapter.id}
               id={chapter.id}
               data-explore-block
-              className="scroll-mt-32 border-t border-white/10 py-14 first:border-0 first:pt-0"
+              className="scroll-mt-28 border-t border-white/10 py-10 first:border-0 first:pt-0 md:scroll-mt-32 md:py-14"
             >
               <div className="flex items-baseline gap-5">
                 <span
@@ -524,9 +524,9 @@ export function ExploreExperience({
       {/* ── gallery ──────────────────────────────────────────────────────── */}
       <section
         data-explore-block
-        className="mx-auto max-w-6xl px-6 pb-24 md:px-10"
+        className="mx-auto max-w-6xl px-5 pb-20 sm:px-6 md:px-10 md:pb-24"
       >
-        <div className="flex items-end justify-between gap-6 border-t border-white/10 pt-12">
+        <div className="flex items-end justify-between gap-6 border-t border-white/10 pt-10 md:pt-12">
           <h2
             data-explore-lead
             className="font-display text-[clamp(1.5rem,2.6vw,2.1rem)] text-bone"
@@ -564,7 +564,7 @@ export function ExploreExperience({
       {topic.quote ? (
         <section
           data-explore-block
-          className="relative overflow-hidden px-6 py-24 md:px-10"
+          className="relative overflow-hidden px-5 py-16 sm:px-6 md:px-10 md:py-24"
         >
           <div
             className="pointer-events-none absolute inset-0 -z-10"
@@ -584,7 +584,7 @@ export function ExploreExperience({
       {/* ── deeper reading ───────────────────────────────────────────────── */}
       <section
         data-explore-block
-        className="mx-auto max-w-6xl px-6 pb-20 md:px-10"
+        className="mx-auto max-w-6xl px-5 pb-16 sm:px-6 md:px-10 md:pb-20"
       >
         <h2
           data-explore-lead
@@ -619,11 +619,11 @@ export function ExploreExperience({
       {/* ── call to action ───────────────────────────────────────────────── */}
       <section
         data-explore-block
-        className="mx-auto max-w-6xl px-6 pb-20 md:px-10"
+        className="mx-auto max-w-6xl px-5 pb-16 sm:px-6 md:px-10 md:pb-20"
       >
         <div
           data-explore-item
-          className="relative overflow-hidden rounded-3xl border border-white/12 px-8 py-14 text-center md:px-16"
+          className="relative overflow-hidden rounded-3xl border border-white/12 px-6 py-12 text-center sm:px-8 md:px-16 md:py-14"
           style={{
             backgroundImage: `linear-gradient(150deg, ${topic.tint[0]}, ${topic.tint[1]})`,
           }}
@@ -653,7 +653,7 @@ export function ExploreExperience({
       </section>
 
       {/* ── the rest of the tour ─────────────────────────────────────────── */}
-      <footer className="mx-auto max-w-6xl px-6 pb-24 md:px-10">
+      <footer className="safe-bottom mx-auto max-w-6xl px-5 pb-20 sm:px-6 md:px-10 md:pb-24">
         <div className="grid gap-4 border-t border-white/10 pt-8 sm:grid-cols-2">
           <Link
             href={`/explore/${prev.slug}`}
@@ -671,12 +671,12 @@ export function ExploreExperience({
           <Link
             href={`/explore/${next.slug}`}
             {...hoverable}
-            className="group rounded-2xl border border-white/10 p-6 text-right transition-colors hover:border-white/25"
+            className="group rounded-2xl border border-white/10 p-6 transition-colors hover:border-white/25 sm:text-right"
           >
             <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-bone/35">
               Next room &rarr;
             </p>
-            <p className="mt-3 flex items-center justify-end gap-2 font-display text-2xl text-bone transition-colors group-hover:text-ember">
+            <p className="mt-3 flex items-center gap-2 font-display text-2xl text-bone transition-colors group-hover:text-ember sm:justify-end">
               <span className="numeral numeral--lg text-[0.8em]">{next.index}</span>
               {next.word}
             </p>

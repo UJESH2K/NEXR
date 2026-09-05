@@ -22,6 +22,19 @@ import { clamp01, damp, scroll } from '@/lib/scrollStore'
 const _a = new Color()
 const _b = new Color()
 
+/**
+ * How far the beat's accent is pulled toward a warm white before it is used as
+ * light.
+ *
+ * A rim light is not a swatch. At full saturation the brand orange washed the
+ * whole room brown — the green sky, the rock and the figure's white suit all
+ * came back the same warm mud. Mixing most of the way to white keeps the
+ * direction of the colour, which is all a rim needs to carry, and lets the sky
+ * be the thing that says what colour the room is.
+ */
+const LIGHT_WASH = 0.55
+const _white = new Color('#fff3e4')
+
 export function Lighting({ reduced = false }: { reduced?: boolean }) {
   const key = useRef<DirectionalLight>(null)
   const warmRim = useRef<DirectionalLight>(null)
@@ -39,6 +52,7 @@ export function Lighting({ reduced = false }: { reduced?: boolean }) {
     _a.set(SECTIONS[i].accent)
     _b.set(SECTIONS[j].accent)
     _a.lerp(_b, t)
+    _a.lerp(_white, LIGHT_WASH)
 
     if (warmRim.current) warmRim.current.color.lerp(_a, 1 - Math.exp(-4 * dt))
     if (pool.current) pool.current.color.lerp(_a, 1 - Math.exp(-4 * dt))

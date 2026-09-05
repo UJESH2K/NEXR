@@ -124,6 +124,7 @@
     display: inline-flex;
     align-items: center;
     gap: 30px;
+    min-height: 44px;
     padding: 15px 18px;
     border: 1px solid rgb(255 255 255 / 0.8);
     font-family: var(--font-mono);
@@ -354,6 +355,27 @@
 }
 
 /*
+ * Vertical centring for the columns that flank the figure.
+ *
+ * This is a class rather than Tailwind's `top-1/2 -translate-y-1/2` because
+ * the mobile layout has to undo it, and undoing it turned out to be
+ * impossible: Tailwind v4 compiles translate utilities to the standalone
+ * `translate` property, and the CSS minifier folds a `transform: none;
+ * translate: none` pair back into `transform: translate(0)` — which cancels
+ * the transform and leaves the translate standing. The block was pulled up by
+ * half its own height, so the taller a beat's copy was, the further it climbed
+ * over the character.
+ *
+ * Owning the rule here means the phone layout simply does not opt in.
+ */
+@media (min-width: 1024px) {
+  .story-col--mid {
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+
+/*
  * Below this the figure and two side columns cannot all fit, so the copy drops
  * to a full-width block along the bottom. CameraRig pushes the camera back and
  * lifts the framing on narrow viewports to open that space up, which is what
@@ -364,13 +386,21 @@
     position: absolute;
     inset-inline: var(--gutter);
     top: auto;
-    /* Low enough to clear the lifted figure. CameraRig drops the look target by
-       up to 10 world units on narrow viewports, which puts the base of the rock
-       at roughly 70% of the frame height — this block starts just below it. */
-    bottom: 9vh;
+    /* Low enough to clear the lifted figure. CameraRig drops the look target on
+       narrow viewports and backs the camera off, which puts the base of the
+       rock at roughly half the frame height — this block starts below that, and
+       adds the home indicator's inset so the last line is never under it. */
+    bottom: calc(4vh + env(safe-area-inset-bottom));
     width: auto;
     max-width: 34rem;
-    transform: none;
+  }
+}
+
+/* Phones proper. The gutter tightens and the type steps down a little, because
+   at 390px the desktop measure leaves about four words to a line. */
+@media (max-width: 639px) {
+  :root {
+    --gutter: 20px;
   }
 }
 
@@ -397,6 +427,9 @@
   align-items: center;
   gap: 0.85rem;
   padding: 0.85rem 1.6rem;
+  /* A finger needs about 44px of height to hit reliably; the type in here is
+     11px, so the padding alone does not get there on every zoom level. */
+  min-height: 44px;
   overflow: hidden;
   border: 1px solid rgb(190 209 168 / 0.34);
   border-radius: 999px;
@@ -683,5 +716,133 @@
   .numeral {
     animation: none;
     background-position: 62% 0;
+  }
+}
+
+/* ── phones ────────────────────────────────────────────────────────────── */
+
+/*
+ * Safe areas.
+ *
+ * The page is declared viewport-fit: cover so the scene reaches under the
+ * notch and the home indicator. Anything anchored to an edge has to add the
+ * inset back, or it sits under hardware. These are additive so an element can
+ * keep the padding it already had.
+ */
+.safe-top {
+  padding-top: calc(1rem + env(safe-area-inset-top));
+}
+
+@media (min-width: 768px) {
+  .safe-top {
+    padding-top: calc(1.25rem + env(safe-area-inset-top));
+  }
+}
+
+.safe-bottom {
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+}
+
+/*
+ * The compact primary button.
+ *
+ * Same control, less padding and a smaller label, for the header on a phone.
+ * The height stays at 44px so it is still a comfortable tap target — that is
+ * the floor, and it is why the padding shrinks rather than the type.
+ */
+.btn-primary--compact {
+  padding: 0.7rem 1rem;
+  gap: 0.5rem;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  min-height: 44px;
+}
+
+/* Matches the header's own breakpoint: the full-length label only appears once
+   the route list does, at lg. */
+@media (min-width: 1024px) {
+  .btn-primary--compact {
+    padding: 0.85rem 1.6rem;
+    gap: 0.85rem;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+  }
+}
+
+/*
+ * The scene's copy block on a phone.
+ *
+ * The figure owns the middle of a wide frame, but on a phone there is no
+ * "beside" — the copy has to sit under it, over the room. CameraRig lifts and
+ * shrinks the figure to open that strip up, and this scrim covers the rest:
+ * the room's own gradient is bright enough in places that body text on it
+ * failed to read at all. It is drawn behind the column and bleeds past its
+ * edges so there is no visible box.
+ */
+.story-scrim {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  top: 38%;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgb(8 11 8 / 0.55) 32%,
+    rgb(8 11 8 / 0.86) 62%,
+    rgb(8 11 8 / 0.94) 100%
+  );
+}
+
+@media (min-width: 1024px) {
+  .story-scrim {
+    display: none;
+  }
+}
+
+/*
+ * Short phones.
+ *
+ * An iPhone SE is 667px tall and the tallest beat — kicker, three-line
+ * headline, five-line body, three tiles and a link — needs most of that. The
+ * copy stays complete; it just sets tighter, and the scrim starts higher so
+ * the part of it that crosses the figure still reads. Below this the numbers
+ * are the same on a phone in landscape, which is the other case this covers.
+ */
+@media (max-width: 1023px) and (max-height: 740px) {
+  .story-col h1,
+  .story-col h2 {
+    font-size: clamp(1.35rem, 5.4vw, 2rem);
+  }
+
+  .story-col p {
+    font-size: 12.5px;
+    line-height: 1.6;
+  }
+
+  .story-col li {
+    padding-block: 0.45rem;
+    font-size: 11.5px;
+  }
+
+  .story-scrim {
+    top: 24%;
+  }
+}
+
+/*
+ * Gallery frames on a phone.
+ *
+ * The rooms mix 16:9, 4:3 and 3:4 so the grid does not read as a contact
+ * sheet, which works while the cards sit two to a row. One to a row, a 3:4
+ * card is taller than the screen and the reader has to scroll a whole viewport
+ * to pass one picture. Below the two-column breakpoint they all take the same
+ * landscape shape. The ratio is set inline from the data, so this has to win
+ * with !important — the alternative is threading a second ratio through every
+ * gallery entry for no gain.
+ */
+@media (max-width: 767px) {
+  .explore-frame {
+    aspect-ratio: 4 / 3 !important;
   }
 }

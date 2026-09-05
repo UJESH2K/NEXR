@@ -120,7 +120,7 @@ export function BeatAside({
   if (section.tiles) {
     return (
       <div
-        className="story-col absolute top-1/2 hidden -translate-y-1/2 lg:block"
+        className="story-col story-col--mid absolute hidden lg:block"
         style={{ [side]: 'clamp(20px, 3vw, 72px)' }}
       >
         <motion.p
@@ -164,7 +164,7 @@ export function BeatAside({
   if (section.quote) {
     return (
       <div
-        className="story-col absolute top-1/2 hidden -translate-y-1/2 lg:block"
+        className="story-col story-col--mid absolute hidden lg:block"
         style={{ [side]: 'clamp(20px, 3vw, 72px)' }}
       >
         <TiltCard

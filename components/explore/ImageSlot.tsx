@@ -29,7 +29,7 @@ export function ImageSlot({
   return (
     <figure
       data-explore-item
-      className={`group relative overflow-hidden rounded-2xl border border-white/10 ${className}`}
+      className={`explore-frame group relative overflow-hidden rounded-2xl border border-white/10 ${className}`}
       style={{
         aspectRatio: item.aspect,
         backgroundImage: `linear-gradient(140deg, ${tint[0]}, ${tint[1]})`,

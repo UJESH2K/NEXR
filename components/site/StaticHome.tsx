@@ -25,7 +25,7 @@ const CREDIBILITY = [
 
 export function StaticHome() {
   return (
-    <div className="pointer-events-auto min-h-svh bg-void px-6 pt-32 pb-24 md:px-10">
+    <div className="safe-bottom pointer-events-auto min-h-svh bg-void px-5 pb-20 pt-28 sm:px-6 md:px-10 md:pb-24 md:pt-32">
       {/* ── hero ─────────────────────────────────────────────────────────── */}
       <section className="mx-auto grid max-w-5xl gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
         <h1 className="display text-balance text-[clamp(2.4rem,6vw,4.75rem)] text-bone">

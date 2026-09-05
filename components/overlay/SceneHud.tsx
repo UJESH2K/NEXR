@@ -35,6 +35,7 @@ const SOCIALS = [
 export function SceneHud() {
   const { activeCard, past } = useScrollSnapshot()
   const fill = useRef<HTMLSpanElement>(null)
+  const mobileFill = useRef<HTMLSpanElement>(null)
   const bar = useRef<HTMLSpanElement>(null)
   const readout = useRef<HTMLSpanElement>(null)
 
@@ -45,6 +46,7 @@ export function SceneHud() {
       const p = scroll.homeProgress
 
       if (fill.current) fill.current.style.transform = `scaleX(${p})`
+      if (mobileFill.current) mobileFill.current.style.transform = `scaleX(${p})`
       if (bar.current) bar.current.style.transform = `scaleY(${p})`
 
       // The readout only touches the DOM when the rounded value changes, which
@@ -72,6 +74,20 @@ export function SceneHud() {
       className="overlay-layer fixed inset-0"
       style={{ zIndex: 'var(--z-chrome)' }}
     >
+      {/* ── progress, phones ─────────────────────────────────────────────── */}
+      {/* The six-tick rail needs about 340px of clear width and the phone
+          header already owns that row, so small screens get the same
+          information as one hairline under the header instead. */}
+      <div
+        className="absolute inset-x-0 top-0 h-px bg-bone/15 md:hidden"
+        style={{ top: 'calc(4.25rem + env(safe-area-inset-top))' }}
+      >
+        <span
+          ref={mobileFill}
+          className="block h-full w-full origin-left scale-x-0 bg-ember"
+        />
+      </div>
+
       {/* ── progress rail, top centre ────────────────────────────────────── */}
       <div className="absolute left-1/2 top-6 hidden -translate-x-1/2 items-center gap-4 md:flex">
         <span className="numeral text-[10px]">01</span>
@@ -112,7 +128,10 @@ export function SceneHud() {
       {/* ── the big word, bottom centre ──────────────────────────────────── */}
       {/* Held back until the visitor scrolls: on the hero the frame already has
           a headline, and two display-size words would fight. */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col items-center">
+      {/* Hidden below lg: on a phone the copy block occupies the bottom of the
+          frame, the word landed on top of it, and the beat's own label already
+          says which section this is. */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 hidden flex-col items-center lg:flex">
         <AnimatePresence mode="wait">
           {past ? (
           <motion.div
@@ -143,7 +162,12 @@ export function SceneHud() {
       </div>
 
       {/* ── vertical progress + socials, bottom right ─────────────────────── */}
-      <div className="absolute bottom-7 right-6 flex flex-col items-end gap-5 md:right-10">
+      {/* Also desktop-only. These sat in the same corner as the copy block on a
+          phone; the mobile menu carries the same links. */}
+      <div
+        className="absolute right-6 hidden flex-col items-end gap-5 md:right-10 lg:flex"
+        style={{ bottom: 'calc(1.75rem + env(safe-area-inset-bottom))' }}
+      >
         <div className="relative h-16 w-px bg-bone/20">
           <span
             ref={bar}

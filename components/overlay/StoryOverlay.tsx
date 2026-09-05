@@ -52,6 +52,10 @@ function Hero() {
       exit={{ opacity: 0, transition: { duration: 0.35 } }}
       className="absolute inset-0"
     >
+      {/* Under 1024px the copy sits beneath the figure rather than beside it,
+          so it needs a ground to read against. Desktop hides this. */}
+      <div className="story-scrim" aria-hidden="true" />
+
       {/* The figure owns the middle of the frame. `--char-half` is the widest a
           flanking column can be without reaching it — see globals.css. */}
       <div className="story-col absolute bottom-[14vh] left-[clamp(20px,3vw,72px)] lg:bottom-[18vh]">
@@ -66,7 +70,7 @@ function Hero() {
         {/* Set word by word so the line assembles rather than appearing. Each
             word carries its own blur, which makes the movement read as focus
             pulling in rather than as a slide. */}
-        <h1 className="font-display text-[clamp(2.1rem,3.6vw,3.6rem)] leading-[1.05] text-bone">
+        <h1 className="font-display text-[clamp(2rem,8vw,3.6rem)] leading-[1.05] text-bone">
           {['Workplace', 'wellbeing,', 'reimagined.'].map((word, i) => (
             <motion.span
               key={word}
@@ -84,12 +88,28 @@ function Hero() {
           ))}
         </h1>
 
+        {/* The script's second line. On a wide frame it lives in the right-hand
+            column; there is no right-hand column on a phone, so it follows the
+            title instead rather than being dropped. */}
+        <motion.p
+          initial="hidden"
+          animate={show}
+          variants={rise}
+          transition={{ duration: 1, ease: EASE, delay: 0.85 }}
+          className="mt-4 text-[13.5px] leading-[1.7] text-bone/70 lg:hidden"
+        >
+          The future of workplace wellbeing isn&rsquo;t one-size-fits-all.{' '}
+          <span className="font-display italic text-ember-soft">
+            It&rsquo;s private. Immersive. Personal.
+          </span>
+        </motion.p>
+
         <motion.div
           initial="hidden"
           animate={show}
           variants={rise}
           transition={{ duration: 1, ease: EASE, delay: 0.95 }}
-          className="mt-9"
+          className="mt-7 lg:mt-9"
         >
           <ExploreButton onPress={() => scrollCommands.start()} />
         </motion.div>
@@ -150,11 +170,13 @@ function Beat({ index }: { index: number }) {
       exit={{ opacity: 0, transition: { duration: 0.35 } }}
       className="absolute inset-0"
     >
+    <div className="story-scrim" aria-hidden="true" />
+
     <motion.div
       initial={{ opacity: 0, x: from, filter: 'blur(10px)' }}
       animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
       transition={{ duration: 0.75, ease: EASE }}
-      className="story-col absolute top-1/2 -translate-y-1/2"
+      className="story-col story-col--mid absolute"
       style={{ [onRight ? 'right' : 'left']: 'clamp(20px, 3vw, 72px)' }}
     >
       <div className="flex items-center gap-3">
@@ -183,7 +205,7 @@ function Beat({ index }: { index: number }) {
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: EASE, delay: 0.12 }}
-          className="mt-5 text-[clamp(0.95rem,1.15vw,1.15rem)] leading-[1.5] text-bone/60"
+          className="mt-4 text-[clamp(0.9rem,3.6vw,1.15rem)] leading-[1.45] text-bone/60 lg:mt-5"
         >
           {section.kicker}
         </motion.p>
@@ -193,7 +215,7 @@ function Beat({ index }: { index: number }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: EASE, delay: 0.2 }}
-        className="mt-2 font-display text-[clamp(1.9rem,3vw,3rem)] font-semibold leading-[1.08] text-bone"
+        className="mt-2 font-display text-[clamp(1.65rem,6.4vw,3rem)] font-semibold leading-[1.08] text-bone"
       >
         {section.headline}
       </motion.h2>
@@ -202,7 +224,7 @@ function Beat({ index }: { index: number }) {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: EASE, delay: 0.3 }}
-        className="mt-5 text-[13.5px] leading-[1.8] text-bone/65"
+        className="mt-4 text-[13px] leading-[1.7] text-bone/70 sm:text-[13.5px] sm:leading-[1.8] lg:mt-5"
       >
         {section.body}
       </motion.p>
@@ -211,14 +233,14 @@ function Beat({ index }: { index: number }) {
           same content is rendered inline here instead. The two are mutually
           exclusive at every width, never both. */}
       {section.tiles ? (
-        <ul className="mt-6 space-y-2 lg:hidden">
+        <ul className="mt-4 space-y-1.5 lg:hidden">
           {section.tiles.map((tile, i) => (
             <motion.li
               key={tile}
               initial={{ opacity: 0, x: onRight ? 18 : -18 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.65, ease: EASE, delay: 0.4 + i * 0.1 }}
-              className="rounded-xl border border-bone/12 bg-bone/[0.04] px-4 py-3 text-[12.5px] leading-[1.5] text-bone/75 backdrop-blur-sm"
+              className="rounded-xl border border-bone/12 bg-bone/[0.04] px-3.5 py-2.5 text-[12px] leading-[1.45] text-bone/80 backdrop-blur-sm"
             >
               {tile}
             </motion.li>
@@ -245,7 +267,7 @@ function Beat({ index }: { index: number }) {
         <Link
           href={section.cta.route}
           {...hoverable}
-          className="group pointer-events-auto mt-8 inline-flex items-center gap-4"
+          className="group pointer-events-auto mt-6 inline-flex min-h-11 items-center gap-4 lg:mt-8"
         >
           <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-bone/80 transition-colors group-hover:text-ember">
             {section.cta.label}

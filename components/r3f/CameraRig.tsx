@@ -68,8 +68,12 @@ export function CameraRig({ reduced = false }: { reduced?: boolean }) {
     // for a card or a column of copy. Backing the camera off shrinks it, and
     // lowering the look target lifts it in frame, which is what opens the strip
     // along the bottom that the stacked mobile layout uses.
+    // Measured against a 390x844 phone, where `narrow` saturates at 1: the
+    // figure has to finish by about half the frame height for the copy under it
+    // to have room, which is roughly nine world units of lift and a little more
+    // distance than the old 0.42 gave.
     const narrow = MathUtils.clamp((1.5 - camera.aspect) / 0.7, 0, 1)
-    const fit = 1 + narrow * 0.42
+    const fit = 1 + narrow * 0.58
 
     const azimuthTarget = reduced ? 0 : Math.sin(p * Math.PI) * SWEEP
     const radiusTarget =
@@ -94,7 +98,7 @@ export function CameraRig({ reduced = false }: { reduced?: boolean }) {
 
     // The look target trails the pointer by a fraction of the camera's own
     // shift. Matching it exactly would cancel the parallax out entirely.
-    _look.set(cur.px * 0.35, LOOK_Y - narrow * 10 + cur.py * 0.3, 0)
+    _look.set(cur.px * 0.35, LOOK_Y - narrow * 16 + cur.py * 0.3, 0)
     camera.lookAt(_look)
 
     if (Math.abs(camera.fov - cur.fov) > 0.001) {

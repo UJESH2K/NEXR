@@ -39,7 +39,7 @@ export function PageShell({
   return (
     <PageFade>
       <GsapRouteMotion>
-      <article className="pointer-events-auto min-h-svh overflow-hidden bg-void px-6 pb-28 pt-32 md:px-10">
+      <article className="safe-bottom pointer-events-auto min-h-svh overflow-hidden bg-void px-5 pb-20 pt-28 sm:px-6 md:px-10 md:pb-28 md:pt-32">
         <header className="mx-auto grid max-w-6xl gap-10 border-b border-white/10 pb-16 lg:grid-cols-[0.7fr_1.3fr] lg:items-end">
           <p data-route-eyebrow className="eyebrow">{eyebrow}</p>
           <div>
@@ -61,7 +61,7 @@ export function PageShell({
         {/* Hero media card with gradient fallback when no image */}
         <div
           data-route-media
-          className="relative mx-auto mt-10 aspect-[2.2/1] max-w-6xl overflow-hidden rounded-2xl border border-white/10 shadow-2xl shadow-black/40"
+          className="relative mx-auto mt-10 aspect-[16/10] max-w-6xl overflow-hidden rounded-2xl border border-white/10 shadow-2xl shadow-black/40 md:aspect-[2.2/1]"
           style={{
             backgroundImage: `linear-gradient(135deg, ${tints[0]}, ${tints[1]})`,
           }}
@@ -92,9 +92,9 @@ export function PageShell({
           </div>
         </div>
 
-        <div className="mx-auto mt-20 max-w-6xl">{children}</div>
+        <div className="mx-auto mt-14 max-w-6xl md:mt-20">{children}</div>
 
-        <footer className="mx-auto mt-24 flex max-w-4xl items-center justify-between border-t border-bone/12 pt-8">
+        <footer className="mx-auto mt-20 flex max-w-4xl flex-wrap items-center justify-between gap-4 border-t border-bone/12 pt-8 md:mt-24">
           <Link
             href="/"
             className="group inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.24em] text-bone/55 transition-colors hover:text-ember"

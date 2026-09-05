@@ -56,6 +56,16 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   themeColor: '#12180f',
   colorScheme: 'dark',
+  width: 'device-width',
+  initialScale: 1,
+  // The scene is full-bleed, so the page has to reach under the notch and the
+  // home indicator rather than being letterboxed between them. Everything that
+  // must stay clear of those bars pads itself with env(safe-area-inset-*) —
+  // see the safe-area rules in globals.css.
+  viewportFit: 'cover',
+  // Deliberately not capping maximumScale: pinch-zoom is the only way some
+  // people can read a page, and taking it away to tidy up a layout is not a
+  // trade worth making.
 }
 
 export default function RootLayout({

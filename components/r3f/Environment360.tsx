@@ -186,7 +186,20 @@ export function Environment360({ reduced = false }: { reduced?: boolean }) {
 
     ;(u.uHorizon.value as Color).copy(_horizonA).lerp(_horizonB, t)
     ;(u.uZenith.value as Color).copy(_zenithA).lerp(_zenithB, t)
-    ;(u.uAccent.value as Color).copy(_accentA).lerp(_accentB, t)
+    /*
+     * The sun pool takes a washed accent rather than the raw one.
+     *
+     * The shader adds the accent back at pow(d, 5), which is a wide lobe
+     * filling most of the frame behind the figure. A saturated brand orange
+     * there stopped being a glow and became the colour of the room: the green
+     * sky, the rock and the figure's white suit all came back brown. Pulling it
+     * halfway to the horizon keeps the warmth in the right place and lets the
+     * sky colour survive.
+     */
+    ;(u.uAccent.value as Color)
+      .copy(_accentA)
+      .lerp(_accentB, t)
+      .lerp(u.uHorizon.value as Color, 0.55)
 
     u.uTime.value = reduced ? 0 : state.clock.elapsedTime
     u.uEnergy.value = reduced ? 0 : scroll.pointerEnergy

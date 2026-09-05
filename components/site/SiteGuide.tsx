@@ -17,5 +17,12 @@ export function SiteGuide() {
   // The explore rooms run their own chapter rail down the left and their own
   // prev/next pair in the footer, and the card lands on top of the second one.
   if (pathname.startsWith('/explore')) return null
-  return <GuideNavigator />
+  return (
+    // Desktop only. It is a floating card in the bottom corner, and on a phone
+    // that corner is the page — it covered the copy on every route it appeared
+    // on, and there is no corner to move it to.
+    <div className="hidden lg:block">
+      <GuideNavigator />
+    </div>
+  )
 }
