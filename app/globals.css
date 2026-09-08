@@ -30,6 +30,9 @@
      it, route content, fixed chrome, the expanded sheet, the load curtain, and
      the cursor above everything because it must never be occluded. */
   --z-canvas: 0;
+  /* The chrome's guaranteed ground — above the scene, below everything drawn
+     on it. See ChromeScrim. */
+  --z-scrim: 5;
   --z-overlay: 10;
   --z-page: 20;
   --z-chrome: 30;
@@ -48,7 +51,7 @@
     margin: 0;
     /* Matches the load curtain, so the pre-hydration frame is the same colour
        as the first thing the visitor actually sees. */
-    background: #12180f;
+    background: #1b0f08;
     color: var(--color-bone);
     font-family: var(--font-sans);
     font-synthesis: none;

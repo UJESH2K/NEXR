@@ -94,7 +94,10 @@ export function GhostWordmark({ word = 'NEXR' }: { word?: string }) {
     const target = 1 - smoothstep(0.0, 0.45, scroll.sectionFloat)
     material.current.opacity = damp(
       material.current.opacity,
-      clamp01(target) * 0.5,
+      // Low, because it now reads as light rather than shadow — see the colour
+      // below. A dark word needs weight to be seen; a bright one needs
+      // restraint, or it competes with the figure standing in front of it.
+      clamp01(target) * 0.17,
       5,
       dt,
     )
@@ -121,7 +124,13 @@ export function GhostWordmark({ word = 'NEXR' }: { word?: string }) {
         // Fogged like everything else at this depth, so it belongs to the room
         // rather than floating in front of it.
         fog
-        color="#0d1a0f"
+        // Warm and light, not dark. This started as a near-black word, which
+        // worked while the sky was a mid green and became invisible the moment
+        // the room went dark — a shadow on a shadow. Lifting it above the sky's
+        // value instead means it reads at every beat, and the figure still cuts
+        // through it because the depth buffer, not the colour, is what puts her
+        // in front.
+        color="#f2a878"
       />
     </mesh>
   )

@@ -66,7 +66,7 @@ export function Plinth() {
   const material = useMemo(
     () =>
       new MeshStandardMaterial({
-        color: '#2b2a24',
+        color: '#2e1b12',
         roughness: 0.95,
         metalness: 0.05,
         flatShading: false,
@@ -102,7 +102,7 @@ export function Plinth() {
         <circleGeometry args={[26, 48]} />
         <meshBasicMaterial
           ref={shade}
-          color="#0d1210"
+          color="#160b06"
           transparent
           opacity={0.5}
           depthWrite={false}

@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { requestReturn } from '@/lib/returnStore'
 import { useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -248,8 +249,11 @@ export function ExploreExperience({
             transition={{ duration: 0.7, ease: EASE }}
             className="flex flex-wrap items-center gap-4"
           >
+            {/* Carries the same return intent as the pinned control, so the two
+                ways back cannot disagree about where "back" is. */}
             <Link
               href="/"
+              onClick={requestReturn}
               {...hoverable}
               className="group inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.22em] text-bone/45 transition-colors hover:text-ember"
             >
@@ -695,8 +699,12 @@ export function ExploreExperience({
               className="transition-transform group-hover:translate-x-1"
             />
           </Link>
+          {/* Third and last way back, and like the other two it carries the
+              return intent — so whichever one a reader finds, they land on the
+              beat they came from rather than at the top of the scene. */}
           <Link
             href="/"
+            onClick={requestReturn}
             {...hoverable}
             className="group inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.22em] text-bone/45 transition-colors hover:text-ember"
           >

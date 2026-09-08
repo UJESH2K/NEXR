@@ -15,7 +15,16 @@ import Lenis from 'lenis'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { CARDS } from './cards'
-import { clamp01, resetScrollState, scroll, scrollCommands, syncSnapshot } from './scrollStore'
+import { consumeReturnIntent, rememberSection } from './returnStore'
+import {
+  SECTION_REST_POINT,
+  clamp01,
+  resetScrollState,
+  scroll,
+  scrollCommands,
+  syncSnapshot,
+} from './scrollStore'
+import { SECTION_COUNT } from './sections'
 import { usePointer } from './usePointer'
 import { useReducedMotion } from './useReducedMotion'
 
@@ -179,16 +188,68 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
     }
   }, [reduced, disarm, router])
 
+  /**
+   * Record which beat was on screen whenever the scene is left.
+   *
+   * Written on the way *out* rather than at the click, so it does not matter
+   * which link was used — a beat's own call to action, the header, a panel, or
+   * the keyboard all leave the same trail. `pathname` is already the new route
+   * by the time this runs, hence the ref holding the previous one.
+   */
+  const previousPath = useRef(pathname)
+  useEffect(() => {
+    if (previousPath.current === '/' && pathname !== '/') {
+      rememberSection(scroll.activeCardIndex)
+    }
+    previousPath.current = pathname
+  }, [pathname])
+
   // ── Route changes ────────────────────────────────────────────────────────
   useEffect(() => {
     if (pathname === '/') {
-      // Returning home (including via the back button) resumes the orbit.
       disarm()
       resetScrollState()
+
+      // Only an explicit back-to-the-scene control sets this, and reading it
+      // clears it. Every other way home — the logo, a bookmark, a fresh tab —
+      // gets the opening frame, which is the whole reason the intent is stored
+      // separately from the remembered beat.
+      const returnTo = consumeReturnIntent()
+
+      if (returnTo === null) {
+        setStartedTick((n) => n + 1)
+        lenis?.scrollTo(0, { immediate: true })
+        ScrollTrigger.refresh()
+        return
+      }
+
+      // Coming back to a beat: the opening frame has already been seen, so skip
+      // the hold and put them where they were.
+      scroll.started = true
+      syncSnapshot()
       setStartedTick((n) => n + 1)
-      lenis?.scrollTo(0, { immediate: true })
-      ScrollTrigger.refresh()
-      return
+      lenis?.start()
+
+      // Two frames of grace before measuring. On a client-side navigation the
+      // home track has only just mounted, and ScrollTrigger cannot size a
+      // spacer the browser has not laid out yet — refreshing too early leaves
+      // the trigger measuring a zero-height document and the jump lands at 0.
+      let raf = requestAnimationFrame(() => {
+        raf = requestAnimationFrame(() => {
+          ScrollTrigger.refresh()
+          const span = document.documentElement.scrollHeight - window.innerHeight
+          if (span <= 0) return
+          // Straight to the beat's rest point rather than an animated scroll:
+          // easing through five beats they did not ask to see again is exactly
+          // the trip this feature exists to save them.
+          lenis?.scrollTo(((returnTo + SECTION_REST_POINT) / SECTION_COUNT) * span, {
+            immediate: true,
+            force: true,
+          })
+        })
+      })
+
+      return () => cancelAnimationFrame(raf)
     }
 
     lenis?.start()
@@ -228,7 +289,7 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
       const span =
         document.documentElement.scrollHeight - window.innerHeight
       if (span <= 0) return
-      const target = ((index + 0.55) / CARDS.length) * span
+      const target = ((index + 0.55) / SECTION_COUNT) * span
       lenis?.scrollTo(target, { duration: 1.6 })
     },
     [lenis],

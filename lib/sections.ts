@@ -46,6 +46,38 @@ export type Section = {
    * Sky gradient for this beat: [horizon, zenith]. The environment sphere
    * cross-fades between the current and next beat's pair as you scroll, which
    * is what makes the 360 read as one continuous space rather than six rooms.
+   *
+   * The run barely travels at all, and that is deliberate.
+   *
+   * The character's suit is #ff7901, hue 28°. The six beats span 30° to 25.5° —
+   * four and a half degrees, start to finish. Lightness moves three points,
+   * saturation five. It is one colour breathing rather than a journey through
+   * several, and it stays orange the whole way.
+   *
+   * Two earlier versions overshot in opposite directions and both were wrong
+   * for the same reason. One slid to hue 10°, which is red: the room stopped
+   * belonging to the figure standing in it. Another opened on a pale amber,
+   * which erased the interface. The colour's job here is to be a constant the
+   * visitor navigates by, not a variable that tells them where they are — the
+   * rail, the numerals and the big word already do that.
+   *
+   * Brightness is the constrained axis, and it was constrained the hard way. A
+   * much lighter version of this palette (horizons around 65% lightness) looked
+   * good in isolation and destroyed everything drawn on top of it: the orange
+   * mark, the orange numerals and the outlined buttons all sat within a few
+   * percent of that value, so the interface fell to a contrast ratio of about
+   * 1.4 against its own background and simply vanished.
+   *
+   * The horizons now sit at 35–41% lightness, and that is close to the ceiling.
+   * The mark measures about 5.7 against the scrimmed frame here, down from 6.7
+   * at 28–34% and heading toward the 3.0 floor where a control stops being
+   * reliably visible. There is perhaps one more step of this available; there is
+   * not two. If these values are raised again, check that ratio rather than the
+   * swatch — the swatch is what made the 1.4 version look reasonable.
+   *
+   * Horizon is always the lighter of the pair, and the shader mixes toward white
+   * in the denser cloud noise above it, which is what gives the sky its lit
+   * tops.
    */
   sky: [string, string]
   /** Fog colour — kept close to the horizon so panels dissolve into the sky. */
@@ -65,8 +97,8 @@ export const SECTIONS: Section[] = [
       'Organisations today invest more in employee wellbeing than ever before. Yet burnout continues to rise, wellbeing programmes remain underused, and many employees hesitate to seek support because of stigma, fear of judgement or concerns around privacy.',
     cta: { label: 'Explore the gap', route: '/explore/gap' },
     images: ['/models/imgs/gap.webp'],
-    sky: ['#59684f', '#1b2419'],
-    fog: '#4a5843',
+    sky: ['#9f6021', '#311c08'],
+    fog: '#84501d',
     accent: '#ff7901',
   },
   {
@@ -79,9 +111,9 @@ export const SECTIONS: Section[] = [
       'At NEXR, we believe workplace wellbeing should feel natural, private and engaging. When support is designed around people instead of processes, organisations create healthier cultures and employees are more likely to begin their wellbeing journey.',
     cta: { label: 'Explore our belief', route: '/explore/belief' },
     images: ['/models/imgs/OurApproach.webp'],
-    sky: ['#6d7a55', '#20281b'],
-    fog: '#5b6749',
-    accent: '#ffa863',
+    sky: ['#a25f20', '#321c08'],
+    fog: '#87501d',
+    accent: '#ff8118',
   },
   {
     id: 'meloworld',
@@ -94,9 +126,9 @@ export const SECTIONS: Section[] = [
     cta: { label: 'Explore MeloWorld', route: '/explore/meloworld' },
     images: ['/models/imgs/meloworld.webp'],
     mark: '/brand/meloworld-mark.webp',
-    sky: ['#4f6f66', '#131f1c'],
-    fog: '#3f5c54',
-    accent: '#9ff2d4',
+    sky: ['#a65f20', '#341c08'],
+    fog: '#89501c',
+    accent: '#ff8a2a',
   },
   {
     id: 'vr-wellness',
@@ -108,9 +140,9 @@ export const SECTIONS: Section[] = [
       'VR Wellness offers immersive, guided experiences that help people work through challenges and build resilience at their own pace. Together with MeloWorld, it forms one connected wellbeing ecosystem.',
     cta: { label: 'Explore VR Wellness', route: '/explore/vr-wellness' },
     images: ['/models/imgs/vrworld.webp'],
-    sky: ['#5b5a7d', '#16151f'],
-    fog: '#4a4a68',
-    accent: '#b9b4ff',
+    sky: ['#a95e1f', '#361c08'],
+    fog: '#8c4f1c',
+    accent: '#ff8422',
   },
   {
     id: 'clinical',
@@ -127,9 +159,9 @@ export const SECTIONS: Section[] = [
     ],
     cta: { label: 'Explore the evidence', route: '/explore/clinical' },
     images: ['/models/imgs/clinicallygrounded.webp'],
-    sky: ['#4c6a6b', '#121b1c'],
-    fog: '#3d5657',
-    accent: '#8fe3e8',
+    sky: ['#ad5d1f', '#381c08'],
+    fog: '#8f4f1c',
+    accent: '#ff7d16',
   },
   {
     id: 'contact',
@@ -143,9 +175,9 @@ export const SECTIONS: Section[] = [
       'Healthier organisations begin with people who feel safe enough to seek support.',
     cta: { label: 'Book a demo', route: '/contact' },
     images: ['/models/imgs/letsconnect.webp'],
-    sky: ['#78834a', '#232717'],
-    fog: '#646e3e',
-    accent: '#ffb589',
+    sky: ['#b05c1e', '#391c08'],
+    fog: '#924e1b',
+    accent: '#ff7609',
   },
 ]
 

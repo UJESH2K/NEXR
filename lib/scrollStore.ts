@@ -17,6 +17,16 @@ export type ScrollMode = 'home' | 'transition'
 /** Kept as an alias so older imports keep resolving. */
 export const CARD_COUNT = SECTION_COUNT
 
+/**
+ * Where inside a beat the scroll comes to rest.
+ *
+ * It has to sit inside the hold and before the pose change begins at 0.5 (see
+ * CharacterModel) or letting go of the wheel would strand the figure between
+ * two poses. Both the snap in HomeScrollDriver and the jump-to-beat in
+ * ScrollProvider aim at it, which is why it lives here rather than in either.
+ */
+export const SECTION_REST_POINT = 0.32
+
 export const scroll = {
   /** 0..1 across the whole home track. */
   homeProgress: 0,

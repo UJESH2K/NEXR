@@ -4,7 +4,7 @@ import { useRef } from 'react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import { SECTION_COUNT } from '@/lib/sections'
-import { setHomeProgress, syncSnapshot } from '@/lib/scrollStore'
+import { SECTION_REST_POINT, setHomeProgress, syncSnapshot } from '@/lib/scrollStore'
 import { useScrollApi } from '@/lib/ScrollProvider'
 
 /**
@@ -18,14 +18,7 @@ import { useScrollApi } from '@/lib/ScrollProvider'
  */
 export const TRACK_VH = 1800
 
-/**
- * Where in a section the scroll settles when the visitor stops.
- *
- * It has to sit inside the hold and before the pose change begins (0.5, see
- * CharacterModel) or releasing the wheel would drop the figure mid-movement and
- * leave it frozen between two poses.
- */
-const REST_POINT = 0.32
+
 
 /**
  * The spacer that gives the home page its scroll length, plus the single master
@@ -54,9 +47,9 @@ export function HomeScrollDriver() {
           // upward scroll is the classic way a snapped page starts fighting the
           // person using it.
           snapTo: (value: number) => {
-            const nearest = Math.round(value * SECTION_COUNT - REST_POINT)
+            const nearest = Math.round(value * SECTION_COUNT - SECTION_REST_POINT)
             const clamped = Math.min(Math.max(nearest, 0), SECTION_COUNT - 1)
-            return (clamped + REST_POINT) / SECTION_COUNT
+            return (clamped + SECTION_REST_POINT) / SECTION_COUNT
           },
           delay: 0.12,
           duration: { min: 0.45, max: 0.9 },

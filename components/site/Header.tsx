@@ -67,6 +67,15 @@ export function Header() {
           width={192}
           height={139}
           priority
+          // Belt and braces with ChromeScrim. The scrim guarantees a dark ground
+          // under the header, and this keeps the mark readable even if a future
+          // beat brightens the top of the frame — which is exactly what happened
+          // the last time the sky was allowed to get light.
+          style={
+            overScene
+              ? { filter: 'drop-shadow(0 2px 10px rgb(20 9 5 / 0.75))' }
+              : undefined
+          }
           className={`w-auto transition-opacity duration-300 group-hover:opacity-80 ${
             overScene ? 'h-8 md:h-9' : 'h-7'
           }`}

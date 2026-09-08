@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from 'next'
 import { Chakra_Petch, DM_Mono, Manrope, Playfair_Display } from 'next/font/google'
 import { CanvasHost } from '@/components/r3f/CanvasHost'
+import { ChromeScrim } from '@/components/site/ChromeScrim'
+import { RouteBackdrop } from '@/components/site/RouteBackdrop'
 import { CursorFollower } from '@/components/ui/cursor-follower'
 import { Header } from '@/components/site/Header'
 import { SkipLink } from '@/components/site/SkipLink'
@@ -54,7 +56,7 @@ export const metadata: Metadata = {
 
 // themeColor lives here rather than in metadata — Next moved it in v14.
 export const viewport: Viewport = {
-  themeColor: '#12180f',
+  themeColor: '#1b0f08',
   colorScheme: 'dark',
   width: 'device-width',
   initialScale: 1,
@@ -107,6 +109,10 @@ export default function RootLayout({
         <CursorFollower />
         <ScrollProvider>
           <CanvasHost />
+          {/* Sibling of the canvas, not a child of <main>: main carries its own
+              z-index and would trap this above the content it sits behind. */}
+          <ChromeScrim />
+          <RouteBackdrop />
           <Header />
           <SiteGuide />
           {/* pointer-events-none is load-bearing: on the home route this element

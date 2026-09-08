@@ -95,7 +95,7 @@ export function Preloader({ waitForAssets = true }: { waitForAssets?: boolean })
         <motion.div
           key="preloader"
           className="fixed inset-0 flex flex-col items-center justify-center"
-          style={{ zIndex: 'var(--z-curtain)', background: '#12180f' }}
+          style={{ zIndex: 'var(--z-curtain)', background: '#1b0f08' }}
           initial={{ opacity: 1 }}
           exit={{
             // Lift rather than fade: the scene is already rendering behind this,

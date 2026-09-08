@@ -53,6 +53,7 @@ const FRAG = /* glsl */ `
   uniform float uEnergy;
   uniform vec2  uPointer;
   uniform float uGrain;
+  uniform vec3  uHighlight;
 
   // Value noise. Cheap, and at this scale the lattice never shows.
   float hash(vec3 p) {
@@ -99,7 +100,26 @@ const FRAG = /* glsl */ `
     // what stops the clouds looking like one texture being scrolled.
     float clouds = fbm(dir * 2.1 + vec3(uTime * 0.012, uTime * 0.006, 0.0));
     clouds = mix(clouds, fbm(dir * 4.7 - vec3(0.0, uTime * 0.02, uTime * 0.01)), 0.45);
-    col += (clouds - 0.5) * 0.085;
+    col += (clouds - 0.5) * 0.105;
+
+    // Lit cloud tops.
+    //
+    // The shading above only darkens and lightens the sky's own hue, which on a
+    // warm palette gives muddy brown shadows and no highlight at all. Mixing the
+    // denser part of the same noise toward white instead reads as sunlight
+    // catching the top of a cloud, and it is the one thing that keeps an orange
+    // sky from looking like a flat orange wall.
+    //
+    // The exponent is what makes it a highlight rather than a haze: raising the
+    // noise to a high power keeps all but the densest few percent at zero, so
+    // the white lands in a handful of places instead of washing the whole dome.
+    float lit = pow(smoothstep(0.36, 0.86, clouds), 2.1);
+    // Strongest just above the horizon and gone overhead, the way a low sun lights
+    // cloud from beneath. The band is wide because on a dark ground this mix is
+    // not a tint on an already-bright sky — it *is* the cloud, and a narrow band
+    // leaves the upper dome flat.
+    lit *= smoothstep(-0.45, 0.12, dir.y) * (1.0 - smoothstep(0.55, 1.0, dir.y));
+    col = mix(col, uHighlight, lit * 0.4);
 
     // Light pool behind the subject, nudged by the pointer.
     vec3 sun = normalize(vec3(uPointer.x * 0.5, 0.18 - uPointer.y * 0.28, -1.0));
@@ -157,6 +177,9 @@ export function Environment360({ reduced = false }: { reduced?: boolean }) {
           uEnergy: { value: 0 },
           uPointer: { value: new Vector2() },
           uGrain: { value: 0.035 },
+          // Near-white, warmed very slightly so the lit edges belong to the same
+          // light as the sky rather than looking like paper laid over it.
+          uHighlight: { value: new Color('#fff6ec') },
         },
       }),
     [],

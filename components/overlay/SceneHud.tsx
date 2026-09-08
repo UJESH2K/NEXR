@@ -7,6 +7,7 @@ import { SECTIONS, SECTION_COUNT } from '@/lib/sections'
 import { scroll, scrollCommands } from '@/lib/scrollStore'
 import { useScrollSnapshot } from '@/lib/useScrollSnapshot'
 import { setCursor, resetCursor } from '@/lib/cursorStore'
+import { SOCIAL_LINKS } from '@/components/ui/SocialIcons'
 
 /**
  * The instrument panel around the frame: the progress rail, the big word pinned
@@ -25,12 +26,6 @@ import { setCursor, resetCursor } from '@/lib/cursorStore'
  * fastest way to make a smooth scene feel cheap. React is only told when the
  * active section actually changes.
  */
-
-const SOCIALS = [
-  { label: 'LI', href: 'https://www.linkedin.com', title: 'LinkedIn' },
-  { label: 'IG', href: 'https://www.instagram.com', title: 'Instagram' },
-  { label: 'YT', href: 'https://www.youtube.com', title: 'YouTube' },
-]
 
 export function SceneHud() {
   const { activeCard, past } = useScrollSnapshot()
@@ -189,19 +184,26 @@ export function SceneHud() {
           >
             000
           </span>
-          {SOCIALS.map((s) => (
-            <a
-              key={s.label}
-              href={s.href}
-              target="_blank"
-              rel="noreferrer noopener"
-              title={s.title}
-              {...hoverable}
-              className="font-mono text-[10px] tracking-[0.22em] text-bone/45 transition-colors hover:text-ember"
-            >
-              {s.label}
-            </a>
-          ))}
+          {/* Real brand marks rather than two-letter abbreviations. "LI / IG /
+              YT" reads as a legend to be decoded; a logo is recognised without
+              being read, which is the entire job of a corner link. */}
+          <ul className="flex items-center gap-4">
+            {SOCIAL_LINKS.map(({ id, label, href, Icon }) => (
+              <li key={id}>
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  aria-label={label}
+                  title={label}
+                  {...hoverable}
+                  className="block text-bone/45 transition-colors duration-300 hover:text-ember"
+                >
+                  <Icon size={15} />
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </div>

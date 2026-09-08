@@ -15,7 +15,13 @@ import { Lighting } from './Lighting'
 import { PanelField } from './PanelField'
 import { Plinth } from './Plinth'
 
-/** How long the canvas keeps rendering after the visitor leaves the home page. */
+/**
+ * How long the canvas keeps *rendering* after the visitor leaves the home page.
+ *
+ * This is a frame-loop delay, not a visibility one — the scene is hidden the
+ * instant the route changes (see below). The grace period exists only so a
+ * quick out-and-back does not stop and restart the loop needlessly.
+ */
 const IDLE_AFTER_LEAVE = 900
 
 export default function SceneRoot() {
@@ -23,17 +29,41 @@ export default function SceneRoot() {
   const pathname = usePathname()
   const [rendering, setRendering] = useState(true)
 
+  const onHome = pathname === '/'
+
   useEffect(() => {
-    if (pathname === '/') {
+    if (onHome) {
       setRendering(true)
       return
     }
     const idle = setTimeout(() => setRendering(false), IDLE_AFTER_LEAVE)
     return () => clearTimeout(idle)
-  }, [pathname])
+  }, [onHome])
 
   return (
-    <div className="fixed inset-0" style={{ zIndex: 'var(--z-canvas)' }} aria-hidden="true">
+    <div
+      className="fixed inset-0"
+      style={{
+        zIndex: 'var(--z-canvas)',
+        /*
+         * Hidden the moment the route is not home, with no transition.
+         *
+         * The scene used to stay on screen for the full IDLE_AFTER_LEAVE while
+         * the destination page faded up over it, so every move into or between
+         * the explore rooms showed a flash of the character behind the new
+         * page. Deriving this straight from `pathname` means it flips in the
+         * same commit as the route itself, and a hard cut rather than a fade is
+         * the point: any duration here is a duration the scene is visible.
+         *
+         * Visibility rather than unmounting. Tearing the canvas down would drop
+         * the WebGL context and force the 4 MB model to be parsed and uploaded
+         * again on the way back, which trades a flash for a stall.
+         */
+        opacity: onHome ? 1 : 0,
+        visibility: onHome ? 'visible' : 'hidden',
+      }}
+      aria-hidden="true"
+    >
       <Canvas
         frameloop={rendering ? 'always' : 'never'}
         // Full retina. The scene is fill-bound on the sky shader, so this is

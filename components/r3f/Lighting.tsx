@@ -65,9 +65,11 @@ export function Lighting({ reduced = false }: { reduced?: boolean }) {
     if (coolRim.current) {
       // The cool rim swells slightly with pointer energy, so quick movement
       // catches an edge on the figure.
+      // Must match the JSX rest value below, or this overwrites it on the first
+      // frame and the silhouette light silently drops back to its old strength.
       coolRim.current.intensity = damp(
         coolRim.current.intensity,
-        0.75 + scroll.pointerEnergy * 0.5,
+        1.35 + scroll.pointerEnergy * 0.5,
         4,
         dt,
       )
@@ -76,17 +78,23 @@ export function Lighting({ reduced = false }: { reduced?: boolean }) {
 
   return (
     <>
-      <ambientLight intensity={0.55} color="#cddcc4" />
-      <hemisphereLight args={['#c9dbb4', '#1a1f18', 0.7]} />
+      <ambientLight intensity={0.5} color="#ffd9bd" />
+      <hemisphereLight args={['#ffcfa4', '#2a1108', 0.7]} />
 
       {/* Key — front-high, camera-left, and the one thing the pointer moves. */}
       <directionalLight ref={key} position={[4, 6, 6]} intensity={1.5} color="#fff6e8" />
 
       {/* Accent rim from behind. Carries the beat's colour. */}
-      <directionalLight ref={warmRim} position={[-5, 3, -6]} intensity={1.25} color="#ff7901" />
+      <directionalLight ref={warmRim} position={[-5, 3, -6]} intensity={0.85} color="#ff7901" />
 
       {/* Cool counter-rim on the opposite side for separation on the turn. */}
-      <directionalLight ref={coolRim} position={[6, 1.5, -5]} intensity={0.75} color="#9fc4d4" />
+      {/* The cool counter-rim, and it matters more than it used to.
+          The figure is orange and white and the room is now orange too, so the
+          warm rim above no longer separates them — it paints orange onto
+          orange. This one is the only light in the scene whose hue the sky does
+          not share, which makes it the entire silhouette. Hence the higher
+          intensity than the warm side. */}
+      <directionalLight ref={coolRim} position={[6, 1.5, -5]} intensity={1.35} color="#a9d0e4" />
 
       {/* Pool from above and behind: this is what puts a halo on the shoulders. */}
       <spotLight
@@ -105,7 +113,7 @@ export function Lighting({ reduced = false }: { reduced?: boolean }) {
       />
 
       {/* Soft underlight so the legs do not fall to black against the rock. */}
-      <pointLight position={[0, -8, 12]} intensity={260} distance={70} color="#3d5145" />
+      <pointLight position={[0, -8, 12]} intensity={260} distance={70} color="#5a2a16" />
     </>
   )
 }
