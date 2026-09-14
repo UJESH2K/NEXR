@@ -27,8 +27,22 @@ export type Section = {
   kicker?: string
   headline: string
   body: string
-  /** Short statements drawn as a stack of tiles under the body. */
-  tiles?: string[]
+  /**
+   * Card blocks drawn on the far side of the figure, one per entry.
+   *
+   * These carry a title as well as a line of copy because the script's card
+   * blocks are named things — "For Workplaces", "For Education" — and a bare
+   * sentence loses the name that makes the set scannable.
+   */
+  tiles?: { title: string; body: string }[]
+  /**
+   * Short single-line statements, set as a compact row under the body.
+   *
+   * Distinct from `tiles` on purpose. The credibility lines are assertions, not
+   * destinations: they want to be read in one sweep, not clicked, and giving
+   * them the card treatment made them look like three more things to go and do.
+   */
+  proof?: string[]
   /** Pull quote set beside the beat, used to close the page. */
   quote?: string
   cta: { label: string; route: string }
@@ -91,8 +105,8 @@ export const SECTIONS: Section[] = [
     id: 'gap',
     index: '01',
     word: 'The Gap',
-    kicker: 'The barrier isn’t always the support.',
-    headline: 'It’s the way in.',
+    kicker: 'People need support.',
+    headline: 'But reaching out isn’t always easy.',
     body:
       'Organisations today invest more in employee wellbeing than ever before. Yet burnout continues to rise, wellbeing programmes remain underused, and many employees hesitate to seek support because of stigma, fear of judgement or concerns around privacy.',
     cta: { label: 'Explore the gap', route: '/explore/gap' },
@@ -119,10 +133,10 @@ export const SECTIONS: Section[] = [
     id: 'meloworld',
     index: '03',
     word: 'MeloWorld',
-    kicker: 'Different ways in. One way forward.',
-    headline: 'A private space where the first step feels easy.',
+    kicker: 'A new ecosystem for workplace wellbeing.',
+    headline: 'A private space, explored anonymously.',
     body:
-      'MeloWorld creates a private, anonymous space where employees can take their first step towards support comfortably. It is one half of a connected ecosystem designed for modern workplaces.',
+      'MeloWorld is a private virtual space where employees can explore their wellbeing anonymously. Choose your avatar, explore different spaces and connect with trained mental health professionals in a comfortable setting.',
     cta: { label: 'Explore MeloWorld', route: '/explore/meloworld' },
     images: ['/models/imgs/meloworld.webp'],
     mark: '/brand/meloworld-mark.webp',
@@ -135,9 +149,9 @@ export const SECTIONS: Section[] = [
     index: '04',
     word: 'VR Wellness',
     kicker: 'The other way in.',
-    headline: 'Immersive experiences, taken at your own pace.',
+    headline: 'Guided immersion, built around real needs.',
     body:
-      'VR Wellness offers immersive, guided experiences that help people work through challenges and build resilience at their own pace. Together with MeloWorld, it forms one connected wellbeing ecosystem.',
+      'VR Wellness is a guided VR experience designed to support mental wellbeing. From relaxation to building confidence, employees can explore experiences shaped around different wellbeing needs. Together with MeloWorld it forms one connected ecosystem, designed for modern workplaces.',
     cta: { label: 'Explore VR Wellness', route: '/explore/vr-wellness' },
     images: ['/models/imgs/vrworld.webp'],
     sky: ['#a95e1f', '#361c08'],
@@ -145,14 +159,38 @@ export const SECTIONS: Section[] = [
     accent: '#ff8422',
   },
   {
+    /*
+     * Two blocks of the script share this beat: who NEXR is for, and what it is
+     * built on. There are six poses in the character's clip and therefore six
+     * beats, and the alternative was to drop one block from the page entirely.
+     *
+     * They merge cleanly because they answer the same buyer question from two
+     * sides — the audience cards say who it is for, the proof line says why it
+     * can be trusted — and the two treatments stay visually distinct: cards on
+     * the far side of the figure, a single quiet row under the copy.
+     */
     id: 'clinical',
     index: '05',
-    word: 'Clinical',
-    kicker: 'Creating psychologically safer workplaces.',
-    headline: 'Where clinical expertise meets immersive technology.',
+    word: 'Who It’s For',
+    kicker: 'Designed for people. Built for organisations.',
+    headline: 'Expertise meets innovation.',
     body:
-      'Whether you are supporting employees across an enterprise or students within an educational institution, NEXR helps create psychologically safer environments where wellbeing becomes approachable, engaging and accessible.',
+      'NEXR works with organisations, educational institutions and healthcare teams to make mental wellbeing more accessible, engaging and easy to approach.',
     tiles: [
+      {
+        title: 'For Workplaces',
+        body: 'Private, engaging ways for employees to access and explore wellbeing.',
+      },
+      {
+        title: 'For Education',
+        body: 'Help students make mental wellbeing a more natural part of everyday life.',
+      },
+      {
+        title: 'For Healthcare',
+        body: 'Immersive tools designed to complement the work of mental health professionals.',
+      },
+    ],
+    proof: [
       'Developed with mental health professionals.',
       'Tested in clinical practice.',
       'Designed for the realities of modern workplaces.',

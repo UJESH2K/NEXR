@@ -27,23 +27,16 @@ import { setCursor, resetCursor } from '@/lib/cursorStore'
  * nothing is lost on a phone.
  */
 
-const EASE = [0.16, 1, 0.3, 1] as const
-
 /** How far the card leans, in degrees, at the very corner of its own box. */
 const TILT = 9
 
 function TiltCard({
   children,
   accent,
-  delay = 0,
-  from,
   className = '',
 }: {
   children: React.ReactNode
   accent: string
-  delay?: number
-  /** Entrance direction in px, so cards arrive from the frame edge they live on. */
-  from: number
   className?: string
 }) {
   const box = useRef<HTMLDivElement>(null)
@@ -82,9 +75,11 @@ function TiltCard({
   return (
     <motion.div
       ref={box}
-      initial={{ opacity: 0, x: from, filter: 'blur(8px)' }}
-      animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
-      transition={{ duration: 0.8, ease: EASE, delay }}
+      // No entrance animation. Every beat is mounted for the whole page now, so
+      // a mount-triggered entrance would fire once at load, behind the curtain,
+      // and never again. The parent layer fades and moves this with scroll
+      // instead; what is left here is the hover tilt, which is a live
+      // interaction and belongs on the card itself.
       onPointerMove={onMove}
       onPointerEnter={() => setCursor({ active: true })}
       onPointerLeave={onLeave}
@@ -112,33 +107,30 @@ export function BeatAside({
   side,
 }: {
   section: Section
-  /** Which edge of the frame this column hugs — always opposite the copy. */
+  /**
+   * Which edge this column hugs. The copy column is pinned left at every beat,
+   * so in practice this is always 'right' — it stays a prop because the column
+   * is positioned from it and hard-coding the edge here would hide that.
+   */
   side: 'left' | 'right'
 }) {
-  const from = side === 'right' ? 40 : -40
-
   if (section.tiles) {
     return (
       <div
-        className="story-col story-col--mid absolute hidden lg:block"
+        className="story-col story-col--mid beat-shift absolute hidden lg:block"
         style={{ [side]: 'clamp(20px, 3vw, 72px)' }}
       >
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.7, ease: EASE, delay: 0.25 }}
-          className="mb-4 font-mono text-[9px] uppercase tracking-[0.28em] text-bone/35"
-        >
-          What it is built on
-        </motion.p>
+        {/* Only one beat carries tiles, and they are the audience cards, so the
+            label names them rather than being generic. */}
+        <p className="mb-4 font-mono text-[9px] uppercase tracking-[0.28em] text-bone/35">
+          Who it is for
+        </p>
 
         <div className="space-y-3">
           {section.tiles.map((tile, i) => (
             <TiltCard
-              key={tile}
+              key={tile.title}
               accent={section.accent}
-              from={from}
-              delay={0.3 + i * 0.12}
               className="beat-card--tile"
             >
               <span
@@ -147,8 +139,11 @@ export function BeatAside({
               >
                 {String(i + 1).padStart(2, '0')}
               </span>
-              <p className="mt-3 text-[13px] leading-[1.55] text-bone/85">
-                {tile}
+              <p className="mt-3 font-display text-[15px] leading-[1.3] text-bone">
+                {tile.title}
+              </p>
+              <p className="mt-1.5 text-[12.5px] leading-[1.5] text-bone/65">
+                {tile.body}
               </p>
               <span
                 className="beat-card__rule"
@@ -164,15 +159,10 @@ export function BeatAside({
   if (section.quote) {
     return (
       <div
-        className="story-col story-col--mid absolute hidden lg:block"
+        className="story-col story-col--mid beat-shift absolute hidden lg:block"
         style={{ [side]: 'clamp(20px, 3vw, 72px)' }}
       >
-        <TiltCard
-          accent={section.accent}
-          from={from}
-          delay={0.3}
-          className="beat-card--action"
-        >
+        <TiltCard accent={section.accent} className="beat-card--action">
           <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-bone/40">
             Book a demo
           </p>

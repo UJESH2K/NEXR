@@ -363,9 +363,11 @@ export function PanelField({ reduced = false }: { reduced?: boolean }) {
 
     for (let section = 0; section < SECTION_COUNT; section++) {
       const own = SECTIONS[section].images[0]
-      // Alternate sides. StoryOverlay reads the same parity and puts its copy
-      // on the opposite side, so card and text never share a half of the frame.
-      const left = section % 2 === 0
+      // Always the right, because StoryOverlay pins its copy to the left at
+      // every beat — the figure gestures to her left at every pose, so the text
+      // has to be on that side. These two files used to alternate in step with
+      // each other; now they are both fixed, and they are still opposites.
+      const left = false
 
       out.push({
         key: `hero-${section}`,

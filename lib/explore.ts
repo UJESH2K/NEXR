@@ -79,45 +79,69 @@ export const EXPLORE_TOPICS: ExploreTopic[] = [
     index: '01',
     word: 'The Gap',
     eyebrow: 'The workplace wellbeing gap',
-    title: 'The barrier isn’t always the support. It’s the way in.',
+    title: 'People need support. But reaching out isn’t always easy.',
     lede:
-      'Organisations today invest more in employee wellbeing than ever before. Yet burnout continues to rise, wellbeing programmes remain underused, and many employees hesitate to seek support.',
+      'Organisations are investing more in employee wellbeing than ever before. Yet many employees still don’t use the support available to them.',
     hero: '/models/imgs/gap.webp',
     accent: '#ff7901',
     tint: ['#2a2f26', '#0b0d0a'],
     chapters: [
       {
-        id: 'spend',
-        kicker: 'The spend is not the problem.',
-        heading: 'More support than ever, used less than ever.',
+        id: 'engagement',
+        kicker: 'More support. Still not enough engagement.',
+        heading: 'The support is there. So why aren’t people using it?',
         paragraphs: [
-          'Employee assistance programmes, counselling benefits, apps, awareness weeks and training all sit inside the modern benefits stack. The budget line has grown for a decade.',
-          'Utilisation has not grown with it. Support that is bought and never opened costs an organisation twice: once in spend, and again in the belief that the problem has been handled.',
+          'Employee assistance programmes, counselling, wellbeing apps, workshops and other initiatives are now common parts of workplace benefits.',
+          'But not everyone wants to sit across from someone and talk about how they’re feeling. Some people need privacy. Some need time. Some find it easier to explore what they’re feeling before talking to someone.',
+          'Good wellbeing support isn’t just about what’s available. It’s about how easily people can connect with it.',
         ],
       },
       {
         id: 'hesitation',
-        kicker: 'Three reasons people stop at the door.',
-        heading: 'Stigma, visibility and privacy.',
+        kicker: 'Why people hesitate to reach out.',
+        heading: 'It can be hard to ask for help.',
         paragraphs: [
-          'Stigma is the fear of being seen differently afterwards. Visibility is the practical worry of who notices the calendar entry, the absence or the referral. Privacy is the question of where the record goes and who can read it.',
-          'None of these are objections to therapy. They are objections to the way in. That distinction is the whole reason NEXR exists.',
+          'For some people, it is the fear of being judged. For others, it is worrying about who might know. Some may simply prefer to keep their wellbeing private. And sometimes, people don’t know where to begin.',
+          'These small concerns can be enough to keep someone from using the support that’s already available to them.',
         ],
       },
       {
         id: 'cost',
-        heading: 'What the gap costs an organisation.',
+        kicker: 'What this means for organisations.',
+        heading: 'The gap affects more than just wellbeing.',
         paragraphs: [
-          'Unaddressed strain does not stay quiet. It shows up as absence, as attrition, as a slow decline in the quality of decisions, and as managers absorbing work they were never trained to hold.',
-          'The organisations that close this gap are rarely the ones that spend the most. They are the ones that make the first step small enough to take.',
+          'When people don’t get support early, everyday stress can build over time. It can affect how they work, how they connect with others and how they feel about their workplace.',
+          'For organisations, this can eventually show up as lower engagement, more burnout, absenteeism and employee turnover.',
+          'The goal isn’t simply to offer more wellbeing programmes. It’s to make wellbeing easier to use.',
         ],
       },
     ],
+    highlights: {
+      heading: 'How the gap shows up',
+      items: [
+        {
+          title: 'Lower engagement',
+          body: 'People who are carrying something quietly have less left to give the work in front of them.',
+        },
+        {
+          title: 'More burnout',
+          body: 'Strain that is never named early tends to be handled late, when the options are fewer.',
+        },
+        {
+          title: 'Absenteeism',
+          body: 'Time away becomes the only remaining way to get the space that support was meant to provide.',
+        },
+        {
+          title: 'Employee turnover',
+          body: 'People rarely leave over one thing, but a workplace that felt unsafe to speak in is often part of it.',
+        },
+      ],
+    },
     stats: [
-      { value: '76%', label: 'Employees who hide struggles at work' },
-      { value: '<10%', label: 'Typical annual EAP utilisation' },
-      { value: '1 in 4', label: 'Report burnout symptoms' },
-      { value: '0', label: 'Names required to start on NEXR' },
+      { value: '76%', label: 'Employees who don’t openly share their struggles' },
+      { value: '<10%', label: 'Typical EAP usage' },
+      { value: '1 in 4', label: 'Employees reporting burnout symptoms' },
+      { value: '0', label: 'Names needed to start with NEXR' },
     ],
     gallery: [
       {
@@ -137,7 +161,7 @@ export const EXPLORE_TOPICS: ExploreTopic[] = [
       },
     ],
     quote:
-      'Everyone talks about mental health. Far fewer people ask for help.',
+      'Good wellbeing support isn’t just about what’s available. It’s about how easily people can connect with it.',
     deeper: [
       {
         label: 'Our approach',

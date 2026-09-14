@@ -866,3 +866,40 @@
     aspect-ratio: 4 / 3 !important;
   }
 }
+
+
+/* ── scroll-driven beat copy ───────────────────────────────────────────────
+ *
+ * StoryOverlay writes one number per beat, `--beat-travel`, on the layer that
+ * wraps it. Everything inside reads that number rather than being animated
+ * individually, so a whole block moves as one gesture on the same scroll that
+ * is moving the character.
+ *
+ * The two modifiers give the block a little internal parallax: a child's
+ * transform composes with its parent's, so a headline marked `--far` travels
+ * about 1.75 times as far as the column it sits in, and a body line about 1.4.
+ * That difference is what stops the copy reading as a flat card sliding past.
+ *
+ * Transform is safe to own here. `.story-col--mid` centres with auto margins
+ * precisely so that no animation has to fight it for a property.
+ */
+.beat-shift {
+  transform: translate3d(0, var(--beat-travel, 0px), 0);
+  will-change: transform;
+}
+
+.beat-shift--near {
+  transform: translate3d(0, calc(var(--beat-travel, 0px) * 0.4), 0);
+}
+
+.beat-shift--far {
+  transform: translate3d(0, calc(var(--beat-travel, 0px) * 0.75), 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beat-shift,
+  .beat-shift--near,
+  .beat-shift--far {
+    transform: none;
+  }
+}
