@@ -18,8 +18,6 @@ import { useScrollApi } from '@/lib/ScrollProvider'
  */
 export const TRACK_VH = 1800
 
-
-
 /**
  * The spacer that gives the home page its scroll length, plus the single master
  * ScrollTrigger that writes normalised progress into the store.

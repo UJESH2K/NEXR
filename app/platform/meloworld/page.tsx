@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Beat, PageShell, Tiles, Stats, ImagePlaceholder, StepCard } from '@/components/site/PageShell'
+import { sectionById } from '@/lib/sections'
 
 export const metadata: Metadata = {
   title: 'MeloWorld — NEXR',
@@ -33,10 +34,15 @@ const STATS = [
   { value: '10min', label: 'Average first session' },
 ]
 
+/** This page's own beat, so its placeholders match the scene rather than a colour chosen by hand. */
+const PAGE_TINT = sectionById('meloworld').sky
+
 export default function MeloWorldPage() {
   return (
     <PageShell
       eyebrow="03 / The Platform"
+      beatId="meloworld"
+      align="center"
       title="MeloWorld"
       mark="/brand/meloworld-mark.webp"
       lede="A virtual mental-health space where a person can interact with therapists and mental-health professionals through an avatar rather than their real identity."
@@ -57,8 +63,8 @@ export default function MeloWorldPage() {
       <Stats items={STATS} />
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <ImagePlaceholder label="MeloWorld avatar interface" tint={['#52665a', '#101815']} aspect="16/10" />
-        <ImagePlaceholder label="Anonymous therapy session" tint={['#4a5e52', '#0e1412']} aspect="16/10" />
+        <ImagePlaceholder label="MeloWorld avatar interface" tint={PAGE_TINT} aspect="16/10" />
+        <ImagePlaceholder label="Anonymous therapy session" tint={PAGE_TINT} aspect="16/10" />
       </div>
 
       <Beat heading="How it works">
@@ -73,7 +79,7 @@ export default function MeloWorldPage() {
             <p>A trained psychologist guides the session through the avatar. The conversation is real, the support is clinical, the identity is protected.</p>
           </StepCard>
           <StepCard number={4} title="Continue on your terms">
-            <p>Return for check-ins, coping exercises, or deeper work — all匿名, all at your pace.</p>
+            <p>Return for check-ins, coping exercises, or deeper work — all anonymous, all at your pace.</p>
           </StepCard>
         </div>
       </Beat>
@@ -83,7 +89,7 @@ export default function MeloWorldPage() {
       </Beat>
 
       <div className="mt-10">
-        <ImagePlaceholder label="Privacy architecture diagram" tint={['#52665a', '#101815']} aspect="21/9" />
+        <ImagePlaceholder label="Privacy architecture diagram" tint={PAGE_TINT} aspect="21/9" />
       </div>
 
       <Beat heading="Where it leads">

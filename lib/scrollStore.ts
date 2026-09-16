@@ -71,6 +71,8 @@ export const scroll = {
    * the composition gets on its own.
    */
   started: false,
+  /** Whether the ambient bed is audible. Written by the HUD's sound toggle. */
+  audioOn: false,
 
   /** Written by CameraRig each frame so overlays can match the projection. */
   camAzimuth: 0,

@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import { Beat, PageShell, ImagePlaceholder } from '@/components/site/PageShell'
+import { SECTIONS, sectionById } from '@/lib/sections'
+import { CONTACT_EMAIL } from '@/lib/contact'
 
 export const metadata: Metadata = {
   title: 'Contact — NEXR',
@@ -7,36 +9,39 @@ export const metadata: Metadata = {
     'Book a demo, talk to the team, or enquire about partnerships. Healthier organisations begin with people who feel safe enough to seek support.',
 }
 
-const CONTACT_EMAIL = 'hello@nexr.com'
-
 const ROUTES = [
   {
     title: 'Book a demo',
     body: 'See MeloWorld and VR Wellness end to end, and how the employee journey works in practice.',
     subject: 'Demo request',
     icon: '🎯',
-    tint: ['#52665a', '#101815'] as [string, string],
+    tint: SECTIONS[0].sky, // The Gap
   },
   {
     title: 'Talk to the team',
     body: 'Questions about privacy, clinical protocols or how this fits alongside an existing EAP.',
     subject: 'Question for the NEXR team',
     icon: '💬',
-    tint: ['#4a4270', '#0e0c17'] as [string, string],
+    tint: SECTIONS[2].sky, // MeloWorld
   },
   {
     title: 'Partnerships',
     body: 'Clinical partners, educational institutions and organisations providing headsets for guided sessions.',
     subject: 'Partnership enquiry',
     icon: '🤝',
-    tint: ['#6b7a2e', '#12150a'] as [string, string],
+    tint: SECTIONS[4].sky, // Who It's For
   },
 ]
+
+/** This page's own beat, so its placeholders match the scene rather than a colour chosen by hand. */
+const PAGE_TINT = sectionById('contact').sky
 
 export default function ContactPage() {
   return (
     <PageShell
       eyebrow="06 / Contact"
+      beatId="contact"
+      align="center"
       title="The next way into wellbeing starts here."
       lede="‘Healthier organisations begin with people who feel safe enough to seek support.’ Tell us about your organisation and we will shape the right way in for your people."
     >
@@ -76,9 +81,9 @@ export default function ContactPage() {
       </Beat>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <ImagePlaceholder label="Book a demo" tint={['#52665a', '#101815']} aspect="4/3" />
-        <ImagePlaceholder label="Talk to us" tint={['#4a4270', '#0e0c17']} aspect="4/3" />
-        <ImagePlaceholder label="Partner with us" tint={['#6b7a2e', '#12150a']} aspect="4/3" />
+        <ImagePlaceholder label="Book a demo" tint={PAGE_TINT} aspect="4/3" />
+        <ImagePlaceholder label="Talk to us" tint={PAGE_TINT} aspect="4/3" />
+        <ImagePlaceholder label="Partner with us" tint={PAGE_TINT} aspect="4/3" />
       </div>
 
       <Beat heading="Direct">
@@ -98,7 +103,7 @@ export default function ContactPage() {
       </Beat>
 
       <div className="mt-10">
-        <ImagePlaceholder label="NEXR headquarters" tint={['#2a2f26', '#0b0d0a']} aspect="21/9" />
+        <ImagePlaceholder label="NEXR headquarters" tint={PAGE_TINT} aspect="21/9" />
       </div>
     </PageShell>
   )

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Beat, PageShell, Tiles, Stats, ImagePlaceholder } from '@/components/site/PageShell'
+import { sectionById } from '@/lib/sections'
 
 export const metadata: Metadata = {
   title: 'Our Approach — NEXR',
@@ -37,10 +38,14 @@ const STATS = [
   { value: '100%', label: 'Anonymous by default' },
 ]
 
+/** This page's own beat, so its placeholders match the scene rather than a colour chosen by hand. */
+const PAGE_TINT = sectionById('belief').sky
+
 export default function ApproachPage() {
   return (
     <PageShell
       eyebrow="Our Approach"
+      beatId="belief"
       title="The barrier isn't always the support. It's the way in."
       lede="For decades, wellbeing has been designed around systems, appointments and treatments. We believe it should be designed around people."
     >
@@ -85,8 +90,8 @@ export default function ApproachPage() {
       </Beat>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <ImagePlaceholder label="Workplace wellbeing gap — visual" tint={['#2a2f26', '#0b0d0a']} aspect="4/3" />
-        <ImagePlaceholder label="People-first design philosophy" tint={['#3b4426', '#0d0f0a']} aspect="4/3" />
+        <ImagePlaceholder label="Workplace wellbeing gap — visual" tint={PAGE_TINT} aspect="4/3" />
+        <ImagePlaceholder label="People-first design philosophy" tint={PAGE_TINT} aspect="4/3" />
       </div>
 
       <Beat heading="Design principles">
@@ -105,7 +110,7 @@ export default function ApproachPage() {
       </Beat>
 
       <div className="mt-10">
-        <ImagePlaceholder label="NEXR north star vision" tint={['#25342a', '#0b0d0a']} aspect="21/9" />
+        <ImagePlaceholder label="NEXR north star vision" tint={PAGE_TINT} aspect="21/9" />
       </div>
     </PageShell>
   )

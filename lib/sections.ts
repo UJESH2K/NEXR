@@ -34,7 +34,7 @@ export type Section = {
    * blocks are named things — "For Workplaces", "For Education" — and a bare
    * sentence loses the name that makes the set scannable.
    */
-  tiles?: { title: string; body: string }[]
+  tiles?: { title: string; body: string; href: string }[]
   /**
    * Short single-line statements, set as a compact row under the body.
    *
@@ -180,14 +180,17 @@ export const SECTIONS: Section[] = [
       {
         title: 'For Workplaces',
         body: 'Private, engaging ways for employees to access and explore wellbeing.',
+        href: '/for/workplaces',
       },
       {
         title: 'For Education',
         body: 'Help students make mental wellbeing a more natural part of everyday life.',
+        href: '/for/education',
       },
       {
         title: 'For Healthcare',
         body: 'Immersive tools designed to complement the work of mental health professionals.',
+        href: '/for/healthcare',
       },
     ],
     proof: [
@@ -220,6 +223,26 @@ export const SECTIONS: Section[] = [
 ]
 
 export const SECTION_COUNT = SECTIONS.length
+
+/**
+ * Look a beat up by id.
+ *
+ * The product pages (`/platform/meloworld`, `/trust`, and so on) are not part
+ * of the scroll — each one is a single beat's argument told at length. They
+ * used to carry their own copy of that beat's colours, keyed by matching a
+ * page title string against a dictionary in PageShell. The keys and the titles
+ * drifted apart within a few edits, silently: three of the five pages were
+ * falling through to a default gradient and never showing their hero image at
+ * all. Looking the beat up by its stable id instead of its display title means
+ * a page can only be wrong about its own colours if it names the wrong beat.
+ */
+export function sectionById(id: string): Section {
+  const found = SECTIONS.find((section) => section.id === id)
+  if (!found) {
+    throw new Error(`No section with id "${id}" — check the beatId prop.`)
+  }
+  return found
+}
 
 /** Every panel image in the deck, used to seed the ambient background field. */
 export const ALL_PANEL_IMAGES = SECTIONS.flatMap((s) => s.images)

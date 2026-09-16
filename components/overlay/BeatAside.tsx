@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useRef } from 'react'
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
+import { DoodleArrow } from '@/components/ui/DoodleArrow'
 import type { Section } from '@/lib/sections'
 import { setCursor, resetCursor } from '@/lib/cursorStore'
 
@@ -117,7 +118,7 @@ export function BeatAside({
   if (section.tiles) {
     return (
       <div
-        className="story-col story-col--mid beat-shift absolute hidden lg:block"
+        className="story-col story-col--mid absolute hidden lg:block"
         style={{ [side]: 'clamp(20px, 3vw, 72px)' }}
       >
         {/* Only one beat carries tiles, and they are the audience cards, so the
@@ -127,29 +128,37 @@ export function BeatAside({
         </p>
 
         <div className="space-y-3">
-          {section.tiles.map((tile, i) => (
-            <TiltCard
+          {section.tiles.map((tile) => (
+            <Link
               key={tile.title}
-              accent={section.accent}
-              className="beat-card--tile"
+              href={tile.href}
+              onMouseEnter={() => setCursor({ active: true })}
+              onMouseLeave={resetCursor}
+              className="group block pointer-events-auto"
             >
-              <span
-                className="beat-card__index numeral"
-                style={{ ['--numeral-accent' as string]: section.accent }}
-              >
-                {String(i + 1).padStart(2, '0')}
-              </span>
-              <p className="mt-3 font-display text-[15px] leading-[1.3] text-bone">
-                {tile.title}
-              </p>
-              <p className="mt-1.5 text-[12.5px] leading-[1.5] text-bone/65">
-                {tile.body}
-              </p>
-              <span
-                className="beat-card__rule"
-                style={{ backgroundColor: section.accent }}
-              />
-            </TiltCard>
+              <TiltCard accent={section.accent} className="beat-card--tile">
+                {/* No numeral. A count only matters if you are meant to read
+                    all three in order; these are three separate doors, and a
+                    "01" in front of one implied it went before the others. */}
+                <div className="flex items-start justify-between gap-3">
+                  <p className="font-display text-[15px] leading-[1.3] text-bone">
+                    {tile.title}
+                  </p>
+                  <DoodleArrow
+                    direction="up-right"
+                    width={30}
+                    className="doodle-hover shrink-0 text-ember/80"
+                  />
+                </div>
+                <p className="mt-1.5 text-[12.5px] leading-[1.5] text-bone/65">
+                  {tile.body}
+                </p>
+                <span
+                  className="beat-card__rule"
+                  style={{ backgroundColor: section.accent }}
+                />
+              </TiltCard>
+            </Link>
           ))}
         </div>
       </div>
@@ -159,7 +168,7 @@ export function BeatAside({
   if (section.quote) {
     return (
       <div
-        className="story-col story-col--mid beat-shift absolute hidden lg:block"
+        className="story-col story-col--mid absolute hidden lg:block"
         style={{ [side]: 'clamp(20px, 3vw, 72px)' }}
       >
         <TiltCard accent={section.accent} className="beat-card--action">

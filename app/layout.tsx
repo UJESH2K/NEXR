@@ -4,6 +4,7 @@ import { CanvasHost } from '@/components/r3f/CanvasHost'
 import { ChromeScrim } from '@/components/site/ChromeScrim'
 import { RouteBackdrop } from '@/components/site/RouteBackdrop'
 import { CursorFollower } from '@/components/ui/cursor-follower'
+import { ContactModal } from '@/components/site/ContactModal'
 import { Header } from '@/components/site/Header'
 import { SkipLink } from '@/components/site/SkipLink'
 import { SiteGuide } from '@/components/site/SiteGuide'
@@ -115,6 +116,7 @@ export default function RootLayout({
           <RouteBackdrop />
           <Header />
           <SiteGuide />
+          <ContactModal />
           {/* pointer-events-none is load-bearing: on the home route this element
               stretches over the whole canvas, and with default hit testing it
               would swallow every click aimed at a 3D panel. Content that wants

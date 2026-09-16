@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { requestReturn } from '@/lib/returnStore'
+import { ConnectConstellation } from './ConnectConstellation'
 import { useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -222,7 +223,7 @@ export function ExploreExperience({
       {/* ── hero ─────────────────────────────────────────────────────────── */}
       <header
         data-explore-hero
-        className="relative overflow-hidden px-5 pb-14 pt-28 sm:px-6 md:px-10 md:pb-20 md:pt-40"
+        className="room-section relative overflow-hidden pb-[var(--room-rhythm)] pt-28 md:pt-40"
       >
         {/* Two washes in the beat's own accent. This is what keeps six rooms
             built from one template from looking like one room six times. */}
@@ -237,7 +238,10 @@ export function ExploreExperience({
           data-explore-ghost
           aria-hidden="true"
           className="pointer-events-none absolute -top-6 right-4 select-none font-display leading-none text-bone/[0.04] md:right-12"
-          style={{ fontSize: 'clamp(9rem, 26vw, 24rem)' }}
+          // Held well below the old 26vw. A watermark should be felt at the
+          // edge of vision, not read — at 26vw this was 500px of type on a
+          // desktop and became the loudest thing on the page.
+          style={{ fontSize: 'clamp(5rem, 13vw, 11rem)' }}
         >
           {topic.index}
         </span>
@@ -363,112 +367,139 @@ export function ExploreExperience({
         </div>
       </header>
 
-      {/* ── chapters, with the tracking rail ─────────────────────────────── */}
-      <div className="mx-auto grid max-w-6xl gap-16 px-5 pb-20 sm:px-6 md:px-10 md:pb-24 lg:grid-cols-[220px_1fr] lg:gap-20">
-        <nav className="hidden lg:block">
-          <div className="sticky top-32">
-            <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-bone/30">
-              In this room
-            </p>
-            <ul className="mt-5 space-y-3">
-              {topic.chapters.map((chapter, i) => {
-                const active = chapter.id === activeChapter
-                return (
-                  <li key={chapter.id}>
-                    <a
-                      href={`#${chapter.id}`}
-                      {...hoverable}
-                      className="group flex items-start gap-3"
-                    >
-                      <span
-                        className="mt-[9px] block h-px transition-all duration-500"
-                        style={{
-                          width: active ? 26 : 12,
-                          backgroundColor: active
-                            ? topic.accent
-                            : 'rgba(244,243,236,0.25)',
-                        }}
-                      />
-                      <span
-                        className={`text-[13px] leading-[1.5] transition-colors duration-500 ${
-                          active ? 'text-bone' : 'text-bone/40 group-hover:text-bone/70'
-                        }`}
-                      >
-                        <span className="numeral mr-1 text-[0.85em]">
-                          {String(i + 1).padStart(2, '0')}
-                        </span>
-                        {chapter.heading}
-                      </span>
-                    </a>
-                  </li>
-                )
-              })}
-            </ul>
+      {/*
+        ── in this room ──────────────────────────────────────────────────
 
-            <Link
-              href={topic.cta.href}
-              {...hoverable}
-              className="mt-10 inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.22em] text-bone/45 transition-colors hover:text-ember"
-            >
-              Book a demo
-              <ArrowUpRight size={12} />
-            </Link>
-          </div>
-        </nav>
-
-        <div className="min-w-0">
-          {topic.chapters.map((chapter, i) => (
-            <section
+        A horizontal strip rather than the sticky sidebar this used to be.
+        220px of fixed rail plus a max-w-2xl text column left roughly a third
+        of every wide screen permanently empty — visible in a screenshot of
+        this exact room, "Belief", where the paragraph sat in a narrow band
+        with the whole right half of the frame unused. Chapters below now use
+        that width themselves; this strip only has to name the stops.
+      */}
+      <nav
+        aria-label="In this room"
+        className="room-section room-section--tight mx-auto flex max-w-6xl flex-wrap items-center gap-x-2 gap-y-3 px-5 sm:px-6 md:px-10"
+      >
+        <p className="mr-3 font-mono text-[9px] uppercase tracking-[0.28em] text-bone/30">
+          In this room
+        </p>
+        {topic.chapters.map((chapter, i) => {
+          const active = chapter.id === activeChapter
+          return (
+            <a
               key={chapter.id}
-              id={chapter.id}
-              data-explore-block
-              className="scroll-mt-28 border-t border-white/10 py-10 first:border-0 first:pt-0 md:scroll-mt-32 md:py-14"
+              href={`#${chapter.id}`}
+              {...hoverable}
+              className="group inline-flex items-center gap-2 rounded-full border px-3.5 py-2 font-mono text-[11px] uppercase tracking-[0.16em] transition-all duration-500"
+              style={{
+                borderColor: active ? topic.accent : 'rgba(244,243,236,0.14)',
+                color: active ? 'var(--color-bone)' : 'rgba(244,243,236,0.5)',
+                backgroundColor: active ? `${topic.accent}14` : 'transparent',
+              }}
             >
-              <div className="flex items-baseline gap-5">
-                <span
-                  data-explore-lead
-                  className="numeral numeral--lg text-[15px]"
-                  style={{ ['--numeral-accent' as string]: topic.accent }}
+              <span
+                className="numeral text-[0.85em]"
+                style={{ ['--numeral-accent' as string]: topic.accent }}
+              >
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <span className="transition-colors duration-500 group-hover:text-bone">
+                {chapter.heading}
+              </span>
+            </a>
+          )
+        })}
+      </nav>
+
+      {/* ── chapters ─────────────────────────────────────────────────────── */}
+      <div className="room-section mx-auto max-w-6xl px-5 pb-20 sm:px-6 md:px-10 md:pb-24">
+        <div className="min-w-0">
+          {topic.chapters.map((chapter, i) => {
+            // One gallery frame per chapter, reused rather than duplicated —
+            // this used to be the whole `gallery` array shown a second time,
+            // on its own further down the page as "Inside {word}". Placing it
+            // beside the paragraph it illustrates uses the width the text was
+            // leaving empty, and it keeps every room at the same three or four
+            // images instead of showing each one twice.
+            const image = topic.gallery[i]
+            const imageOnLeft = i % 2 === 1
+
+            return (
+              <section
+                key={chapter.id}
+                id={chapter.id}
+                data-explore-block
+                className="room-chapter"
+              >
+                <div
+                  className={`grid gap-8 lg:items-center lg:gap-14 ${
+                    image ? 'lg:grid-cols-[1fr_23rem]' : ''
+                  }`}
                 >
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <div className="min-w-0">
-                  {chapter.kicker ? (
-                    <p
-                      data-explore-lead
-                      className="text-[15px] leading-[1.6] text-bone/55"
-                    >
-                      {chapter.kicker}
-                    </p>
+                  <div className={image && imageOnLeft ? 'lg:order-2' : undefined}>
+                    {/* Kicker and heading on the left, the chapter's own
+                        number pinned to the right of the same row — the
+                        count a reader tracks lives at the edge they read
+                        toward, not buried inline before the words it counts. */}
+                    <div className="flex items-start justify-between gap-6">
+                      <div className="min-w-0">
+                        {chapter.kicker ? (
+                          <p
+                            data-explore-lead
+                            className="text-[14px] leading-[1.6] text-bone/55"
+                          >
+                            {chapter.kicker}
+                          </p>
+                        ) : null}
+                        <h2
+                          data-explore-lead
+                          className="mt-2 font-display text-[clamp(1.6rem,3vw,2.5rem)] leading-[1.12] text-bone"
+                        >
+                          {chapter.heading}
+                        </h2>
+                      </div>
+                      <span
+                        data-explore-lead
+                        className="numeral numeral--lg shrink-0 text-[clamp(1.5rem,3vw,2.4rem)] leading-none opacity-70"
+                        style={{ ['--numeral-accent' as string]: topic.accent }}
+                      >
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                    </div>
+
+                    <div className="mt-6 max-w-[62ch] space-y-5">
+                      {chapter.paragraphs.map((paragraph) => (
+                        <p
+                          key={paragraph.slice(0, 24)}
+                          data-explore-lead
+                          className="text-[15px] leading-[1.85] text-sand/70"
+                        >
+                          {paragraph}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+
+                  {image ? (
+                    <div className={imageOnLeft ? 'lg:order-1' : undefined}>
+                      <ImageSlot
+                        item={image}
+                        tint={topic.tint}
+                        accent={topic.accent}
+                        className="explore-frame--tilt"
+                      />
+                    </div>
                   ) : null}
-                  <h2
-                    data-explore-lead
-                    className="mt-2 font-display text-[clamp(1.6rem,3vw,2.5rem)] leading-[1.12] text-bone"
-                  >
-                    {chapter.heading}
-                  </h2>
                 </div>
-              </div>
-
-              <div className="mt-6 space-y-5 lg:pl-[3.1rem]">
-                {chapter.paragraphs.map((paragraph) => (
-                  <p
-                    key={paragraph.slice(0, 24)}
-                    data-explore-lead
-                    className="max-w-2xl text-[15px] leading-[1.85] text-sand/70"
-                  >
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
-            </section>
-          ))}
-
+              </section>
+            )
+          })}
           {/* ── stats ───────────────────────────────────────────────────── */}
           {topic.stats ? (
             <section
               data-explore-block
-              className="border-t border-white/10 py-14"
+              className="room-chapter"
             >
               <div className="grid grid-cols-2 gap-8 lg:grid-cols-4">
                 {topic.stats.map((stat) => (
@@ -492,7 +523,7 @@ export function ExploreExperience({
           {topic.highlights ? (
             <section
               data-explore-block
-              className="border-t border-white/10 py-14"
+              className="room-chapter"
             >
               <h2
                 data-explore-lead
@@ -525,50 +556,11 @@ export function ExploreExperience({
         </div>
       </div>
 
-      {/* ── gallery ──────────────────────────────────────────────────────── */}
-      <section
-        data-explore-block
-        className="mx-auto max-w-6xl px-5 pb-20 sm:px-6 md:px-10 md:pb-24"
-      >
-        <div className="flex items-end justify-between gap-6 border-t border-white/10 pt-10 md:pt-12">
-          <h2
-            data-explore-lead
-            className="font-display text-[clamp(1.5rem,2.6vw,2.1rem)] text-bone"
-          >
-            Inside {topic.word}
-          </h2>
-          <p
-            data-explore-lead
-            className="hidden font-mono text-[10px] uppercase tracking-[0.2em] text-bone/35 sm:block"
-          >
-            {topic.gallery.length} frames
-          </p>
-        </div>
-
-        <div className="mt-8 grid gap-4 md:grid-cols-2">
-          {topic.gallery.map((item, i) => (
-            <ImageSlot
-              key={item.slot}
-              item={item}
-              tint={topic.tint}
-              accent={topic.accent}
-              // The last card runs full width when the count is odd, so the
-              // grid closes on a line rather than on a hole.
-              className={
-                i === topic.gallery.length - 1 && topic.gallery.length % 2 === 1
-                  ? 'md:col-span-2'
-                  : ''
-              }
-            />
-          ))}
-        </div>
-      </section>
-
       {/* ── quote ────────────────────────────────────────────────────────── */}
       {topic.quote ? (
         <section
           data-explore-block
-          className="relative overflow-hidden px-5 py-16 sm:px-6 md:px-10 md:py-24"
+          className="room-section room-band relative overflow-hidden"
         >
           <div
             className="pointer-events-none absolute inset-0 -z-10"
@@ -588,7 +580,7 @@ export function ExploreExperience({
       {/* ── deeper reading ───────────────────────────────────────────────── */}
       <section
         data-explore-block
-        className="mx-auto max-w-6xl px-5 pb-16 sm:px-6 md:px-10 md:pb-20"
+        className="room-section"
       >
         <h2
           data-explore-lead
@@ -623,7 +615,7 @@ export function ExploreExperience({
       {/* ── call to action ───────────────────────────────────────────────── */}
       <section
         data-explore-block
-        className="mx-auto max-w-6xl px-5 pb-16 sm:px-6 md:px-10 md:pb-20"
+        className="room-section"
       >
         <div
           data-explore-item
@@ -656,8 +648,18 @@ export function ExploreExperience({
         </div>
       </section>
 
+      {/* ── where to carry on ────────────────────────────────────────────── */}
+      {/* Only on the closing room. It is the one place where "follow us" is an
+          answer to the question the reader actually has; on the other five it
+          would be an interruption between the argument and its call to action. */}
+      {topic.slug === 'contact' ? (
+        <section data-explore-block className="room-section">
+          <ConnectConstellation accent={topic.accent} />
+        </section>
+      ) : null}
+
       {/* ── the rest of the tour ─────────────────────────────────────────── */}
-      <footer className="safe-bottom mx-auto max-w-6xl px-5 pb-20 sm:px-6 md:px-10 md:pb-24">
+      <footer className="room-section room-section--end safe-bottom">
         <div className="grid gap-4 border-t border-white/10 pt-8 sm:grid-cols-2">
           <Link
             href={`/explore/${prev.slug}`}

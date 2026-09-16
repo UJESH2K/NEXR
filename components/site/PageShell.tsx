@@ -1,48 +1,58 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import type { ReactNode } from 'react'
+import { sectionById } from '@/lib/sections'
+import { requestReturn } from '@/lib/returnStore'
 import { PageFade } from './PageFade'
 import { GsapRouteMotion } from './GsapRouteMotion'
-
-const ROUTE_ART: Record<string, string> = {
-  'Our Approach': '/models/imgs/OurApproach.webp',
-  MeloWorld: '/models/imgs/meloworld.webp',
-  'VR Wellness': '/models/imgs/vrworld.webp',
-  'Trust Centre': '/models/imgs/clinicallygrounded.webp',
-  Contact: '/models/imgs/letsconnect.webp',
-}
-
-const ROUTE_TINTS: Record<string, [string, string]> = {
-  'Our Approach': ['#3b4426', '#0d0f0a'],
-  MeloWorld: ['#52665a', '#101815'],
-  'VR Wellness': ['#4a4270', '#0e0c17'],
-  'Trust Centre': ['#1f3a3a', '#080e0e'],
-  Contact: ['#6b7a2e', '#12150a'],
-}
 
 export function PageShell({
   eyebrow,
   title,
   lede,
+  /** Which beat this page tells at length. Its colours and hero image come
+   *  from here rather than being copied per page — see `sectionById`. */
+  beatId,
   /** Optional product mark drawn above the title, e.g. MeloWorld's. */
   mark,
+  /** Centres the eyebrow and title instead of the default two-column grid.
+   *  For a page that reads as one held statement rather than a report — the
+   *  product pages want this; the longer argument pages (Approach, Trust)
+   *  read better as the grid, where the eyebrow sits beside a long title
+   *  instead of stacked above it. */
+  align = 'default',
   children,
 }: {
   eyebrow: string
   title: string
   lede?: string
+  beatId: string
   mark?: string
+  align?: 'default' | 'center'
   children: ReactNode
 }) {
-  const tints = ROUTE_TINTS[title] ?? ['#2a2f26', '#0b0d0a']
+  const section = sectionById(beatId)
+  const tints = section.sky
+  const hero = section.images[0]
 
   return (
     <PageFade>
       <GsapRouteMotion>
       <article className="safe-bottom pointer-events-auto min-h-svh overflow-hidden bg-void px-5 pb-20 pt-28 sm:px-6 md:px-10 md:pb-28 md:pt-32">
-        <header className="mx-auto grid max-w-6xl gap-10 border-b border-white/10 pb-16 lg:grid-cols-[0.7fr_1.3fr] lg:items-end">
-          <p data-route-eyebrow className="eyebrow">{eyebrow}</p>
-          <div>
+        <header
+          className={
+            align === 'center'
+              ? 'mx-auto max-w-4xl border-b border-white/10 pb-16 text-center'
+              : 'mx-auto grid max-w-6xl gap-10 border-b border-white/10 pb-16 lg:grid-cols-[0.7fr_1.3fr] lg:items-end'
+          }
+        >
+          <p
+            data-route-eyebrow
+            className={`eyebrow ${align === 'center' ? 'justify-center' : ''}`}
+          >
+            {eyebrow}
+          </p>
+          <div className={align === 'center' ? 'mx-auto' : undefined}>
             {mark ? (
               <Image
                 data-route-mark
@@ -50,11 +60,25 @@ export function PageShell({
                 alt=""
                 width={96}
                 height={70}
-                className="mb-6 h-14 w-auto"
+                className={`mb-6 h-14 w-auto ${align === 'center' ? 'mx-auto' : ''}`}
               />
             ) : null}
-            <h1 data-route-title className="display text-balance text-[clamp(2.7rem,7vw,6.8rem)] text-bone">{title}</h1>
-            {lede ? <p data-route-lede className="mt-8 max-w-2xl text-lg leading-relaxed text-sand/75 md:text-xl">{lede}</p> : null}
+            <h1
+              data-route-title
+              className="display text-balance text-[clamp(2.7rem,7vw,6.8rem)] text-bone"
+            >
+              {title}
+            </h1>
+            {lede ? (
+              <p
+                data-route-lede
+                className={`mt-8 text-lg leading-relaxed text-sand/75 md:text-xl ${
+                  align === 'center' ? 'mx-auto max-w-2xl' : 'max-w-2xl'
+                }`}
+              >
+                {lede}
+              </p>
+            ) : null}
           </div>
         </header>
 
@@ -66,9 +90,9 @@ export function PageShell({
             backgroundImage: `linear-gradient(135deg, ${tints[0]}, ${tints[1]})`,
           }}
         >
-          {ROUTE_ART[title] ? (
+          {hero ? (
             <Image
-              src={ROUTE_ART[title]}
+              src={hero}
               alt=""
               fill
               priority
@@ -88,7 +112,7 @@ export function PageShell({
           <div className="absolute bottom-0 left-0 h-px w-1/3 bg-gradient-to-r from-ember/50 to-transparent" />
           <div className="absolute bottom-0 left-0 h-1/3 w-px bg-gradient-to-t from-ember/50 to-transparent" />
           <div className="absolute bottom-5 left-5 font-mono text-[10px] uppercase tracking-[0.25em] text-ember/80 md:bottom-8 md:left-8">
-            NEXR / {title}
+            NEXR / {section.word}
           </div>
         </div>
 
@@ -97,6 +121,7 @@ export function PageShell({
         <footer className="mx-auto mt-20 flex max-w-4xl flex-wrap items-center justify-between gap-4 border-t border-bone/12 pt-8 md:mt-24">
           <Link
             href="/"
+            onClick={requestReturn}
             className="group inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.24em] text-bone/55 transition-colors hover:text-ember"
           >
             <span className="inline-block transition-transform group-hover:-translate-x-1">&larr;</span>

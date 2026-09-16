@@ -3,9 +3,16 @@
 /* Design tokens ported from the previous global.css so the visual language
    survives the Tailwind migration. Available as bg-ink, text-ember, etc. */
 @theme {
+  /* Black, and two warm near-blacks.
+   *
+   * `--color-ink` used to be #111611, a green-black from the original palette.
+   * It is the surface colour of every card on the explore rooms, so while the
+   * scene in front of them was orange the panels behind them were quietly
+   * green — a tint too slight to name and more than enough to make the rooms
+   * feel like a different site. These are the same hue as the sky now. */
   --color-void: #000000;
-  --color-ink: #111611;
-  --color-abyss: #080b0d;
+  --color-ink: #16100b;
+  --color-abyss: #0d0906;
   --color-paper: #e8e5da;
   --color-bone: #f4f3ec;
   --color-moss: #25342a;
@@ -868,38 +875,180 @@
 }
 
 
-/* ── scroll-driven beat copy ───────────────────────────────────────────────
+/* ── beat copy ─────────────────────────────────────────────────────────────
  *
- * StoryOverlay writes one number per beat, `--beat-travel`, on the layer that
- * wraps it. Everything inside reads that number rather than being animated
- * individually, so a whole block moves as one gesture on the same scroll that
- * is moving the character.
+ * One motion, not four and not a wipe.
  *
- * The two modifiers give the block a little internal parallax: a child's
- * transform composes with its parent's, so a headline marked `--far` travels
- * about 1.75 times as far as the column it sits in, and a body line about 1.4.
- * That difference is what stops the copy reading as a flat card sliding past.
+ * Two earlier versions both overcorrected. The first animated the parts —
+ * label, then kicker, then headline, then body, each on its own delay — which
+ * read as fussy rather than considered. The second replaced that with a clip
+ * wipe travelling across the whole block, which was meant to feel considered
+ * and instead read as a loading-screen trick repeated on every single scroll.
  *
- * Transform is safe to own here. `.story-col--mid` centres with auto margins
- * precisely so that no animation has to fight it for a property.
+ * This is the plain version: the whole column fades and lifts a few pixels as
+ * one object, settles, and later reverses the same way. Nothing inside moves
+ * on its own schedule, and nothing pretends to be more than a fade.
+ *
+ * Sequential, never crossfaded: the outgoing block clears before the incoming
+ * one starts, via the delay on the entrance below. Two paragraphs of different
+ * lengths fading through each other in the same place interleave line by line.
  */
-.beat-shift {
-  transform: translate3d(0, var(--beat-travel, 0px), 0);
-  will-change: transform;
+.beat-layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translate3d(0, 10px, 0);
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease,
+    visibility 0s linear 200ms;
 }
 
-.beat-shift--near {
-  transform: translate3d(0, calc(var(--beat-travel, 0px) * 0.4), 0);
-}
-
-.beat-shift--far {
-  transform: translate3d(0, calc(var(--beat-travel, 0px) * 0.75), 0);
+.beat-layer[data-visible='true'] {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 480ms cubic-bezier(0.16, 1, 0.3, 1) 220ms,
+    transform 480ms cubic-bezier(0.16, 1, 0.3, 1) 220ms,
+    visibility 0s linear 220ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .beat-shift,
-  .beat-shift--near,
-  .beat-shift--far {
+  .beat-layer,
+  .beat-layer[data-visible='true'] {
     transform: none;
+    transition:
+      opacity 160ms linear,
+      visibility 0s linear 160ms;
+  }
+}
+
+/* ── explore room rhythm ───────────────────────────────────────────────────
+ *
+ * One vertical scale for the rooms, and one measure.
+ *
+ * The sections used to carry their own spacing inline, and they had drifted to
+ * seven different values — py-10/14, py-14, pb-16/20, pb-20/24, py-16/24, pb-8
+ * — none of which were multiples of each other. Read down a page and the gaps
+ * between blocks changed size for no reason the reader could see, which is what
+ * made the rooms feel unplanned rather than merely spacious.
+ *
+ * Everything below is derived from one number. `--room-rhythm` is the gap
+ * between major blocks; the half and double steps are the only permitted
+ * variations, so a section is never a size that has to be justified.
+ *
+ * Put `.room-section` on a block and it is correct. Nothing should set its own
+ * vertical padding again.
+ */
+:root {
+  --room-gutter: clamp(20px, 4vw, 56px);
+  --room-rhythm: clamp(3.5rem, 7vw, 6.5rem);
+  --room-measure: 72rem;
+}
+
+.room-section {
+  margin-inline: auto;
+  width: 100%;
+  max-width: var(--room-measure);
+  padding-inline: var(--room-gutter);
+  padding-block-start: var(--room-rhythm);
+}
+
+/* For a block that belongs to the one above it rather than standing apart —
+   a gallery under its own heading, say. */
+.room-section--tight {
+  padding-block-start: calc(var(--room-rhythm) * 0.5);
+}
+
+/* The closing block, which needs air beneath it as well as above. */
+.room-section--end {
+  padding-block-end: var(--room-rhythm);
+}
+
+/* A full-bleed band: the rhythm applies, the measure does not. */
+.room-band {
+  max-width: none;
+  padding-block: var(--room-rhythm);
+}
+
+/* Chapters are a list inside one block, so they take the half step and a rule
+   rather than the full gap — the rule is what separates them, not the space. */
+.room-chapter {
+  scroll-margin-top: 7rem;
+  border-top: 1px solid rgb(255 255 255 / 0.1);
+  padding-block: calc(var(--room-rhythm) * 0.55);
+}
+
+.room-chapter:first-child {
+  border-top: 0;
+  padding-block-start: 0;
+}
+
+/* ── explore chapter imagery ───────────────────────────────────────────────
+ *
+ * A light perspective tilt on hover, CSS-only. The scene's own floating cards
+ * (`.beat-card`) track the pointer with a spring for a physical feel that
+ * suits an object apparently orbiting in 3D; a photograph sitting in a
+ * document does not need that machinery; a single fixed tilt plus a lift
+ * reads as "this responds to you" without another pointer-tracking component
+ * per image.
+ */
+.explore-frame--tilt {
+  transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1);
+  transform: perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1);
+}
+
+.explore-frame--tilt:hover {
+  transform: perspective(1000px) rotateX(1.2deg) rotateY(-2.4deg) scale(1.015);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .explore-frame--tilt,
+  .explore-frame--tilt:hover {
+    transform: none;
+  }
+}
+
+/* ── doodle, drawn on hover rather than looping ────────────────────────────
+ *
+ * The idle hints above redraw forever because nobody is looking at them yet —
+ * the whole point is to catch an eye that has wandered off. A card someone is
+ * already hovering has the opposite problem: a looping sketch next to a
+ * pointer that is sitting still reads as broken, not lively. So this variant
+ * draws once, on `:hover`/`:focus-visible` of the ancestor `.group`, and
+ * un-draws just as plainly when the pointer leaves.
+ */
+.doodle-hover .doodle-line {
+  stroke-dasharray: 130;
+  stroke-dashoffset: 130;
+  transition: stroke-dashoffset 480ms ease;
+}
+
+.group:hover .doodle-hover .doodle-line,
+.group:focus-visible .doodle-hover .doodle-line {
+  stroke-dashoffset: 0;
+}
+
+.doodle-hover .doodle-head {
+  stroke-dasharray: 34;
+  stroke-dashoffset: 34;
+  opacity: 0;
+  transition: stroke-dashoffset 320ms ease 380ms, opacity 160ms ease 460ms;
+}
+
+.group:hover .doodle-hover .doodle-head,
+.group:focus-visible .doodle-hover .doodle-head {
+  stroke-dashoffset: 0;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .doodle-hover .doodle-line,
+  .doodle-hover .doodle-head {
+    transition: none;
+    stroke-dashoffset: 0;
+    opacity: 1;
   }
 }

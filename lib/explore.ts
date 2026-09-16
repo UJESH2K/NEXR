@@ -62,6 +62,16 @@ export type ExploreTopic = {
   /** Hero artwork. Every topic has one already. */
   hero: string
   mark?: string
+  /**
+   * Accent and background tint, both taken from this room's beat on the home
+   * scene rather than chosen here.
+   *
+   * They used to be chosen here, and they drifted badly: three rooms ended up
+   * mint, lavender and cyan while the scene they opened from was orange, and
+   * every tint was still a green left over from an older palette. A room is
+   * meant to read as the inside of the beat you clicked, which only works if it
+   * is lit by the same colour. If the home palette moves, these move with it.
+   */
   accent: string
   tint: [string, string]
   chapters: ExploreChapter[]
@@ -84,7 +94,7 @@ export const EXPLORE_TOPICS: ExploreTopic[] = [
       'Organisations are investing more in employee wellbeing than ever before. Yet many employees still don’t use the support available to them.',
     hero: '/models/imgs/gap.webp',
     accent: '#ff7901',
-    tint: ['#2a2f26', '#0b0d0a'],
+    tint: ['#9f6021', '#311c08'],
     chapters: [
       {
         id: 'engagement',
@@ -188,56 +198,59 @@ export const EXPLORE_TOPICS: ExploreTopic[] = [
     eyebrow: 'What we believe',
     title: 'Stop making people fit wellbeing. Make wellbeing fit people.',
     lede:
-      'At NEXR, we believe workplace wellbeing should feel natural, private and engaging. When support is designed around people instead of processes, employees are more likely to begin.',
+      'Wellbeing is personal. What works for one person may not work for another — and the way in matters as much as what is waiting on the other side of it.',
     hero: '/models/imgs/OurApproach.webp',
-    accent: '#ffa863',
-    tint: ['#3b4426', '#0d0f0a'],
+    accent: '#ff8118',
+    tint: ['#a25f20', '#321c08'],
     chapters: [
       {
-        id: 'process',
-        kicker: 'Traditional wellbeing starts with a process.',
-        heading: 'A form, a queue, a room, a record.',
+        id: 'today',
+        kicker: 'The way wellbeing works today.',
+        heading: 'Wellbeing often starts with a process. But people don’t all need the same starting point.',
         paragraphs: [
-          'Every one of those steps asks the person to adapt: to disclose before they are ready, to be seen before they feel safe, to book before they know what they need.',
-          'People who are already struggling are the least able to absorb that cost. So the support goes unused by exactly the people it was bought for.',
+          'Wellbeing is personal. What works for one person may not work for another. Some may prefer a conversation, while others may feel more comfortable starting on their own.',
+          'The need may be similar. The way people respond to it can be very different.',
         ],
       },
       {
-        id: 'people',
-        kicker: 'We start at the other end.',
-        heading: 'Natural, private and engaging.',
+        id: 'natural',
+        kicker: 'A more natural way to experience it.',
+        heading: 'Start where you feel comfortable.',
         paragraphs: [
-          'Natural means the first step happens in a space that already feels familiar rather than clinical. Private means anonymity is the default state, not a setting to find. Engaging means the experience is worth returning to before anything is wrong.',
-          'Designed this way, wellbeing becomes proactive: daily, intentional resilience building rather than a response to a crisis that has already arrived.',
+          'It doesn’t always have to begin with a formal session or a difficult conversation. It can start with a private space to explore, an activity that helps you pause, or an experience that helps you understand what you need.',
+          'The more natural it feels, the easier it is to make wellbeing part of everyday life.',
+          'When people feel comfortable with the way they access wellbeing, taking that first step becomes easier.',
         ],
       },
       {
-        id: 'culture',
-        heading: 'Healthier cultures follow, not the other way round.',
+        id: 'outcome',
+        kicker: 'What better wellbeing can create.',
+        heading: 'Better wellbeing can shape better workplaces.',
         paragraphs: [
-          'Psychological safety is not created by a policy announcement. It is created by many small, low-stakes experiences of asking for something and not being penalised for it.',
-          'Give people a first step that costs them nothing socially, and the culture around it changes on its own.',
+          'When people feel supported, organisations benefit too. Wellbeing isn’t only about helping someone when they are struggling.',
+          'It’s also about helping people build healthier habits, feel more comfortable asking for support and take better care of themselves over time.',
+          'And when that becomes part of everyday work life, it can contribute to healthier teams and healthier workplace cultures.',
         ],
       },
     ],
     highlights: {
-      heading: 'Four principles we design against',
+      heading: 'Four principles',
       items: [
         {
           title: 'Private by design',
-          body: 'Anonymity is how psychological safety is created. Nobody should choose between getting help and protecting their privacy.',
+          body: 'Anonymity is how psychological safety is created. Nobody should have to choose between getting help and protecting their privacy.',
         },
         {
-          title: 'Accessible first',
-          body: 'The wider platform runs on the phones and laptops people already own. No hardware purchase, no queue, no waiting room.',
+          title: 'Easy to begin',
+          body: 'The first step should be small enough that taking it does not feel like a decision about yourself.',
         },
         {
-          title: 'Immersive engagement',
-          body: 'Interactive, guided and safe experiences, engaging enough to become part of everyday life.',
+          title: 'Engaging enough to return to',
+          body: 'Support that is used once is a moment. Support people come back to is a habit, and habits are what change outcomes.',
         },
         {
           title: 'Clinically grounded',
-          body: 'Established psychological practice, delivered by trained professionals and tested in clinical contexts.',
+          body: 'Every experience is built with mental health professionals and tested in practice, not designed around what demos well.',
         },
       ],
     },
@@ -245,15 +258,15 @@ export const EXPLORE_TOPICS: ExploreTopic[] = [
       {
         label: 'Designed around people',
         slot: '/explore/belief/01.webp',
-        aspect: '3/4',
+        aspect: '4/3',
       },
       {
-        label: 'Principles in practice',
+        label: 'Our principles in action',
         slot: '/explore/belief/02.webp',
         aspect: '4/3',
       },
       {
-        label: 'From reactive to proactive',
+        label: 'From reactive to everyday',
         slot: '/explore/belief/03.webp',
         aspect: '16/9',
       },
@@ -262,20 +275,20 @@ export const EXPLORE_TOPICS: ExploreTopic[] = [
       'NEXR isn’t reinventing mental wellness. It’s reinventing how people access it.',
     deeper: [
       {
-        label: 'Our approach',
-        href: '/approach#belief',
-        note: 'The philosophy in full, including the design principles.',
+        label: 'MeloWorld',
+        href: '/explore/meloworld',
+        note: 'The private space where a first step actually gets taken.',
       },
       {
-        label: 'The ecosystem',
-        href: '/explore/meloworld',
-        note: 'What the belief becomes in practice: MeloWorld.',
+        label: 'VR Wellness',
+        href: '/explore/vr-wellness',
+        note: 'Guided experiences, taken at the pace the person sets.',
       },
     ],
     cta: {
       label: 'Book a demo',
       href: '/contact',
-      note: 'Walk through the philosophy with the team that built it.',
+      note: 'See what people-first wellbeing looks like inside your organisation.',
     },
   },
 
@@ -283,94 +296,94 @@ export const EXPLORE_TOPICS: ExploreTopic[] = [
     slug: 'meloworld',
     index: '03',
     word: 'MeloWorld',
-    eyebrow: 'Different ways in. One way forward.',
-    title: 'A private, anonymous space where the first step feels easy.',
+    eyebrow: 'A private space to explore wellbeing',
+    title: 'A private space to explore wellbeing.',
     lede:
-      'MeloWorld creates a private, anonymous space where employees can take their first step towards support comfortably, as someone nobody in the building can recognise.',
+      'MeloWorld gives employees a private and anonymous way to explore their wellbeing, connect with mental health professionals and take their first step towards support comfortably.',
     hero: '/models/imgs/meloworld.webp',
     mark: '/brand/meloworld-mark.webp',
-    accent: '#9ff2d4',
-    tint: ['#52665a', '#101815'],
+    accent: '#ff8a2a',
+    tint: ['#a65f20', '#341c08'],
     chapters: [
       {
-        id: 'anonymous',
-        kicker: 'Every person gets an identifier, never a name.',
-        heading: 'Anonymity that is structural, not promised.',
+        id: 'privacy',
+        kicker: 'A space built around privacy.',
+        heading: 'A space where you can be yourself, anonymously.',
         paragraphs: [
-          'People arrive as an avatar. There is no photograph, no directory entry and no way for a colleague to place them in the room. The anonymity is a property of how the space is built rather than a policy written about it.',
-          'That is what makes a first conversation possible for someone who would never book one under their own name.',
+          'Employees enter MeloWorld using an avatar instead of their real identity. They don’t need to share their name or photograph with other people in the space.',
+          'This gives people the privacy and comfort to explore their wellbeing in their own way.',
         ],
       },
       {
-        id: 'space',
-        kicker: 'A space, not a form.',
-        heading: 'Familiar enough to enter without preparing.',
+        id: 'pace',
+        kicker: 'Explore at your own pace.',
+        heading: 'Explore first. Connect when you’re ready.',
         paragraphs: [
-          'MeloWorld is closer to a place than to an application. People can look around, spend time there, and reach a professional when they decide to, rather than being asked to declare a problem before anything begins.',
-          'Sessions run with qualified psychologists. What changes is the doorway, not the standard of care behind it.',
+          'MeloWorld feels more like a space than a traditional wellbeing platform. Employees can enter, explore different environments and spend some time there before deciding what they want to do next.',
+          'When they’re ready, they can connect with a qualified mental health professional within the platform.',
         ],
       },
       {
-        id: 'organisation',
-        heading: 'What the organisation sees.',
+        id: 'visibility',
+        kicker: 'What organisations can see.',
+        heading: 'Private for employees. Clear for organisations.',
         paragraphs: [
-          'Employers see engagement at the level of the population, never the individual. Nobody is identified for having used the platform, because the platform never held their identity in the first place.',
-          'That separation is the point. It is what allows an organisation to measure whether support is working without becoming a reason people avoid it.',
+          'Organisations can understand overall engagement with the platform without seeing which individual employees are using it.',
+          'This gives organisations useful insights while allowing employees to keep their personal wellbeing private.',
         ],
       },
     ],
     highlights: {
-      heading: 'How the first step works',
+      heading: 'How MeloWorld works',
       items: [
         {
-          title: 'Enter as an avatar',
-          body: 'No photo, no real name, no colleague able to identify who is in the room.',
+          title: 'Choose your avatar',
+          body: 'Enter MeloWorld with an avatar instead of your real identity.',
         },
         {
-          title: 'Look around first',
-          body: 'Spend time in the space before speaking to anyone. Nothing is required up front.',
+          title: 'Explore the space',
+          body: 'Take your time, explore the different spaces and see what feels right for you.',
         },
         {
-          title: 'Speak when ready',
-          body: 'Reach a qualified psychologist inside the same private space, on your own timing.',
+          title: 'Connect when you’re ready',
+          body: 'When you want support, connect with a qualified mental health professional within MeloWorld.',
         },
       ],
     },
     gallery: [
       {
-        label: 'MeloWorld environment',
+        label: 'The world — explore the virtual spaces',
         slot: '/explore/meloworld/01.webp',
-        aspect: '16/9',
-      },
-      {
-        label: 'Avatar and identity',
-        slot: '/explore/meloworld/02.webp',
-        aspect: '3/4',
-      },
-      {
-        label: 'A session in the space',
-        slot: '/explore/meloworld/03.webp',
         aspect: '4/3',
       },
-    ],
-    quote:
-      'The doorway changes. The standard of care behind it does not.',
-    deeper: [
       {
-        label: 'MeloWorld platform',
-        href: '/platform/meloworld',
-        note: 'The product page, in detail.',
+        label: 'Your avatar — choose how you appear',
+        slot: '/explore/meloworld/02.webp',
+        aspect: '4/3',
       },
+      {
+        label: 'Your session — connect with a qualified professional',
+        slot: '/explore/meloworld/03.webp',
+        aspect: '16/9',
+      },
+    ],
+    quote: 'A new way to access wellbeing. Built with care.',
+    deeper: [
       {
         label: 'VR Wellness',
         href: '/explore/vr-wellness',
-        note: 'The other half of the ecosystem.',
+        note: 'The other half of the ecosystem, for when someone is ready to go further.',
+      },
+      {
+        label: 'Trust centre',
+        href: '/trust',
+        note: 'Exactly what an employer can and cannot see.',
       },
     ],
     cta: {
       label: 'Book a demo',
       href: '/contact',
-      note: 'See MeloWorld running, and how it would sit in your workplace.',
+      note: 'Walk through MeloWorld the way your people would meet it.',
     },
   },
 
@@ -378,55 +391,62 @@ export const EXPLORE_TOPICS: ExploreTopic[] = [
     slug: 'vr-wellness',
     index: '04',
     word: 'VR Wellness',
-    eyebrow: 'The other way in',
-    title: 'Immersive, guided experiences, taken at your own pace.',
+    eyebrow: 'A different way to experience wellbeing',
+    title: 'A different way to experience wellbeing.',
     lede:
-      'VR Wellness offers immersive, guided experiences that help people work through challenges and build resilience at a pace they set themselves.',
+      'Guided VR experiences designed to help people relax, build confidence and work through different wellbeing needs, at their own pace.',
     hero: '/models/imgs/vrworld.webp',
-    accent: '#b9b4ff',
-    tint: ['#4a4270', '#0e0c17'],
+    accent: '#ff8422',
+    tint: ['#a95e1f', '#361c08'],
     chapters: [
       {
         id: 'guided',
-        kicker: 'Paced by a clinician, never by a headset.',
-        heading: 'Immersion is the method, not the attraction.',
+        kicker: 'Guided experiences, not just technology.',
+        heading: 'Guided by people. Powered by VR.',
         paragraphs: [
-          'Every experience is assessed, consented and monitored, and it stops the moment it should. The technology is there because graded, repeatable exposure is difficult to arrange in the real world, not because it is novel.',
-          'Progress that felt impossible in a consulting room becomes possible when the situation can be entered a step at a time and left at will.',
+          'VR Wellness uses immersive experiences to help people work through specific challenges in a controlled environment.',
+          'Each experience is designed with professional guidance, so people can move through it step by step, at a pace that feels comfortable for them.',
+          'The technology creates the experience. The right guidance makes it meaningful.',
         ],
       },
       {
-        id: 'resilience',
-        kicker: 'Not only for acute difficulty.',
-        heading: 'Building resilience before it is needed.',
+        id: 'confidence',
+        kicker: 'Build skills before you need them.',
+        heading: 'Wellbeing isn’t only about difficult moments.',
         paragraphs: [
-          'Alongside structured work on specific challenges, the library covers regulation, focus and recovery: short guided experiences people use regularly rather than in a crisis.',
-          'This is what turns wellbeing from something an organisation offers into something its people practise.',
+          'VR Wellness isn’t only designed for people going through a challenge. It also includes guided experiences that can help with relaxation, focus, confidence and recovery.',
+          'These can become simple ways for people to practise wellbeing regularly, rather than waiting until they need help.',
         ],
       },
       {
         id: 'safety',
-        heading: 'Safety is designed in.',
+        kicker: 'Safety comes first.',
+        heading: 'Every experience has a safe way in and a safe way out.',
         paragraphs: [
-          'Sessions are bounded in length, supervised where the content requires it, and always under the participant’s control. Nobody is held in an experience they want to leave.',
-          'Clinical oversight covers what is offered, to whom, and when to stop, which is the difference between a therapeutic tool and a demo.',
+          'People can move through each experience at their own pace and stop whenever they need to.',
+          'The experiences are designed with professional input, with the right guidance and boundaries built into the process.',
+          'Because trying something new should always feel safe enough to try.',
         ],
       },
     ],
     highlights: {
-      heading: 'What the experiences cover',
+      heading: 'Different needs. Different experiences.',
       items: [
         {
-          title: 'Graded exposure',
-          body: 'Structured work on heights, flying, speaking and social anxiety, assessed and consented before it begins.',
+          title: 'Relax & reset',
+          body: 'Guided experiences designed to help people slow down, relax and recover from everyday stress.',
         },
         {
-          title: 'Regulation and recovery',
-          body: 'Short guided sessions for stress, focus and sleep, designed for regular use.',
+          title: 'Build confidence',
+          body: 'Experiences that help people practise confidence in situations that may feel difficult or unfamiliar.',
         },
         {
-          title: 'Clinician in the loop',
-          body: 'Progression, pacing and stopping points are set by a professional, not by the software.',
+          title: 'Work through fears',
+          body: 'Structured experiences that can help people gradually work through specific fears and anxieties.',
+        },
+        {
+          title: 'Focus & recover',
+          body: 'Short guided experiences designed to support focus, rest and everyday wellbeing.',
         },
       ],
     },
@@ -434,51 +454,55 @@ export const EXPLORE_TOPICS: ExploreTopic[] = [
       {
         label: 'Immersive environment',
         slot: '/explore/vr-wellness/01.webp',
-        aspect: '16/9',
+        aspect: '4/3',
       },
       {
-        label: 'Guided session',
+        label: 'Guided experience',
         slot: '/explore/vr-wellness/02.webp',
         aspect: '4/3',
       },
       {
-        label: 'Resilience library',
+        label: 'Build your practice',
         slot: '/explore/vr-wellness/03.webp',
-        aspect: '3/4',
+        aspect: '16/9',
       },
     ],
-    quote:
-      'The pace belongs to the person in the experience, always.',
+    quote: 'A new way to experience wellbeing. At your own pace.',
     deeper: [
       {
-        label: 'VR Wellness platform',
-        href: '/platform/vr-wellness',
-        note: 'The product page, in detail.',
+        label: 'MeloWorld',
+        href: '/explore/meloworld',
+        note: 'The private first step, for people not ready to go further yet.',
       },
       {
-        label: 'Clinical grounding',
+        label: 'The evidence',
         href: '/explore/clinical',
-        note: 'Who built it, and how it was tested.',
+        note: 'Who designs these experiences, and what they are tested against.',
       },
     ],
     cta: {
       label: 'Book a demo',
       href: '/contact',
-      note: 'Try a guided experience with our clinical team.',
+      note: 'Try a guided experience the way your people would meet it.',
     },
   },
 
   {
     slug: 'clinical',
     index: '05',
-    word: 'Clinical',
-    eyebrow: 'Creating psychologically safer workplaces',
-    title: 'Where clinical expertise meets immersive technology.',
+    // Renamed from "Clinical" — on its own that word describes the evidence
+    // behind the platform, not who it is for, and this room is as much about
+    // workplaces, education and healthcare as it is about the research. It now
+    // matches the home beat's own word exactly, so arriving here reads as
+    // continuing the same sentence rather than starting a new one.
+    word: 'Who It’s For',
+    eyebrow: 'Who NEXR is built for',
+    title: 'Where clinical expertise meets the realities of the people you serve.',
     lede:
       'Whether you are supporting employees across an enterprise or students within an educational institution, NEXR helps create environments where wellbeing is approachable, engaging and accessible.',
     hero: '/models/imgs/clinicallygrounded.webp',
-    accent: '#8fe3e8',
-    tint: ['#1f3a3a', '#080e0e'],
+    accent: '#ff7d16',
+    tint: ['#ad5d1f', '#381c08'],
     chapters: [
       {
         id: 'built',
@@ -572,8 +596,8 @@ export const EXPLORE_TOPICS: ExploreTopic[] = [
     lede:
       'Bring the way in to your people. We will shape the right entry point for your workplace or campus, and show you the whole ecosystem in a live walkthrough.',
     hero: '/models/imgs/letsconnect.webp',
-    accent: '#ffb589',
-    tint: ['#6b7a2e', '#12150a'],
+    accent: '#ff7609',
+    tint: ['#b05c1e', '#391c08'],
     chapters: [
       {
         id: 'walkthrough',

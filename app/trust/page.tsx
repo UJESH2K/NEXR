@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Beat, PageShell, Tiles, Stats, ImagePlaceholder } from '@/components/site/PageShell'
+import { sectionById } from '@/lib/sections'
 
 export const metadata: Metadata = {
   title: 'Trust Centre — NEXR',
@@ -32,10 +33,14 @@ const STATS = [
   { value: 'HIPAA', label: 'Compliant framework' },
 ]
 
+/** This page's own beat, so its placeholders match the scene rather than a colour chosen by hand. */
+const PAGE_TINT = sectionById('clinical').sky
+
 export default function TrustPage() {
   return (
     <PageShell
       eyebrow="05 / Trust Centre"
+      beatId="clinical"
       title="Where clinical expertise meets immersive technology."
       lede="Technology supports credibility; it does not replace it. Every session is handled by trained professionals working to real clinical protocols."
     >
@@ -46,9 +51,9 @@ export default function TrustPage() {
       <Stats items={STATS} />
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <ImagePlaceholder label="Clinical team" tint={['#1f3a3a', '#080e0e']} aspect="1/1" />
-        <ImagePlaceholder label="Hospital partnership" tint={['#1a3333', '#060b0b']} aspect="1/1" />
-        <ImagePlaceholder label="Research publications" tint={['#243f3f', '#0a1111']} aspect="1/1" />
+        <ImagePlaceholder label="Clinical team" tint={PAGE_TINT} aspect="1/1" />
+        <ImagePlaceholder label="Hospital partnership" tint={PAGE_TINT} aspect="1/1" />
+        <ImagePlaceholder label="Research publications" tint={PAGE_TINT} aspect="1/1" />
       </div>
 
       <Beat heading="Clinical and safety basis">
@@ -76,7 +81,7 @@ export default function TrustPage() {
       </Beat>
 
       <div className="mt-10">
-        <ImagePlaceholder label="Privacy and anonymity architecture" tint={['#1f3a3a', '#080e0e']} aspect="21/9" />
+        <ImagePlaceholder label="Privacy and anonymity architecture" tint={PAGE_TINT} aspect="21/9" />
       </div>
 
       <Beat heading="Why not an existing therapy app">

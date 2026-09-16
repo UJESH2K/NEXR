@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Beat, PageShell, Tiles, Stats, ImagePlaceholder, StepCard } from '@/components/site/PageShell'
+import { sectionById } from '@/lib/sections'
 
 export const metadata: Metadata = {
   title: 'VR Wellness — NEXR',
@@ -33,10 +34,15 @@ const STATS = [
   { value: '0', label: 'Headsets needed to start' },
 ]
 
+/** This page's own beat, so its placeholders match the scene rather than a colour chosen by hand. */
+const PAGE_TINT = sectionById('vr-wellness').sky
+
 export default function VrWellnessPage() {
   return (
     <PageShell
       eyebrow="04 / The Platform"
+      beatId="vr-wellness"
+      align="center"
       title="VR Wellness"
       lede="An additional wellness tool, introduced later in the journey rather than as the core product — immersive, guided, and always clinically supervised."
     >
@@ -51,8 +57,8 @@ export default function VrWellnessPage() {
       <Stats items={STATS} />
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <ImagePlaceholder label="VR exposure therapy session" tint={['#4a4270', '#0e0c17']} aspect="16/10" />
-        <ImagePlaceholder label="Guided immersive environment" tint={['#3d3660', '#0c0a14']} aspect="16/10" />
+        <ImagePlaceholder label="VR exposure therapy session" tint={PAGE_TINT} aspect="16/10" />
+        <ImagePlaceholder label="Guided immersive environment" tint={PAGE_TINT} aspect="16/10" />
       </div>
 
       <Beat heading="What immersive work can support">
@@ -97,7 +103,7 @@ export default function VrWellnessPage() {
       </Beat>
 
       <div className="mt-10">
-        <ImagePlaceholder label="Safety protocols and clinical oversight" tint={['#4a4270', '#0e0c17']} aspect="21/9" />
+        <ImagePlaceholder label="Safety protocols and clinical oversight" tint={PAGE_TINT} aspect="21/9" />
       </div>
     </PageShell>
   )

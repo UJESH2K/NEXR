@@ -6,6 +6,8 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Menu, MoveUpRight, X } from 'lucide-react'
+import { HeaderNav } from './HeaderNav'
+import { openContactModal } from '@/lib/contactModalStore'
 
 const NAV = [
   { label: 'Explore', href: '/explore' },
@@ -96,6 +98,11 @@ export function Header() {
       </Link>
 
       <nav className="flex min-w-0 items-center gap-3 md:gap-8">
+        {/* Home and, once there is somewhere to return to, Back — on the scene
+            itself these are meaningless (you cannot go back to where you
+            already are), so the pair only mounts on every other route. */}
+        {!overScene ? <HeaderNav /> : null}
+
         {/* The route list is hidden over the scene. The HUD already runs a
             six-tick progress rail across the top centre, and two rows of
             navigation at the same height collide on anything narrower than a
@@ -126,14 +133,22 @@ export function Header() {
             390px "Start a conversation" pushed the menu button off the screen
             entirely, and a call to action nobody can reach is worse than a
             terse one. */}
-        <Link href="/contact" className="btn-primary btn-primary--compact group">
+        {/* Opens the quick-contact popup rather than navigating — see
+            ContactModal. /contact still exists, and is what "book a full
+            demo" inside the popup goes to; this is the fast path for someone
+            who wants to send one line and not visit a whole page to do it. */}
+        <button
+          type="button"
+          onClick={openContactModal}
+          className="btn-primary btn-primary--compact group"
+        >
           <span className="lg:hidden">Book a demo</span>
           <span className="hidden lg:inline">Start a conversation</span>
           <MoveUpRight
             size={13}
             className="shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
           />
-        </Link>
+        </button>
 
         <button
           onClick={() => setOpen((value) => !value)}
@@ -169,13 +184,16 @@ export function Header() {
               {/* Contact belongs in the list as well as in the button: on a
                   phone the sheet is where people look for a route to a human. */}
               <li>
-                <Link
-                  href="/contact"
-                  onClick={() => setOpen(false)}
-                  className="block rounded-2xl px-4 py-4 font-mono text-xs uppercase tracking-[0.2em] text-ember hover:bg-white/5"
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpen(false)
+                    openContactModal()
+                  }}
+                  className="block w-full rounded-2xl px-4 py-4 text-left font-mono text-xs uppercase tracking-[0.2em] text-ember hover:bg-white/5"
                 >
                   Contact
-                </Link>
+                </button>
               </li>
             </ul>
 
