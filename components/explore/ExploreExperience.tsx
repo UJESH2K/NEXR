@@ -237,7 +237,13 @@ export function ExploreExperience({
         <span
           data-explore-ghost
           aria-hidden="true"
-          className="pointer-events-none absolute -top-6 right-4 select-none font-display leading-none text-bone/[0.04] md:right-12"
+          // top-24/md:top-32 rather than the negative offset this had: the
+          // number is absolutely positioned, so it ignores the header's own
+          // pt-28/md:pt-40 padding and was sitting right at the box's literal
+          // top edge — which is also where the fixed site header covers it and
+          // where this box's own `overflow-hidden` clips it, so the glyph read
+          // as sliced in half. Starting inside the padded area clears both.
+          className="pointer-events-none absolute top-24 right-4 select-none font-display leading-none text-bone/[0.04] md:top-32 md:right-12"
           // Held well below the old 26vw. A watermark should be felt at the
           // edge of vision, not read — at 26vw this was 500px of type on a
           // desktop and became the loudest thing on the page.
