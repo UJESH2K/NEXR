@@ -284,7 +284,15 @@ export function ExploreExperience({
             </p>
           </motion.div>
 
-          <div className="mt-8 grid gap-8 md:mt-12 md:gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
+          {/*
+            Text on one side, the room's own image on the other — a portrait
+            card with a floating badge rather than the wide banner this used
+            to run full-bleed underneath the title. The reference brief asked
+            for this exact shape (an agency "about" hero); the badge and the
+            card both carry the room's own accent instead of the reference's
+            colours, so six rooms still read as one site.
+          */}
+          <div className="mt-8 grid gap-10 md:mt-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16">
             <div>
               {topic.mark ? (
                 <motion.img
@@ -310,22 +318,26 @@ export function ExploreExperience({
                 initial={{ opacity: 0, y: 42, filter: 'blur(12px)' }}
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 transition={{ duration: 1.1, ease: EASE, delay: 0.2 }}
-                className="mt-6 font-display text-[clamp(2.4rem,5.6vw,4.6rem)] leading-[1.03] text-bone"
+                className="mt-6 font-display text-[clamp(2.1rem,4.6vw,3.6rem)] leading-[1.06] text-bone"
               >
                 {topic.title}
               </motion.h1>
-            </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 26 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, ease: EASE, delay: 0.4 }}
-              className="lg:pb-3"
-            >
-              <p className="max-w-md text-[15px] leading-[1.85] text-sand/75">
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.9, ease: EASE, delay: 0.32 }}
+                className="mt-6 max-w-md text-[15px] leading-[1.85] text-sand/75"
+              >
                 {topic.lede}
-              </p>
-              <div className="mt-8 flex flex-wrap items-center gap-5">
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: EASE, delay: 0.45 }}
+                className="mt-8 flex flex-wrap items-center gap-5"
+              >
                 <Link href={topic.cta.href} {...hoverable} className="btn-primary group">
                   {topic.cta.label}
                   <ArrowUpRight
@@ -340,36 +352,49 @@ export function ExploreExperience({
                 >
                   Start reading &darr;
                 </a>
+              </motion.div>
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 40, filter: 'blur(14px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              transition={{ duration: 1.1, ease: EASE, delay: 0.35 }}
+              className="relative"
+            >
+              <div
+                data-explore-art
+                className="relative aspect-[4/5] w-full max-w-sm overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl shadow-black/50 sm:mx-auto lg:mx-0 lg:max-w-none"
+                style={{
+                  backgroundImage: `linear-gradient(135deg, ${topic.tint[0]}, ${topic.tint[1]})`,
+                }}
+              >
+                <img
+                  src={topic.hero}
+                  alt=""
+                  className="h-full w-full object-cover opacity-70 mix-blend-luminosity"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-void via-void/25 to-transparent" />
+                <p className="absolute bottom-6 left-6 font-mono text-[10px] uppercase tracking-[0.26em] text-bone/60 md:bottom-8 md:left-8">
+                  NEXR / {topic.word}
+                </p>
+              </div>
+
+              {/* The floating badge. Every reference of this layout has one —
+                  a small circle overlapping the card's corner, usually holding
+                  an arrow or an icon. Ours holds the room's own number, which
+                  is content rather than decoration: it is the same number the
+                  breadcrumb above and the chapter numerals below both use. */}
+              <div
+                aria-hidden="true"
+                className="absolute -bottom-6 -left-6 flex h-20 w-20 items-center justify-center rounded-full border-[6px] shadow-xl"
+                style={{ borderColor: '#0d0906', backgroundColor: topic.accent }}
+              >
+                <span className="numeral text-[1.1rem] text-ink" style={{ ['--numeral-accent' as string]: '#0d0906' }}>
+                  {topic.index}
+                </span>
               </div>
             </motion.div>
           </div>
-
-          <motion.div
-            data-explore-art
-            initial={{ opacity: 0, y: 50, filter: 'blur(14px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            transition={{ duration: 1.2, ease: EASE, delay: 0.35 }}
-            className="relative mt-10 aspect-[16/10] overflow-hidden rounded-3xl border border-white/10 shadow-2xl shadow-black/50 md:mt-16 md:aspect-[2.3/1]"
-            style={{
-              backgroundImage: `linear-gradient(135deg, ${topic.tint[0]}, ${topic.tint[1]})`,
-            }}
-          >
-            <img
-              src={topic.hero}
-              alt=""
-              className="h-full w-full object-cover opacity-70 mix-blend-luminosity"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-void via-void/25 to-transparent" />
-            <div
-              className="absolute bottom-0 left-0 h-px w-1/3"
-              style={{
-                background: `linear-gradient(90deg, ${topic.accent}88, transparent)`,
-              }}
-            />
-            <p className="absolute bottom-6 left-6 font-mono text-[10px] uppercase tracking-[0.26em] text-bone/60 md:bottom-8 md:left-8">
-              NEXR / {topic.word}
-            </p>
-          </motion.div>
         </div>
       </header>
 
@@ -538,16 +563,29 @@ export function ExploreExperience({
                 {topic.highlights.heading}
               </h2>
               <ul className="mt-8 grid gap-4 sm:grid-cols-2">
-                {topic.highlights.items.map((item) => (
+                {topic.highlights.items.map((item, i) => (
                   <li
                     key={item.title}
                     data-explore-item
                     className="glow-hover group rounded-2xl border border-white/10 bg-ink/50 p-6 transition-colors duration-500 hover:border-white/25"
                   >
+                    {/* A small circular badge rather than the plain rule this
+                        used to open with — the reference brief's own pillar
+                        cards ("VISION", "MISSION") each carry one, and it is
+                        what keeps a grid of cards from reading as a bare list. */}
                     <span
-                      className="block h-px w-6 transition-all duration-500 group-hover:w-12"
-                      style={{ backgroundColor: topic.accent }}
-                    />
+                      aria-hidden="true"
+                      className="flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-500 group-hover:scale-110"
+                      style={{
+                        borderColor: `${topic.accent}4d`,
+                        backgroundColor: `${topic.accent}14`,
+                        color: topic.accent,
+                      }}
+                    >
+                      <span className="numeral text-[0.8rem]" style={{ ['--numeral-accent' as string]: topic.accent }}>
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                    </span>
                     <h3 className="mt-5 font-display text-xl leading-snug text-bone">
                       {item.title}
                     </h3>

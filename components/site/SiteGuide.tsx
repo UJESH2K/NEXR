@@ -1,46 +1,25 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { RoomNav } from './RoomNav'
-import { GuideNavigator } from './GuideNavigator'
-import { MeloGuide } from './MeloGuide'
+import { MeloNav } from './MeloNav'
 
 /**
- * Route-level wayfinding.
+ * Route-level wayfinding: Melo, on every page that is not the scene.
  *
- * Three jobs, all off the home route:
+ * This used to be three components — RoomNav (Back/Home, bottom left),
+ * GuideNavigator (a per-page orientation card, bottom right, product pages
+ * only) and a MeloWorld-only guide. Three pieces of chrome in two corners,
+ * covering overlapping ground. MeloNav is all three folded into one widget:
+ * a contextual greeting, Back and Home, and a way to keep moving, wherever a
+ * visitor actually is.
  *
- *   - RoomNav is the Back and Home pair. It applies to every route away from
- *     home: each one is somewhere you can arrive at from a beat, and somewhere
- *     you can lose track of where you came from.
- *   - MeloGuide is the character-led guide, and it only belongs on MeloWorld's
- *     own page — everywhere else "Melo" would be a stranger giving directions.
- *   - GuideNavigator is the anonymous version of the same idea, for every other
- *     product page. The explore rooms run their own prev/next pair in the
- *     footer, so it stays out of those, and MeloWorld gets MeloGuide instead of
- *     it rather than both at once.
+ * It does not appear on the scene itself — Melo has nothing to say about a
+ * page the visitor has not left yet — and it does not compete with the explore
+ * rooms' own prev/next footer, which is a different, slower kind of control
+ * for someone reading the whole room rather than passing through it.
  */
 export function SiteGuide() {
   const pathname = usePathname()
   if (pathname === '/') return null
-
-  const isExplore = pathname.startsWith('/explore')
-  const isMeloWorld = pathname === '/platform/meloworld'
-
-  return (
-    <>
-      <RoomNav />
-
-      {isMeloWorld ? <MeloGuide /> : null}
-
-      {!isExplore && !isMeloWorld ? (
-        // Desktop only. It is a floating card in the bottom corner, and on a
-        // phone that corner is the page — it covered the copy on every route it
-        // appeared on, and there is no corner to move it to.
-        <div className="hidden lg:block">
-          <GuideNavigator />
-        </div>
-      ) : null}
-    </>
-  )
+  return <MeloNav />
 }

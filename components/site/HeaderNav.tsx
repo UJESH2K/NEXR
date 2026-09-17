@@ -5,18 +5,18 @@ import { setCursor, resetCursor } from '@/lib/cursorStore'
 import { useSceneReturn } from '@/lib/useSceneReturn'
 
 /**
- * The same Back / Home pair as RoomNav, in the top bar.
+ * The same Back / Home pair Melo carries, in the top bar.
  *
- * RoomNav is pinned to the corner for the whole page, but the header scrolls
- * out of view on anything longer than one screen — and a long room is exactly
- * where "I don't know where I am" shows up. This puts the identical two
- * controls where the logo already lives, so they are visible the instant a
- * visitor looks up rather than only at the bottom of wherever they happen to
+ * Melo's widget is pinned to the corner for the whole page, but the header
+ * scrolls out of view on anything longer than one screen — and a long room is
+ * exactly where "I don't know where I am" shows up. This puts the identical
+ * two controls where the logo already lives, so they are visible the instant
+ * a visitor looks up rather than only at the bottom of wherever they happen to
  * be scrolled to.
  *
  * Icon-only. The header is already carrying the logo, the route list, the
  * call to action and the menu button; a third labelled pill here is the one
- * that would not fit. RoomNav's pill still carries the full "Back to 03
+ * that would not fit. Melo's own panel still carries the full "Back to 03
  * MeloWorld" label — this is the fast, glanceable version of the same thing.
  */
 export function HeaderNav() {
