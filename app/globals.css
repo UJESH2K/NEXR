@@ -420,6 +420,21 @@
     bottom: calc(4vh + env(safe-area-inset-bottom));
     width: auto;
     max-width: 34rem;
+    /* The clinical beat is taller than the rest — kicker, headline, body,
+       three audience tiles and a CTA all stacked in one bottom-anchored
+       block. Without a cap that stack can run past the top of a short phone
+       screen with nothing to reveal it. Capping the height and letting the
+       block scroll internally keeps every beat reachable regardless of how
+       much copy it carries, instead of clipping the tallest one. */
+    max-height: calc(100svh - 4vh - env(safe-area-inset-bottom) - 88px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .story-col::-webkit-scrollbar {
+    display: none;
   }
 }
 
@@ -812,12 +827,18 @@
   bottom: 0;
   top: 38%;
   pointer-events: none;
+  /* The clinical beat's raised-arm pose reaches into its own headline on a
+     phone, where the copy stacks inline instead of sitting beside the
+     figure — see the note above `.story-col`'s mobile block. The old ramp
+     (transparent until 32% into this box) left exactly that first line
+     unprotected; darkening from the very top of the scrim, not a third of
+     the way down it, is what actually covers it. */
   background: linear-gradient(
     to bottom,
-    transparent 0%,
-    rgb(8 11 8 / 0.55) 32%,
-    rgb(8 11 8 / 0.86) 62%,
-    rgb(8 11 8 / 0.94) 100%
+    rgb(8 11 8 / 0.32) 0%,
+    rgb(8 11 8 / 0.62) 22%,
+    rgb(8 11 8 / 0.88) 55%,
+    rgb(8 11 8 / 0.95) 100%
   );
 }
 
@@ -853,7 +874,11 @@
   }
 
   .story-scrim {
-    top: 24%;
+    /* The clinical beat's headline sits right where this pose's raised arm
+       and hair are, so on a short phone the scrim has to start above the
+       headline, not at it — 24% still put the whole first line outside the
+       darkened area. */
+    top: 8%;
   }
 }
 

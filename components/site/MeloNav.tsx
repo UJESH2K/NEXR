@@ -71,17 +71,17 @@ const GUIDE: Record<string, Guide> = {
     step: '04 / 08',
   },
   '/for/workplaces': {
-    label: 'For Workplaces',
+    label: 'Workplaces',
     message: 'What changes for an organisation once the first step is actually taken, not just offered.',
     step: '05 / 08',
   },
   '/for/education': {
-    label: 'For Education',
+    label: 'Schools & Colleges',
     message: 'How this fits a campus rather than a clinic — private, on the device a student already has.',
     step: '06 / 08',
   },
   '/for/healthcare': {
-    label: 'For Healthcare',
+    label: 'Healthcare',
     message: 'Built around clinical judgement, never instead of it. Assessment and consent come first.',
     step: '07 / 08',
   },

@@ -1,109 +1,42 @@
 import type { Metadata } from 'next'
-import { Beat, PageShell, ImagePlaceholder } from '@/components/site/PageShell'
-import { SECTIONS, sectionById } from '@/lib/sections'
+import { PageShell } from '@/components/site/PageShell'
 import { CONTACT_EMAIL } from '@/lib/contact'
 
 export const metadata: Metadata = {
   title: 'Contact — NEXR',
   description:
-    'Book a demo, talk to the team, or enquire about partnerships. Healthier organisations begin with people who feel safe enough to seek support.',
+    'Discover how NEXR can bring a new approach to your organisation, institution or practice.',
 }
 
-const ROUTES = [
-  {
-    title: 'Book a demo',
-    body: 'See MeloWorld and VR Wellness end to end, and how the employee journey works in practice.',
-    subject: 'Demo request',
-    icon: '🎯',
-    tint: SECTIONS[0].sky, // The Gap
-  },
-  {
-    title: 'Talk to the team',
-    body: 'Questions about privacy, clinical protocols or how this fits alongside an existing EAP.',
-    subject: 'Question for the NEXR team',
-    icon: '💬',
-    tint: SECTIONS[2].sky, // MeloWorld
-  },
-  {
-    title: 'Partnerships',
-    body: 'Clinical partners, educational institutions and organisations providing headsets for guided sessions.',
-    subject: 'Partnership enquiry',
-    icon: '🤝',
-    tint: SECTIONS[4].sky, // Who It's For
-  },
-]
-
-/** This page's own beat, so its placeholders match the scene rather than a colour chosen by hand. */
-const PAGE_TINT = sectionById('contact').sky
-
+/**
+ * CLOSING CTA — common for all sub pages.
+ *
+ * This page used to carry three invented "how can we help" routes with their
+ * own fabricated descriptions, plus a paragraph about who NEXR is sold to that
+ * was never in the brief. Trimmed to the one block the brief actually gives a
+ * contact page: the closing headline, its note, and the italic line under it.
+ * The direct email address is a functional necessity a text brief cannot
+ * supply on its own, so it stays — everything sitting around it does not.
+ */
 export default function ContactPage() {
   return (
     <PageShell
-      eyebrow="06 / Contact"
+      eyebrow="Let's Talk"
       beatId="contact"
       align="center"
       title="The next way into wellbeing starts here."
-      lede="‘Healthier organisations begin with people who feel safe enough to seek support.’ Tell us about your organisation and we will shape the right way in for your people."
+      lede="Discover how NEXR can bring a new approach to your organisation, institution or practice."
     >
-      <Beat heading="How can we help?">
-        <ul className="grid gap-4 sm:grid-cols-3">
-          {ROUTES.map((route) => (
-            <li
-              key={route.title}
-              data-beat-item
-              className="group relative overflow-hidden rounded-lg border border-bone/12 bg-ink/60 p-6 transition-all duration-500 hover:border-ember/30 hover:bg-ink/80 hover:shadow-lg hover:shadow-ember/5"
-            >
-              {/* Gradient background on hover */}
-              <div
-                className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                style={{
-                  backgroundImage: `linear-gradient(135deg, ${route.tint[0]}33, ${route.tint[1]}33)`,
-                }}
-              />
-              <div className="relative">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-ember/10 text-xl">
-                  {route.icon}
-                </div>
-                <h3 className="font-display text-xl text-bone transition-colors group-hover:text-ember">{route.title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-sand/70">
-                  {route.body}
-                </p>
-                <a
-                  href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(route.subject)}`}
-                  className="mt-6 inline-block font-mono text-[11px] uppercase tracking-[0.24em] text-bone/60 transition-colors hover:text-ember"
-                >
-                  Email us &rarr;
-                </a>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </Beat>
-
-      <div className="grid gap-6 lg:grid-cols-3">
-        <ImagePlaceholder label="Book a demo" tint={PAGE_TINT} aspect="4/3" />
-        <ImagePlaceholder label="Talk to us" tint={PAGE_TINT} aspect="4/3" />
-        <ImagePlaceholder label="Partner with us" tint={PAGE_TINT} aspect="4/3" />
-      </div>
-
-      <Beat heading="Direct">
-        <p>
-          <a
-            href={`mailto:${CONTACT_EMAIL}`}
-            className="text-ember underline decoration-ember/40 underline-offset-4"
-          >
-            {CONTACT_EMAIL}
-          </a>
+      <div className="flex flex-col items-center gap-6 text-center">
+        <a
+          href={`mailto:${CONTACT_EMAIL}`}
+          className="btn-primary group"
+        >
+          {CONTACT_EMAIL}
+        </a>
+        <p className="font-display text-lg italic text-bone/60">
+          Better wellbeing starts when the way in feels right.
         </p>
-        <p className="text-sm text-sand/60">
-          Sold to organisations — companies, educational institutions, HR and
-          People &amp; Culture teams, founders, deans and student heads. Used by
-          the people inside them.
-        </p>
-      </Beat>
-
-      <div className="mt-10">
-        <ImagePlaceholder label="NEXR headquarters" tint={PAGE_TINT} aspect="21/9" />
       </div>
     </PageShell>
   )

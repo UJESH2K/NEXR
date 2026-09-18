@@ -74,7 +74,7 @@ function Hero({ visible }: { visible: boolean }) {
             word carries its own blur, which makes the movement read as focus
             pulling in rather than as a slide. */}
         <h1 className="font-display text-[clamp(2rem,8vw,3.6rem)] leading-[1.05] text-bone">
-          {['Workplace', 'wellbeing,', 'reimagined.'].map((word, i) => (
+          {['Wellbeing,', 'reimagined.'].map((word, i) => (
             <motion.span
               key={word}
               initial="hidden"
@@ -101,9 +101,10 @@ function Hero({ visible }: { visible: boolean }) {
           transition={{ duration: 1, ease: EASE, delay: 0.85 }}
           className="mt-4 text-[13.5px] leading-[1.7] text-bone/70 lg:hidden"
         >
-          A better way to support people at work.{' '}
+          A new way to experience, access and practise wellbeing.{' '}
           <span className="font-display italic text-ember-soft">
-            With private and immersive care.
+            Private spaces, immersive experiences and professional support,
+            brought together in one ecosystem.
           </span>
         </motion.p>
 
@@ -129,7 +130,7 @@ function Hero({ visible }: { visible: boolean }) {
           transition={{ duration: 1.1, ease: EASE, delay: 0.75 }}
           className="text-[15px] leading-[1.85] text-bone/75"
         >
-          A better way to support people at work.
+          A new way to experience, access and practise wellbeing.
         </motion.p>
 
         <motion.p
@@ -139,7 +140,8 @@ function Hero({ visible }: { visible: boolean }) {
           transition={{ duration: 1.1, ease: EASE, delay: 0.92 }}
           className="mt-3 font-display text-[19px] italic leading-[1.6] text-ember/90"
         >
-          With private and immersive care.
+          Private spaces, immersive experiences and professional support,
+          brought together in one ecosystem.
         </motion.p>
 
         <motion.span
@@ -195,26 +197,6 @@ function Beat({ section, visible }: { section: Section; visible: boolean }) {
         <p className="mt-4 text-[13px] leading-[1.7] text-bone/70 sm:text-[13.5px] sm:leading-[1.8] lg:mt-5">
           {section.body}
         </p>
-
-        {/* Assertions, not destinations — one quiet row rather than three more
-            cards competing with the ones across the frame. */}
-        {section.proof ? (
-          <ul className="mt-5 space-y-1.5">
-            {section.proof.map((line) => (
-              <li
-                key={line}
-                className="flex items-start gap-2.5 text-[12px] leading-[1.5] text-bone/55"
-              >
-                <span
-                  aria-hidden="true"
-                  className="mt-[0.5em] block h-1 w-1 shrink-0 rounded-full"
-                  style={{ backgroundColor: section.accent }}
-                />
-                {line}
-              </li>
-            ))}
-          </ul>
-        ) : null}
 
         {/* Below 1024px the aside column cannot exist — see BeatAside — so the
             same content is rendered inline here instead. The two are mutually

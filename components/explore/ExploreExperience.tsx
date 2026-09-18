@@ -61,6 +61,20 @@ export function ExploreExperience({
       if (!page) return
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
+      // Below 1024px, skip the reveal-on-scroll timeline entirely rather than
+      // trust it to fire correctly. It depends on ScrollTrigger's 'top 82%'
+      // boundary staying accurate relative to the page's own layout, and on a
+      // phone that layout keeps moving under it: the address bar collapsing
+      // mid-scroll resizes the viewport, and images/webfonts finishing late
+      // shift where every block actually sits. Either one can leave the
+      // trigger's start point stale by the time a reader scrolls past it, and
+      // a `play none none none` timeline that never enters stays at its
+      // `.from()` state forever — the block is there, just invisible, which
+      // reads as the room being broken rather than merely unanimated. Desktop
+      // keeps the reveal; a phone gets the same fully-visible content the
+      // reduced-motion path already gives everyone else.
+      const skipReveal = window.matchMedia('(max-width: 1023px)').matches
+
       const triggers: ScrollTrigger[] = []
 
       /*
@@ -156,7 +170,9 @@ export function ExploreExperience({
         },
       })
 
-      // Blocks reveal once, on their own trigger.
+      // Blocks reveal once, on their own trigger — desktop only, see above.
+      if (skipReveal) return () => triggers.forEach((trigger) => trigger.kill())
+
       gsap.utils.toArray<HTMLElement>('[data-explore-block]').forEach((block) => {
         const items = block.querySelectorAll<HTMLElement>('[data-explore-item]')
 
@@ -350,7 +366,7 @@ export function ExploreExperience({
                   {...hoverable}
                   className="font-mono text-[10px] uppercase tracking-[0.22em] text-bone/45 transition-colors hover:text-bone"
                 >
-                  Start reading &darr;
+                  {topic.readMoreLabel ?? 'Start reading'} &darr;
                 </a>
               </motion.div>
             </div>
@@ -407,7 +423,13 @@ export function ExploreExperience({
         this exact room, "Belief", where the paragraph sat in a narrow band
         with the whole right half of the frame unused. Chapters below now use
         that width themselves; this strip only has to name the stops.
+
+        Guarded on chapter count: a couple of rooms carry no chapters yet — see
+        the comment on the "clinical" and "contact" entries in lib/explore.ts —
+        and a nav strip labelled "In this room" pointing at nothing reads as
+        broken rather than simply short.
       */}
+      {topic.chapters.length > 0 ? (
       <nav
         aria-label="In this room"
         className="room-section room-section--tight mx-auto flex max-w-6xl flex-wrap items-center gap-x-2 gap-y-3 px-5 sm:px-6 md:px-10"
@@ -436,12 +458,13 @@ export function ExploreExperience({
                 {String(i + 1).padStart(2, '0')}
               </span>
               <span className="transition-colors duration-500 group-hover:text-bone">
-                {chapter.heading}
+                {chapter.navLabel ?? chapter.heading}
               </span>
             </a>
           )
         })}
       </nav>
+      ) : null}
 
       {/* ── chapters ─────────────────────────────────────────────────────── */}
       <div className="room-section mx-auto max-w-6xl px-5 pb-20 sm:px-6 md:px-10 md:pb-24">
@@ -677,6 +700,10 @@ export function ExploreExperience({
           </h2>
           <p className="relative mx-auto mt-4 max-w-xl text-sm leading-relaxed text-sand/70">
             {topic.cta.note}
+          </p>
+          {/* CLOSING CTA — common for all sub pages. */}
+          <p className="relative mt-6 font-display text-base italic text-bone/60">
+            Better wellbeing starts when the way in feels right.
           </p>
           <Link
             href={topic.cta.href}

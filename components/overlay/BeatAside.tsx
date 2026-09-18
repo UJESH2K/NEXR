@@ -180,11 +180,6 @@ export function BeatAside({
             &lsquo;{section.quote}&rsquo;
           </p>
 
-          <p className="mt-5 text-[12.5px] leading-[1.7] text-bone/55">
-            Forty minutes, your context, no deck. We walk through MeloWorld and
-            VR Wellness as your people would meet them.
-          </p>
-
           <Link
             href="/contact"
             onMouseEnter={() => setCursor({ active: true })}

@@ -31,18 +31,10 @@ export type Section = {
    * Card blocks drawn on the far side of the figure, one per entry.
    *
    * These carry a title as well as a line of copy because the script's card
-   * blocks are named things — "For Workplaces", "For Education" — and a bare
-   * sentence loses the name that makes the set scannable.
+   * blocks are named things — "Workplaces", "Schools & Colleges", "Healthcare"
+   * — and a bare sentence loses the name that makes the set scannable.
    */
   tiles?: { title: string; body: string; href: string }[]
-  /**
-   * Short single-line statements, set as a compact row under the body.
-   *
-   * Distinct from `tiles` on purpose. The credibility lines are assertions, not
-   * destinations: they want to be read in one sweep, not clicked, and giving
-   * them the card treatment made them look like three more things to go and do.
-   */
-  proof?: string[]
   /** Pull quote set beside the beat, used to close the page. */
   quote?: string
   cta: { label: string; route: string }
@@ -105,10 +97,12 @@ export const SECTIONS: Section[] = [
     id: 'gap',
     index: '01',
     word: 'The Gap',
-    kicker: 'People need support.',
-    headline: 'But reaching out isn’t always easy.',
+    // S2 — THE PROBLEM. The PDF gives this as one two-line headline rather
+    // than a kicker-then-headline pair, so both lines live in `headline` and
+    // wrap naturally rather than being split across two type sizes.
+    headline: 'We\u2019ve solved for availability. Have we solved for approachability?',
     body:
-      'Organisations today invest more in employee wellbeing than ever before. Yet burnout continues to rise, wellbeing programmes remain underused, and many employees hesitate to seek support because of stigma, fear of judgement or concerns around privacy.',
+      'Having support available is only one part of the journey. What matters is how comfortable someone feels taking that first step. Reaching out can be difficult when you\u2019re unsure what to say, who to speak to, or whether you\u2019re ready at all. Sometimes, people simply need a little time, privacy, or a different way to begin. Wellbeing works better when the way in feels as personal as the need itself.',
     cta: { label: 'Explore the gap', route: '/explore/gap' },
     images: ['/models/imgs/gap.webp'],
     sky: ['#9f6021', '#311c08'],
@@ -119,10 +113,11 @@ export const SECTIONS: Section[] = [
     id: 'belief',
     index: '02',
     word: 'Belief',
+    // S3 — BELIEF.
     kicker: 'Stop making people fit wellbeing.',
     headline: 'Make wellbeing fit people.',
     body:
-      'At NEXR, we believe workplace wellbeing should feel natural, private and engaging. When support is designed around people instead of processes, organisations create healthier cultures and employees are more likely to begin their wellbeing journey.',
+      'People don\u2019t experience wellbeing in the same way. The right starting point could be a private space, a guided experience, a conversation with a professional, or simply the opportunity to understand what you\u2019re feeling first. At NEXR, we believe wellbeing should adapt to the person, the setting and the need. Because wellbeing should work around people, not the other way around.',
     cta: { label: 'Explore our belief', route: '/explore/belief' },
     images: ['/models/imgs/OurApproach.webp'],
     sky: ['#a25f20', '#321c08'],
@@ -133,10 +128,10 @@ export const SECTIONS: Section[] = [
     id: 'meloworld',
     index: '03',
     word: 'MeloWorld',
-    kicker: 'A new ecosystem for workplace wellbeing.',
-    headline: 'A private space, explored anonymously.',
+    // S5 — PRODUCTS / MELOWORLD.
+    headline: 'A private space to begin.',
     body:
-      'MeloWorld is a private virtual space where employees can explore their wellbeing anonymously. Choose your avatar, explore different spaces and connect with trained mental health professionals in a comfortable setting.',
+      'An anonymous virtual environment where people can explore their wellbeing, move at their own pace and connect with qualified mental health professionals when they\u2019re ready.',
     cta: { label: 'Explore MeloWorld', route: '/explore/meloworld' },
     images: ['/models/imgs/meloworld.webp'],
     mark: '/brand/meloworld-mark.webp',
@@ -148,10 +143,10 @@ export const SECTIONS: Section[] = [
     id: 'vr-wellness',
     index: '04',
     word: 'VR Wellness',
-    kicker: 'The other way in.',
-    headline: 'Guided immersion, built around real needs.',
+    // S6 — PRODUCTS / VR WELLNESS.
+    headline: 'Experience it before you face it.',
     body:
-      'VR Wellness is a guided VR experience designed to support mental wellbeing. From relaxation to building confidence, employees can explore experiences shaped around different wellbeing needs. Together with MeloWorld it forms one connected ecosystem, designed for modern workplaces.',
+      'Guided virtual experiences designed around specific wellbeing, learning and therapeutic needs, from relaxation and emotional regulation to confidence-building and gradual exposure.',
     cta: { label: 'Explore VR Wellness', route: '/explore/vr-wellness' },
     images: ['/models/imgs/vrworld.webp'],
     sky: ['#a95e1f', '#361c08'],
@@ -160,43 +155,31 @@ export const SECTIONS: Section[] = [
   },
   {
     /*
-     * Two blocks of the script share this beat: who NEXR is for, and what it is
-     * built on. There are six poses in the character's clip and therefore six
-     * beats, and the alternative was to drop one block from the page entirely.
-     *
-     * They merge cleanly because they answer the same buyer question from two
-     * sides — the audience cards say who it is for, the proof line says why it
-     * can be trusted — and the two treatments stay visually distinct: cards on
-     * the far side of the figure, a single quiet row under the copy.
+     * S7 — WHERE NEXR FITS. There are six poses in the character's clip and
+     * therefore six beats, and this is the one the audience block occupies.
      */
     id: 'clinical',
     index: '05',
-    word: 'Who It’s For',
-    kicker: 'Designed for people. Built for organisations.',
-    headline: 'Expertise meets innovation.',
+    word: 'Who It\u2019s For',
+    headline: 'Designed for people. Built for organisations.',
     body:
-      'NEXR works with organisations, educational institutions and healthcare teams to make mental wellbeing more accessible, engaging and easy to approach.',
+      'NEXR adapts to the people and environments it serves, bringing new ways to engage with wellbeing into everyday spaces.',
     tiles: [
       {
-        title: 'For Workplaces',
-        body: 'Private, engaging ways for employees to access and explore wellbeing.',
+        title: 'Workplaces',
+        body: 'Create more approachable ways for employees to explore wellbeing, build healthier habits and access professional support.',
         href: '/for/workplaces',
       },
       {
-        title: 'For Education',
-        body: 'Help students make mental wellbeing a more natural part of everyday life.',
+        title: 'Schools & Colleges',
+        body: 'Give students safe, engaging ways to understand their wellbeing, build emotional skills and access support when they need it.',
         href: '/for/education',
       },
       {
-        title: 'For Healthcare',
-        body: 'Immersive tools designed to complement the work of mental health professionals.',
+        title: 'Healthcare',
+        body: 'Extend the toolkit available to mental health professionals with immersive environments and digital experiences that can complement existing care.',
         href: '/for/healthcare',
       },
-    ],
-    proof: [
-      'Developed with mental health professionals.',
-      'Tested in clinical practice.',
-      'Designed for the realities of modern workplaces.',
     ],
     cta: { label: 'Explore the evidence', route: '/explore/clinical' },
     images: ['/models/imgs/clinicallygrounded.webp'],
@@ -207,14 +190,13 @@ export const SECTIONS: Section[] = [
   {
     id: 'contact',
     index: '06',
-    word: 'Let’s Talk',
-    kicker: 'One connected ecosystem.',
+    word: 'Let\u2019s Talk',
+    // CLOSING CTA — common for all sub pages.
     headline: 'The next way into wellbeing starts here.',
     body:
-      'Bring the way in to your people. We will shape the right entry point for your workplace or campus, and show you the whole ecosystem in a live walkthrough.',
-    quote:
-      'Healthier organisations begin with people who feel safe enough to seek support.',
-    cta: { label: 'Book a demo', route: '/contact' },
+      'Discover how NEXR can bring a new approach to your organisation, institution or practice.',
+    quote: 'Better wellbeing starts when the way in feels right.',
+    cta: { label: 'Book a Demo', route: '/contact' },
     images: ['/models/imgs/letsconnect.webp'],
     sky: ['#b05c1e', '#391c08'],
     fog: '#924e1b',
