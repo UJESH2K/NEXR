@@ -23,7 +23,7 @@ export type MeloAction =
 export type MeloBubble = {
   /** Stable per message, so the same nudge is never posted twice per page. */
   id: string
-  kind: 'intro' | 'arrival' | 'nudge' | 'menu'
+  kind: 'arrival' | 'nudge' | 'menu'
   pose: MeloPose
   label?: string
   text: string

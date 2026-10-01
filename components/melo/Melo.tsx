@@ -14,9 +14,9 @@ import {
   arrivalBubble,
   endBubble,
   idleBubble,
-  introBubble,
   quoteBubble,
   routeContext,
+  WELCOME_STEP,
 } from '@/lib/melo/script'
 import { EASE, MeloCard, faceSrc } from './MeloCard'
 import { MeloTour } from './MeloTour'
@@ -40,8 +40,9 @@ import { MeloTour } from './MeloTour'
  * applies — without it the hair draws over her face).
  */
 
-const TOUR_KEY = 'nexr:melo-tour'
-const OFFERED_KEY = 'nexr:melo-offered'
+// v2: the tour now starts by itself. Anyone who dismissed the old optional
+// offer gets the new tour once rather than never seeing it.
+const TOUR_KEY = 'nexr:melo-tour-v2'
 const IDLE_MS = 15000
 const COOLDOWN_MS = 18000
 const MAX_UNPROMPTED = 3
@@ -74,6 +75,7 @@ export function Melo() {
   const unprompted = useRef(0)
   const idleCount = useRef(0)
   const shownAtY = useRef(0)
+  const autoTour = useRef(false)
 
   // She appears once, in the circle; what she is saying sets her expression there.
   const pose: MeloPose = (touring ? tourPose : bubble?.pose) ?? ctx.pose
@@ -90,7 +92,6 @@ export function Melo() {
 
   const close = useCallback(() => {
     const current = melo.get().bubble
-    if (current?.kind === 'intro' && !memory.get(TOUR_KEY)) memory.set(TOUR_KEY, 'skipped')
     lastClosed.current = Date.now()
     melo.close()
   }, [])
@@ -117,18 +118,21 @@ export function Melo() {
     lastClosed.current = 0
     lastActive.current = Date.now()
 
-    const firstVisit = !memory.get(TOUR_KEY) && !memory.sessionGet(OFFERED_KEY)
+    // Until a visitor has either finished the tour or skipped it, every sub
+    // page they open starts it. Skipping is final; so is finishing.
+    const firstVisit = !memory.get(TOUR_KEY)
     setSeen(!!memory.sessionGet('nexr:melo-seen'))
 
     const hello = window.setTimeout(() => {
       if (firstVisit) {
-        memory.sessionSet(OFFERED_KEY, '1')
-        melo.say(introBubble(ctx))
+        autoTour.current = true
+        setMenuOpen(false)
+        melo.startTour()
       } else {
         melo.say(arrivalBubble(ctx))
       }
       shownAtY.current = window.scrollY
-    }, firstVisit ? 1100 : 900)
+    }, firstVisit ? 1300 : 900)
 
     // Every pose, once the page is settled, so later swaps never wait on a fetch.
     const warm = window.setTimeout(() => ([1, 2, 3, 4, 5, 6] as MeloPose[]).forEach(preload), 2500)
@@ -253,6 +257,7 @@ export function Melo() {
 
   // ── actions ───────────────────────────────────────────────────────────────
   const startTour = useCallback(() => {
+    autoTour.current = false
     setMenuOpen(false)
     melo.startTour()
   }, [])
@@ -483,7 +488,13 @@ export function Melo() {
       </div>
 
       <AnimatePresence>
-        {touring ? <MeloTour key={pathname} steps={ctx.tour} onFinish={endTour} /> : null}
+        {touring ? (
+          <MeloTour
+            key={pathname}
+            steps={autoTour.current ? [WELCOME_STEP, ...ctx.tour] : ctx.tour}
+            onFinish={endTour}
+          />
+        ) : null}
       </AnimatePresence>
     </>
   )

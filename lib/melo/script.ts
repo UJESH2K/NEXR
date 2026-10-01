@@ -82,9 +82,21 @@ const MENU_STEP: TourStep = {
 
 const MELO_STEP: TourStep = {
   target: '[data-tour="melo"]',
-  title: 'And this is me',
-  text: 'Tap me any time for the next part, a way back to where you were, or to start over.',
+  title: 'Any time you need me',
+  text: 'Tap me for the next part, a way back to where you were, or to start over.',
   pose: EXPRESSION.connect,
+}
+
+/**
+ * Opens the tour that starts by itself on a visitor's first sub page. It is
+ * not added when someone replays the tour from the menu — they already know
+ * who is talking.
+ */
+export const WELCOME_STEP: TourStep = {
+  target: '[data-tour="melo"]',
+  title: "Hi, I'm Melo",
+  text: "There's a lot on this page, so let me show you around. It only takes a moment, and you can skip at any point.",
+  pose: EXPRESSION.hello,
 }
 
 function roomTour(topic: ExploreTopic): TourStep[] {
@@ -226,21 +238,6 @@ export function routeContext(pathname: string): RouteContext {
     next: null,
     isLast: pathname === '/contact',
     tour: PAGE_TOUR,
-  }
-}
-
-/** First visit to any sub page: offer the tour, never force it. */
-export function introBubble(ctx: RouteContext): MeloBubble {
-  return {
-    id: 'intro',
-    kind: 'intro',
-    pose: EXPRESSION.hello,
-    label: "Hi, I'm Melo",
-    text: 'Want a quick tour of this page? It takes about thirty seconds, and you can skip it at any point.',
-    actions: [
-      { label: 'Show me around', kind: 'tour' },
-      { label: 'Skip tour', kind: 'dismiss' },
-    ],
   }
 }
 
