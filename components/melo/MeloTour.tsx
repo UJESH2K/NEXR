@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useScrollApi } from '@/lib/ScrollProvider'
 import type { TourStep } from '@/lib/melo/script'
+import { melo } from '@/lib/melo/store'
 import { EASE, MeloCard } from './MeloCard'
 
 /**
@@ -65,7 +66,6 @@ export function MeloTour({
 
   const step = list[index]
   const last = index === list.length - 1
-  const [short] = useState(() => typeof window !== 'undefined' && window.innerHeight < 760)
 
   const finish = useCallback(
     (completed: boolean) => {
@@ -103,6 +103,7 @@ export function MeloTour({
   useLayoutEffect(() => {
     indexRef.current = index
     if (!step) return
+    melo.setTourPose(step.pose)
     const el = document.querySelector<HTMLElement>(step.target)
     if (!el) return
     const rect = el.getBoundingClientRect()
@@ -225,8 +226,7 @@ export function MeloTour({
       >
         <MeloCard
           ref={cardRef}
-          pose={step.pose}
-          compactFigure={short}
+          tail={placement === 'bottom'}
           role="dialog"
           label={step.title}
           meta={`Tour · ${index + 1} of ${list.length}`}

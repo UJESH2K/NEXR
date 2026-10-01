@@ -1,62 +1,41 @@
 'use client'
 
 import { forwardRef, type ReactNode } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
-import type { MeloPose } from '@/lib/melo/store'
 
 export const EASE = [0.16, 1, 0.3, 1] as const
 
-export const poseSrc = (pose: MeloPose) => `/brand/melo/pose-${pose}.webp`
-export const faceSrc = (pose: MeloPose) => `/brand/melo/face-${pose}.webp`
+export const faceSrc = (pose: number) => `/brand/melo/face-${pose}.webp`
 
 /**
  * The speech card Melo talks through — shared by her messages and the tour so
  * the two can never drift apart visually.
  *
- * She stands behind the card's top-right corner, cut at the waist by its edge,
- * so it reads as her holding it up rather than as a notification with a
- * picture on it. Her pose changes with what she is saying; the swap is a short
- * cross-fade on a pre-loaded image, which costs nothing.
+ * Melo herself appears once, in the avatar circle under this card; her pose
+ * there changes with what she is saying. The tail on the card's lower-right
+ * edge points down at that circle, so the words read as hers. Callers turn it
+ * off when the card is not sitting directly above her.
  */
 export const MeloCard = forwardRef<
   HTMLDivElement,
   {
-    pose: MeloPose
     label?: string
     meta?: string
     onClose?: () => void
     closeLabel?: string
-    compactFigure?: boolean
+    tail?: boolean
     children: ReactNode
     role?: 'dialog' | 'status'
   }
->(function MeloCard({ pose, label, meta, onClose, closeLabel = 'Close', compactFigure, children, role = 'status' }, ref) {
+>(function MeloCard({ label, meta, onClose, closeLabel = 'Close', tail = true, children, role = 'status' }, ref) {
   return (
-    <div
-      ref={ref}
-      className={`relative w-[min(22rem,calc(100vw-2rem))] ${compactFigure ? 'pt-[64px]' : 'pt-[96px] md:pt-[118px]'}`}
-    >
-      <div
-        aria-hidden="true"
-        className={`pointer-events-none absolute right-1 top-0 z-0 ${
-          compactFigure ? 'h-[84px] w-[84px]' : 'h-[124px] w-[124px] md:h-[148px] md:w-[148px]'
-        }`}
-      >
-        <AnimatePresence initial={false}>
-          <motion.img
-            key={pose}
-            src={poseSrc(pose)}
-            alt=""
-            draggable={false}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.32, ease: EASE }}
-            className="absolute inset-0 h-full w-full select-none object-contain object-bottom drop-shadow-[0_8px_18px_rgba(0,0,0,0.45)]"
-          />
-        </AnimatePresence>
-      </div>
+    <div ref={ref} className="relative w-[min(22rem,calc(100vw-2rem))]">
+      {tail ? (
+        <span
+          aria-hidden="true"
+          className="absolute -bottom-[6px] right-[22px] z-0 h-3 w-3 rotate-45 border-b border-r border-white/12 bg-[#16100b] md:right-[26px]"
+        />
+      ) : null}
 
       <div
         role={role}

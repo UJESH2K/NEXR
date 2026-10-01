@@ -42,10 +42,12 @@ export type MeloContext = {
 type State = {
   bubble: MeloBubble | null
   touring: boolean
+  /** The expression for the current tour step, shown in her avatar. */
+  tourPose: MeloPose | null
   context: MeloContext
 }
 
-let state: State = { bubble: null, touring: false, context: { chapterId: null } }
+let state: State = { bubble: null, touring: false, tourPose: null, context: { chapterId: null } }
 const listeners = new Set<() => void>()
 const shown = new Set<string>()
 
@@ -70,7 +72,10 @@ export const melo = {
     emit({ bubble: null, touring: true })
   },
   endTour() {
-    emit({ touring: false })
+    emit({ touring: false, tourPose: null })
+  },
+  setTourPose(pose: MeloPose) {
+    if (state.tourPose !== pose) emit({ tourPose: pose })
   },
   setChapter(chapterId: string | null) {
     if (state.context.chapterId === chapterId) return
@@ -79,7 +84,7 @@ export const melo = {
   /** A new page is a new conversation: what was said on the last one is forgotten. */
   resetPage() {
     shown.clear()
-    emit({ bubble: null, touring: false, context: { chapterId: null } })
+    emit({ bubble: null, touring: false, tourPose: null, context: { chapterId: null } })
   },
   get: () => state,
 }
@@ -89,7 +94,7 @@ function subscribe(listener: () => void) {
   return () => listeners.delete(listener)
 }
 
-const serverState: State = { bubble: null, touring: false, context: { chapterId: null } }
+const serverState: State = { bubble: null, touring: false, tourPose: null, context: { chapterId: null } }
 
 export function useMelo(): State {
   return useSyncExternalStore(subscribe, () => state, () => serverState)

@@ -18,7 +18,7 @@ import {
   quoteBubble,
   routeContext,
 } from '@/lib/melo/script'
-import { EASE, MeloCard, faceSrc, poseSrc } from './MeloCard'
+import { EASE, MeloCard, faceSrc } from './MeloCard'
 import { MeloTour } from './MeloTour'
 
 /**
@@ -52,17 +52,15 @@ const hoverable = {
 }
 
 function preload(pose: MeloPose) {
-  const a = new Image()
-  a.src = poseSrc(pose)
-  const b = new Image()
-  b.src = faceSrc(pose)
+  const img = new Image()
+  img.src = faceSrc(pose)
 }
 
 export function Melo() {
   const pathname = usePathname()
   const router = useRouter()
   const { lenis } = useScrollApi()
-  const { bubble, touring, context } = useMelo()
+  const { bubble, touring, tourPose } = useMelo()
   const contactOpen = useContactModalOpen()
   const { topic: returnTopic, goBack, goHome } = useSceneReturn()
   const ctx = useMemo(() => routeContext(pathname), [pathname])
@@ -77,7 +75,8 @@ export function Melo() {
   const idleCount = useRef(0)
   const shownAtY = useRef(0)
 
-  const pose: MeloPose = bubble?.pose ?? ctx.pose
+  // She appears once, in the circle; what she is saying sets her expression there.
+  const pose: MeloPose = (touring ? tourPose : bubble?.pose) ?? ctx.pose
 
   const scrollTo = useCallback(
     (target: string | number) => {
@@ -328,7 +327,11 @@ export function Melo() {
 
   return (
     <>
-      <div className="melo-dock fixed flex flex-col items-end gap-3" style={{ zIndex: 'var(--z-chrome)' }}>
+      {/* Above the tour's dimming while it runs, so she stays beside her card. */}
+      <div
+        className="melo-dock fixed flex flex-col items-end gap-3"
+        style={{ zIndex: touring ? 'var(--z-tour-card)' : 'var(--z-chrome)' }}
+      >
         {/* Keyed by page: what she said on the last page must not linger on
             this one while it fades out, so a new page drops it instantly. */}
         <AnimatePresence key={pathname} mode="popLayout">
@@ -341,7 +344,7 @@ export function Melo() {
               transition={{ duration: 0.38, ease: EASE }}
               style={{ transformOrigin: 'bottom right' }}
             >
-              <MeloCard pose={bubble.pose} label={bubble.label} onClose={close} compactFigure={bubble.compact}>
+              <MeloCard label={bubble.label} onClose={close}>
                 <p className="melo-text mt-3 text-[14px] leading-[1.6] text-bone/85">{bubble.text}</p>
                 {bubble.actions?.length ? (
                   <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
@@ -384,7 +387,7 @@ export function Melo() {
               transition={{ duration: 0.35, ease: EASE }}
               style={{ transformOrigin: 'bottom right' }}
             >
-              <MeloCard pose={ctx.pose} label={ctx.label} onClose={() => setMenuOpen(false)} role="dialog">
+              <MeloCard label={ctx.label} onClose={() => setMenuOpen(false)} role="dialog">
                 <p className="melo-text mt-3 text-[14px] leading-[1.6] text-bone/85">{ctx.message}</p>
                 <div className="-mx-2 mt-4 space-y-1 border-t border-white/10 pt-3">
                   <button
