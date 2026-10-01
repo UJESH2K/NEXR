@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRef } from 'react'
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
-import { DoodleArrow } from '@/components/ui/DoodleArrow'
+import { AudienceIcon, audienceFromHref } from '@/components/ui/AudienceDoodle'
 import type { Section } from '@/lib/sections'
 import { setCursor, resetCursor } from '@/lib/cursorStore'
 
@@ -118,49 +118,40 @@ export function BeatAside({
   if (section.tiles) {
     return (
       <div
-        className="story-col story-col--mid absolute hidden lg:block"
+        className="story-col story-col--mid story-col--slim absolute hidden lg:block"
         style={{ [side]: 'clamp(20px, 3vw, 72px)' }}
       >
-        {/* Only one beat carries tiles, and they are the audience cards, so the
-            label names them rather than being generic. */}
-        <p className="mb-4 font-mono text-[9px] uppercase tracking-[0.28em] text-bone/35">
-          Who it is for
+        {/* A plain list, not cards: three doors, one hairline apart. The
+            heading says they open; the arrow on each row is the handle. */}
+        <p className="mb-3 font-mono text-[9px] uppercase tracking-[0.28em] text-bone/55">
+          Who it is for <span className="text-ember-soft/90">&middot; pick one to explore</span>
         </p>
 
-        <div className="space-y-3">
+        <ul className="border-t border-bone/15">
           {section.tiles.map((tile) => (
-            <Link
-              key={tile.title}
-              href={tile.href}
-              onMouseEnter={() => setCursor({ active: true })}
-              onMouseLeave={resetCursor}
-              className="group block pointer-events-auto"
-            >
-              <TiltCard accent={section.accent} className="beat-card--tile">
-                {/* No numeral. A count only matters if you are meant to read
-                    all three in order; these are three separate doors, and a
-                    "01" in front of one implied it went before the others. */}
-                <div className="flex items-start justify-between gap-3">
-                  <p className="font-display text-[15px] leading-[1.3] text-bone">
+            <li key={tile.title} className="border-b border-bone/15">
+              <Link
+                href={tile.href}
+                onMouseEnter={() => setCursor({ active: true })}
+                onMouseLeave={resetCursor}
+                className="audience-row group pointer-events-auto"
+              >
+                <span className="audience-row__icon">
+                  <AudienceIcon kind={audienceFromHref(tile.href)} className="h-auto w-[30px]" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block font-display text-[17px] leading-[1.25] text-bone transition-colors duration-300 group-hover:text-ember-soft">
                     {tile.title}
-                  </p>
-                  <DoodleArrow
-                    direction="up-right"
-                    width={30}
-                    className="doodle-hover shrink-0 text-ember/80"
-                  />
-                </div>
-                <p className="mt-1.5 text-[12.5px] leading-[1.5] text-bone/65">
-                  {tile.body}
-                </p>
-                <span
-                  className="beat-card__rule"
-                  style={{ backgroundColor: section.accent }}
-                />
-              </TiltCard>
-            </Link>
+                  </span>
+                  <span className="mt-1 block text-[12.5px] leading-[1.5] text-bone/65">{tile.body}</span>
+                </span>
+                <span className="audience-row__go" aria-hidden="true">
+                  <ArrowUpRight size={14} />
+                </span>
+              </Link>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     )
   }

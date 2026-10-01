@@ -1,4 +1,5 @@
 import { EXPLORE_TOPICS, getExploreTopic, getNextTopic, type ExploreTopic } from '@/lib/explore'
+import { sectionById } from '@/lib/sections'
 import type { MeloBubble, MeloPose } from './store'
 
 /**
@@ -49,8 +50,14 @@ export type RouteContext = {
   room: ExploreTopic | null
   next: { href: string; label: string } | null
   isLast: boolean
+  /** One of the three audience pages. */
+  isAudience: boolean
   tour: TourStep[]
 }
+
+/** The three audiences, straight from the "Who It's For" beat. */
+export const AUDIENCES = (sectionById('clinical').tiles ?? []).map((t) => ({ label: t.title, href: t.href }))
+export const AUDIENCE_LABEL = sectionById('clinical').word
 
 const BACK_STEP: TourStep = {
   target: '[data-tour="header-back"]',
@@ -210,6 +217,7 @@ export function routeContext(pathname: string): RouteContext {
         room: topic,
         next: isLast ? null : { href: `/explore/${next.slug}`, label: `Continue to ${next.index} · ${next.word}` },
         isLast,
+        isAudience: false,
         tour: roomTour(topic),
       }
     }
@@ -224,6 +232,7 @@ export function routeContext(pathname: string): RouteContext {
       room: null,
       next: { href: `/explore/${EXPLORE_TOPICS[0].slug}`, label: `Start with 01 · ${EXPLORE_TOPICS[0].word}` },
       isLast: false,
+      isAudience: false,
       tour: INDEX_TOUR,
     }
   }
@@ -237,6 +246,7 @@ export function routeContext(pathname: string): RouteContext {
     room: null,
     next: null,
     isLast: pathname === '/contact',
+    isAudience: pathname.startsWith('/for/'),
     tour: PAGE_TOUR,
   }
 }
@@ -250,8 +260,23 @@ export function arrivalBubble(ctx: RouteContext): MeloBubble {
     pose: ctx.pose,
     label: `You're in ${ctx.label}`,
     text: ctx.message,
-    ttl: 5000,
+    // One way straight to the three audience pages, from every page that is
+    // not already one of them.
+    actions: ctx.isAudience ? undefined : [{ label: AUDIENCE_LABEL, kind: 'audiences' }],
+    ttl: ctx.isAudience ? 5000 : 8000,
     compact: true,
+  }
+}
+
+/** The three audiences as quick links, under the beat's own headline. */
+export function audiencesBubble(): MeloBubble {
+  return {
+    id: 'audiences',
+    kind: 'nudge',
+    pose: EXPRESSION.offer,
+    label: AUDIENCE_LABEL,
+    text: sectionById('clinical').headline,
+    links: AUDIENCES,
   }
 }
 

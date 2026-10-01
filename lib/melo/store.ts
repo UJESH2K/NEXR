@@ -19,6 +19,7 @@ export type MeloAction =
   | { label: string; kind: 'tour' }
   | { label: string; kind: 'contact' }
   | { label: string; kind: 'dismiss' }
+  | { label: string; kind: 'audiences' }
 
 export type MeloBubble = {
   /** Stable per message, so the same nudge is never posted twice per page. */
@@ -30,8 +31,10 @@ export type MeloBubble = {
   actions?: MeloAction[]
   /** ms before it closes itself; omitted means it stays until dismissed. */
   ttl?: number
-  /** A passing remark: smaller figure, and it clears the moment the visitor scrolls. */
+  /** A passing remark: it clears the moment the visitor scrolls. */
   compact?: boolean
+  /** Quick links shown as chips under the text. */
+  links?: { label: string; href: string }[]
 }
 
 export type MeloContext = {

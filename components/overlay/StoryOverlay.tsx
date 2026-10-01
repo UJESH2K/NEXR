@@ -11,6 +11,7 @@ import { useScrollSnapshot } from '@/lib/useScrollSnapshot'
 import { setCursor, resetCursor } from '@/lib/cursorStore'
 import { ExploreButton } from '@/components/ui/ExploreButton'
 import { BeatAside } from './BeatAside'
+import { AudienceDoodle, audienceFromHref } from '@/components/ui/AudienceDoodle'
 
 /**
  * The words: the opening title treatment, and the per-beat copy.
@@ -245,7 +246,7 @@ function AudienceTabs({ tiles }: { tiles: NonNullable<Section['tiles']> }) {
       <div
         role="tablist"
         aria-label="Who it is for"
-        className="grid grid-cols-3 gap-1 rounded-xl border border-bone/12 bg-[#140c07]/55 p-1 backdrop-blur-sm"
+        className="grid grid-cols-3 gap-1 rounded-xl border border-bone/15 bg-[#140c07]/45 p-1"
       >
         {tiles.map((t, i) => (
           <button
@@ -262,17 +263,24 @@ function AudienceTabs({ tiles }: { tiles: NonNullable<Section['tiles']> }) {
           </button>
         ))}
       </div>
+      {/* The open tab is a card of its own, with the same sketch as on
+          desktop and a plain "Explore" — so it reads as a door, not a caption. */}
       <Link
         href={tile.href}
         role="tabpanel"
         {...hoverable}
-        className="mt-2.5 flex min-h-[3.6rem] items-start justify-between gap-3 px-1"
+        className="relative mt-2 block overflow-hidden rounded-xl border border-bone/15 bg-[#140c07]/45 px-3.5 py-3"
       >
-        <span key={tile.title} className="melo-text text-[12.5px] leading-[1.5] text-bone/75">
+        <AudienceDoodle
+          key={`d-${tile.title}`}
+          kind={audienceFromHref(tile.href)}
+          className="melo-text pointer-events-none absolute -bottom-3 -right-3 w-[44%] text-ember-soft/15"
+        />
+        <span key={tile.title} className="melo-text relative block max-w-[86%] text-[12.5px] leading-[1.5] text-bone/80">
           {tile.body}
         </span>
-        <span aria-hidden="true" className="mt-0.5 shrink-0 font-mono text-[13px] text-ember">
-          &rarr;
+        <span className="relative mt-2 inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-ember">
+          Explore {tile.title} <span aria-hidden="true">&rarr;</span>
         </span>
       </Link>
     </div>

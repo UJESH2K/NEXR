@@ -11,7 +11,10 @@ import { setCursor, resetCursor } from '@/lib/cursorStore'
 import { melo, memory, useMelo, type MeloAction, type MeloBubble, type MeloPose } from '@/lib/melo/store'
 import {
   CLOSING,
+  AUDIENCES,
+  AUDIENCE_LABEL,
   arrivalBubble,
+  audiencesBubble,
   endBubble,
   idleBubble,
   quoteBubble,
@@ -293,6 +296,11 @@ export function Melo() {
         case 'dismiss':
           close()
           return
+        case 'audiences':
+          melo.close()
+          melo.say(audiencesBubble(), { force: true })
+          shownAtY.current = window.scrollY
+          return
       }
     },
     [close, router, scrollTo, startTour],
@@ -351,6 +359,22 @@ export function Melo() {
             >
               <MeloCard label={bubble.label} onClose={close}>
                 <p className="melo-text mt-3 text-[14px] leading-[1.6] text-bone/85">{bubble.text}</p>
+                {bubble.links?.length ? (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {bubble.links.map((link) => (
+                      <button
+                        key={link.href}
+                        type="button"
+                        onClick={() => run({ label: link.label, kind: 'href', href: link.href })}
+                        {...hoverable}
+                        className="melo-chip"
+                      >
+                        {link.label}
+                        <span aria-hidden="true">&rarr;</span>
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
                 {bubble.actions?.length ? (
                   <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
                     {bubble.actions.map((action, i) =>
@@ -404,6 +428,28 @@ export function Melo() {
                     {ctx.isLast ? CLOSING.action : (ctx.next?.label ?? 'Take me to the next part')}
                     <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
                   </button>
+                  {/* The three audiences, one tap away from anywhere. */}
+                  <div className="mx-2 mb-1.5 border-b border-white/10 pb-3">
+                    <p className="mb-2 font-mono text-[9px] uppercase tracking-[0.22em] text-bone/40">
+                      {AUDIENCE_LABEL}
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {AUDIENCES.map((link) => (
+                        <button
+                          key={link.href}
+                          type="button"
+                          onClick={() => {
+                            setMenuOpen(false)
+                            router.push(link.href)
+                          }}
+                          {...hoverable}
+                          className={`melo-chip ${pathname === link.href ? 'melo-chip--on' : ''}`}
+                        >
+                          {link.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                   {returnTopic ? (
                     <MenuRow
                       icon={<ArrowLeft size={14} />}
