@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { ArrowLeft, ArrowUpRight } from 'lucide-react'
 import { EXPLORE_TOPICS } from '@/lib/explore'
 import { setCursor, resetCursor } from '@/lib/cursorStore'
+import { RoomSky } from '@/components/site/RoomSky'
 
 /**
  * The index of the six rooms.
@@ -29,12 +30,13 @@ export function ExploreIndex() {
   const preview = EXPLORE_TOPICS[hovered]
 
   return (
-    <div className="safe-bottom pointer-events-auto min-h-svh bg-void px-5 pb-20 pt-28 sm:px-6 md:px-10 md:pb-24 md:pt-32">
+    <div className="safe-bottom pointer-events-auto relative isolate min-h-svh bg-abyss px-5 pb-20 pt-28 sm:px-6 md:px-10 md:pb-24 md:pt-32">
+      <RoomSky sky={EXPLORE_TOPICS[0].tint} accent={EXPLORE_TOPICS[0].accent} />
       <div className="mx-auto max-w-6xl">
         <Link
           href="/"
           {...hoverable}
-          className="group inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.22em] text-bone/45 transition-colors hover:text-ember"
+          className="group inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.22em] text-bone/70 transition-colors hover:text-ember"
         >
           <ArrowLeft size={12} className="transition-transform group-hover:-translate-x-1" />
           The experience
@@ -44,7 +46,7 @@ export function ExploreIndex() {
           initial={{ opacity: 0, y: 32, filter: 'blur(10px)' }}
           animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
           transition={{ duration: 1, ease: EASE }}
-          className="mt-8 font-display text-[clamp(2.4rem,6vw,4.6rem)] leading-[1.05] text-bone"
+          className="mt-8 font-display text-[clamp(2.4rem,6vw,4.6rem)] font-semibold leading-[1.05] text-bone"
         >
           Six ways in. One way forward.
         </motion.h1>
@@ -60,7 +62,7 @@ export function ExploreIndex() {
         </motion.p>
 
         <div className="mt-10 grid gap-12 md:mt-16 lg:grid-cols-[1fr_0.72fr] lg:items-start">
-          <ul className="border-t border-white/10">
+          <ul data-tour="explore-list" className="border-t border-white/10">
             {EXPLORE_TOPICS.map((topic, i) => (
               <motion.li
                 key={topic.slug}

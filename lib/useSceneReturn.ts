@@ -1,8 +1,14 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useMemo, useSyncExternalStore } from 'react'
 import { useRouter } from 'next/navigation'
-import { clearReturn, readRememberedTopic, requestReturn } from './returnStore'
+import {
+  clearReturn,
+  readRememberedTopic,
+  requestReturn,
+  returnVersion,
+  subscribeReturn,
+} from './returnStore'
 import { resetCursor } from './cursorStore'
 
 /**
@@ -19,16 +25,15 @@ import { resetCursor } from './cursorStore'
  */
 export function useSceneReturn() {
   const router = useRouter()
-  const [topic, setTopic] = useState<{ index: number; word: string } | null>(null)
 
-  // sessionStorage does not exist during the server render, so this can only
-  // decide whether Back applies once mounted.
-  useEffect(() => {
+  // -1 on the server, where sessionStorage does not exist; the client value
+  // takes over after hydration and again every time the beat is re-recorded.
+  const version = useSyncExternalStore(subscribeReturn, returnVersion, () => -1)
+  const topic = useMemo(() => {
+    if (version < 0) return null
     const remembered = readRememberedTopic()
-    if (remembered) {
-      setTopic({ index: remembered.index, word: remembered.section.word })
-    }
-  }, [])
+    return remembered ? { index: remembered.index, word: remembered.section.word } : null
+  }, [version])
 
   const goBack = () => {
     requestReturn()

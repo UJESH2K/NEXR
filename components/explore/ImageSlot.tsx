@@ -23,8 +23,12 @@ export function ImageSlot({
   accent: string
   className?: string
 }) {
-  const [missing, setMissing] = useState(false)
-  const src = item.src ?? item.slot
+  // `src` is only set once the artwork exists (the room page checks at build
+  // time), so a card without it goes straight to the placeholder instead of
+  // requesting a file that is not there and logging a 404 for every visitor.
+  const [failed, setFailed] = useState(false)
+  const src = item.src
+  const missing = !src || failed
 
   return (
     <figure
@@ -64,9 +68,11 @@ export function ImageSlot({
             <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-bone/45">
               {item.label}
             </p>
-            <p className="font-mono text-[10px] tracking-[0.08em] text-bone/25">
-              drop file at public{item.slot}
-            </p>
+            {process.env.NODE_ENV !== 'production' ? (
+              <p className="font-mono text-[10px] tracking-[0.08em] text-bone/25">
+                drop file at public{item.slot}
+              </p>
+            ) : null}
           </div>
         </>
       ) : (
@@ -74,7 +80,7 @@ export function ImageSlot({
           src={src}
           alt={item.label}
           loading="lazy"
-          onError={() => setMissing(true)}
+          onError={() => setFailed(true)}
           className="h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.06]"
         />
       )}

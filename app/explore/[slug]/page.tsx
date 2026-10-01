@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { ExploreExperience } from '@/components/explore/ExploreExperience'
@@ -45,9 +47,15 @@ export default async function ExploreTopicPage({
   const next = getNextTopic(slug)
   const prev = getPrevTopic(slug)
 
+  // Artwork is dropped into /public by path; only point at the files that are
+  // actually there, so a missing one never costs a failed request.
+  const gallery = topic.gallery.map((item) =>
+    item.src || existsSync(join(process.cwd(), 'public', item.slot)) ? { ...item, src: item.src ?? item.slot } : item,
+  )
+
   return (
     <ExploreExperience
-      topic={topic}
+      topic={{ ...topic, gallery }}
       next={{ slug: next.slug, word: next.word, index: next.index }}
       prev={{ slug: prev.slug, word: prev.word, index: prev.index }}
     />

@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useState } from 'react'
 
 import { motion } from 'framer-motion'
 import { SECTIONS, type Section } from '@/lib/sections'
@@ -159,7 +160,6 @@ function Hero({ visible }: { visible: boolean }) {
 function Beat({ section, visible }: { section: Section; visible: boolean }) {
   return (
     <div className="beat-layer" data-visible={visible ? 'true' : 'false'}>
-      <div className="story-scrim" aria-hidden="true" />
 
       {/*
         Always the left. The figure gestures to her left at every pose, so this
@@ -201,34 +201,7 @@ function Beat({ section, visible }: { section: Section; visible: boolean }) {
         {/* Below 1024px the aside column cannot exist — see BeatAside — so the
             same content is rendered inline here instead. The two are mutually
             exclusive at every width, never both. */}
-        {section.tiles ? (
-          <ul className="mt-4 space-y-1.5 lg:hidden">
-            {section.tiles.map((tile) => (
-              <li key={tile.title}>
-                <Link
-                  href={tile.href}
-                  {...hoverable}
-                  className="pointer-events-auto flex items-center justify-between gap-3 rounded-xl border border-bone/12 bg-bone/[0.04] px-3.5 py-2.5 backdrop-blur-sm"
-                >
-                  <span>
-                    <span className="block font-display text-[14px] leading-[1.3] text-bone">
-                      {tile.title}
-                    </span>
-                    <span className="mt-1 block text-[12px] leading-[1.45] text-bone/65">
-                      {tile.body}
-                    </span>
-                  </span>
-                  <span
-                    aria-hidden="true"
-                    className="shrink-0 font-mono text-[13px] text-bone/30"
-                  >
-                    &rarr;
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        ) : null}
+        {section.tiles ? <AudienceTabs tiles={section.tiles} /> : null}
 
         {section.quote ? (
           <p className="mt-6 border-l border-ember/40 pl-4 font-display text-[15px] italic leading-[1.6] text-bone/70 lg:hidden">
@@ -254,6 +227,58 @@ function Beat({ section, visible }: { section: Section; visible: boolean }) {
   )
 }
 
+/**
+ * The three audiences, on a phone.
+ *
+ * Stacked as full cards they were taller than everything else in the beat put
+ * together — on a 390px screen they ran up over the figure and the headline
+ * landed on her face. Tabs hold the same three titles and the same three lines,
+ * one line at a time, in about a sixth of the height. Desktop never sees this:
+ * BeatAside shows the cards there, beside the figure, where they fit.
+ */
+function AudienceTabs({ tiles }: { tiles: NonNullable<Section['tiles']> }) {
+  const [active, setActive] = useState(0)
+  const tile = tiles[active]
+
+  return (
+    <div className="mt-4 lg:hidden">
+      <div
+        role="tablist"
+        aria-label="Who it is for"
+        className="grid grid-cols-3 gap-1 rounded-xl border border-bone/12 bg-[#140c07]/55 p-1 backdrop-blur-sm"
+      >
+        {tiles.map((t, i) => (
+          <button
+            key={t.title}
+            type="button"
+            role="tab"
+            aria-selected={i === active}
+            onClick={() => setActive(i)}
+            className={`min-h-11 rounded-lg px-1.5 py-1.5 text-center font-display text-[12.5px] leading-[1.2] transition-colors duration-300 ${
+              i === active ? 'bg-ember/90 text-ink' : 'text-bone/65'
+            }`}
+          >
+            {t.title}
+          </button>
+        ))}
+      </div>
+      <Link
+        href={tile.href}
+        role="tabpanel"
+        {...hoverable}
+        className="mt-2.5 flex min-h-[3.6rem] items-start justify-between gap-3 px-1"
+      >
+        <span key={tile.title} className="melo-text text-[12.5px] leading-[1.5] text-bone/75">
+          {tile.body}
+        </span>
+        <span aria-hidden="true" className="mt-0.5 shrink-0 font-mono text-[13px] text-ember">
+          &rarr;
+        </span>
+      </Link>
+    </div>
+  )
+}
+
 export function StoryOverlay() {
   const { activeCard, started } = useScrollSnapshot()
 
@@ -262,6 +287,11 @@ export function StoryOverlay() {
       className="overlay-layer fixed inset-0"
       style={{ zIndex: 'var(--z-overlay)' }}
     >
+      {/* One scrim for every beat, not one inside each. Beats swap by fading
+          out and back in, and a scrim that went with them blinked off and on
+          at every change — on a phone, a dark band flickering mid-scroll.
+          Phone layout only; it is not drawn at desktop widths. */}
+      <div className="story-scrim" data-visible={started ? 'true' : 'false'} aria-hidden="true" />
       {/* The opening frame holds until Explore is pressed; from then on exactly
           one beat is visible, and which one is a discrete value that changes
           once per gesture. */}

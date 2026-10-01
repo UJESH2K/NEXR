@@ -43,6 +43,10 @@
   --z-overlay: 10;
   --z-page: 20;
   --z-chrome: 30;
+  /* Melo's tour: the dimmed page sits over the chrome it is pointing at, and
+     her card sits over the dimming. Both stay under the contact sheet. */
+  --z-tour: 40;
+  --z-tour-card: 42;
   --z-sheet: 45;
   --z-curtain: 60;
   --z-cursor: 90;
@@ -825,21 +829,27 @@
   position: absolute;
   inset-inline: 0;
   bottom: 0;
-  top: 38%;
+  top: 36%;
   pointer-events: none;
-  /* The clinical beat's raised-arm pose reaches into its own headline on a
-     phone, where the copy stacks inline instead of sitting beside the
-     figure — see the note above `.story-col`'s mobile block. The old ramp
-     (transparent until 32% into this box) left exactly that first line
-     unprotected; darkening from the very top of the scrim, not a third of
-     the way down it, is what actually covers it. */
+  opacity: 0;
+  transition: opacity 600ms ease;
+  /* Eased rather than linear, and starting from nothing: a ramp that begins
+     part-way opaque draws a visible line across the figure where it starts.
+     The steps follow a smoothstep curve so there is no edge anywhere. */
   background: linear-gradient(
     to bottom,
-    rgb(8 11 8 / 0.32) 0%,
-    rgb(8 11 8 / 0.62) 22%,
-    rgb(8 11 8 / 0.88) 55%,
-    rgb(8 11 8 / 0.95) 100%
+    rgb(14 8 5 / 0) 0%,
+    rgb(14 8 5 / 0.08) 8%,
+    rgb(14 8 5 / 0.26) 18%,
+    rgb(14 8 5 / 0.5) 30%,
+    rgb(14 8 5 / 0.72) 44%,
+    rgb(14 8 5 / 0.86) 60%,
+    rgb(14 8 5 / 0.93) 100%
   );
+}
+
+.story-scrim[data-visible='true'] {
+  opacity: 1;
 }
 
 @media (min-width: 1024px) {
@@ -874,11 +884,7 @@
   }
 
   .story-scrim {
-    /* The clinical beat's headline sits right where this pose's raised arm
-       and hair are, so on a short phone the scrim has to start above the
-       headline, not at it — 24% still put the whole first line outside the
-       darkened area. */
-    top: 8%;
+    top: 22%;
   }
 }
 
@@ -1076,4 +1082,168 @@
     stroke-dashoffset: 0;
     opacity: 1;
   }
+}
+
+/* ── Melo ──────────────────────────────────────────────────────────────── */
+
+/* Her corner. Clear of the home indicator and the notch on every phone. */
+.melo-dock {
+  right: max(1rem, calc(env(safe-area-inset-right) + 0.75rem));
+  bottom: max(1rem, calc(env(safe-area-inset-bottom) + 0.75rem));
+}
+
+@media (min-width: 768px) {
+  .melo-dock {
+    right: 2rem;
+    bottom: 2rem;
+  }
+}
+
+/*
+ * A slow ping on the resting avatar, so a first-time visitor notices there is
+ * someone in the corner. Most of each cycle is still: a ring that never stops
+ * moving becomes something people learn to ignore. Transform and opacity only,
+ * so it runs on the compositor and never touches layout.
+ */
+.melo-avatar--idle::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 9999px;
+  border: 2px solid rgb(255 121 1 / 0.6);
+  pointer-events: none;
+  animation: melo-ping 5.5s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+@keyframes melo-ping {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.9;
+  }
+  26%,
+  100% {
+    transform: scale(1.45);
+    opacity: 0;
+  }
+}
+
+.melo-text {
+  animation: melo-text-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes melo-text-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+/* The tour's light. Its giant shadow is the dimmed page; the hole is the target. */
+.melo-spotlight {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  border-radius: 18px;
+  pointer-events: none;
+  will-change: transform, width, height;
+  box-shadow:
+    0 0 0 2px rgb(255 121 1 / 0.95),
+    0 0 36px 6px rgb(255 121 1 / 0.32),
+    0 0 0 200vmax rgb(9 6 4 / 0.74);
+}
+
+.melo-spotlight::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  border: 2px solid rgb(255 121 1 / 0.7);
+  animation: melo-ping-ring 1.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+@keyframes melo-ping-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.06);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .melo-avatar--idle::after,
+  .melo-spotlight::after,
+  .melo-text {
+    animation: none;
+  }
+}
+
+/* ── the scene's sky on sub pages (see RoomSky) ───────────────────────── */
+
+.room-sky {
+  height: min(112svh, 1100px);
+  overflow: hidden;
+}
+
+.room-ghost {
+  top: clamp(4.75rem, 8vw, 6.5rem);
+  font-size: clamp(7.5rem, 28vw, 25rem);
+  letter-spacing: -0.01em;
+  color: rgb(255 238 220 / 0.07);
+}
+
+/* Fades the sky's foot into the page so there is no seam where it ends. */
+.room-sky::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 40%;
+  background: linear-gradient(to bottom, transparent, var(--color-abyss));
+}
+
+.room-grain {
+  opacity: 0.08;
+  background-size: 180px 180px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* The tour card sits above Melo's avatar, not on it — the last step points at her. */
+.melo-dock--above {
+  bottom: calc(max(1rem, calc(env(safe-area-inset-bottom) + 0.75rem)) + 4.25rem);
+}
+
+.melo-dock--top {
+  bottom: auto;
+  top: calc(env(safe-area-inset-top) + 5.25rem);
+}
+
+@media (min-width: 768px) {
+  .melo-dock--above {
+    bottom: calc(2rem + 4.75rem);
+  }
+}
+
+/*
+ * The room hero clears the fixed header. `.room-section` sets its own top
+ * padding, and as unlayered CSS it beat the pt-28 utility this used to carry —
+ * which left the breadcrumb, the room's main way back, under the header bar on
+ * every phone.
+ */
+.room-section.room-hero {
+  padding-block-start: calc(5.5rem + clamp(0.75rem, 3vw, 3rem));
+}
+
+/* Returning to a beat from a room: the scene's copy waits for the jump to land. */
+.overlay-layer {
+  transition: opacity 450ms ease;
+}
+
+html[data-returning] .overlay-layer {
+  opacity: 0;
+  transition: none;
 }

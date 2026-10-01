@@ -28,10 +28,11 @@ export function HeaderNav() {
   }
 
   return (
-    <div className="hidden items-center gap-1.5 border-r border-white/10 pr-3 md:flex md:mr-1">
+    <div data-tour="header-return" className="hidden items-center gap-1.5 border-r border-white/10 pr-3 md:flex md:mr-1">
       {topic ? (
         <button
           type="button"
+          data-tour="header-back"
           onClick={goBack}
           {...hoverable}
           aria-label={`Back to ${topic.word}`}
@@ -43,6 +44,7 @@ export function HeaderNav() {
       ) : null}
       <button
         type="button"
+        data-tour="header-home"
         onClick={goHome}
         {...hoverable}
         aria-label="Start from the beginning"

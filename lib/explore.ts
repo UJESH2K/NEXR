@@ -57,7 +57,8 @@ export type ExploreStat = {
 export type ExploreLink = {
   label: string
   href: string
-  note: string
+  /** Only ever approved copy; most links carry none. */
+  note?: string
 }
 
 export type ExploreTopic = {
@@ -170,12 +171,10 @@ export const EXPLORE_TOPICS: ExploreTopic[] = [
       {
         label: 'Our approach',
         href: '/approach#gap',
-        note: 'The full argument, with the philosophy that follows from it.',
       },
       {
         label: 'Our belief',
         href: '/explore/belief',
-        note: 'What we do about it: design wellbeing around people.',
       },
     ],
     cta: {
@@ -273,12 +272,10 @@ export const EXPLORE_TOPICS: ExploreTopic[] = [
       {
         label: 'MeloWorld',
         href: '/explore/meloworld',
-        note: 'The private space where a first step actually gets taken.',
       },
       {
         label: 'VR Wellness',
         href: '/explore/vr-wellness',
-        note: 'Guided experiences, taken at the pace the person sets.',
       },
     ],
     cta: {
@@ -374,12 +371,10 @@ export const EXPLORE_TOPICS: ExploreTopic[] = [
       {
         label: 'VR Wellness',
         href: '/explore/vr-wellness',
-        note: 'The other half of the ecosystem, for when someone is ready to go further.',
       },
       {
         label: 'Trust centre',
         href: '/trust',
-        note: 'Exactly what an employer can and cannot see.',
       },
     ],
     cta: {
@@ -483,12 +478,10 @@ export const EXPLORE_TOPICS: ExploreTopic[] = [
       {
         label: 'MeloWorld',
         href: '/explore/meloworld',
-        note: 'The private first step, for people not ready to go further yet.',
       },
       {
         label: 'The evidence',
         href: '/explore/clinical',
-        note: 'Who designs these experiences, and what they are tested against.',
       },
     ],
     cta: {
@@ -536,12 +529,10 @@ export const EXPLORE_TOPICS: ExploreTopic[] = [
       {
         label: 'Trust centre',
         href: '/trust',
-        note: 'Privacy, safeguarding and the clinical basis in full.',
       },
       {
         label: 'Start the conversation',
         href: '/explore/contact',
-        note: 'Bring the way in to your people.',
       },
     ],
     cta: {
@@ -584,12 +575,10 @@ export const EXPLORE_TOPICS: ExploreTopic[] = [
       {
         label: 'Contact',
         href: '/contact',
-        note: 'Send the details and we will come back within two working days.',
       },
       {
         label: 'Trust centre',
         href: '/trust',
-        note: 'The questions procurement asks, answered up front.',
       },
     ],
     cta: {

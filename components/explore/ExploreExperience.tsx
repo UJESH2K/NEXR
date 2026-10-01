@@ -12,6 +12,8 @@ import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-react'
 import type { ExploreTopic } from '@/lib/explore'
 import { setCursor, resetCursor } from '@/lib/cursorStore'
 import { ImageSlot } from './ImageSlot'
+import { RoomSky } from '@/components/site/RoomSky'
+import { melo } from '@/lib/melo/store'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -126,10 +128,13 @@ export function ExploreExperience({
 
             // The chapter that has crossed the reading line most recently.
             const line = window.scrollY + window.innerHeight * 0.45
-            let active = bounds[0]?.id
+            let reading: string | null = null
             for (const entry of bounds) {
-              if (entry.top <= line) active = entry.id
+              if (entry.top <= line) reading = entry.id
             }
+            // The rail always lights one chip; Melo only counts a chapter as
+            // being read once it has actually reached the reading line.
+            const active = reading ?? bounds[0]?.id
 
             // React only hears about it when the answer actually changes,
             // which is a handful of renders across the whole page.
@@ -137,6 +142,7 @@ export function ExploreExperience({
               shown = active
               setActiveChapter(active)
             }
+            melo.setChapter(reading)
           },
         }),
       )
@@ -171,7 +177,12 @@ export function ExploreExperience({
       })
 
       // Blocks reveal once, on their own trigger — desktop only, see above.
-      if (skipReveal) return () => triggers.forEach((trigger) => trigger.kill())
+      if (skipReveal) {
+        return () => {
+          triggers.forEach((trigger) => trigger.kill())
+          melo.setChapter(null)
+        }
+      }
 
       gsap.utils.toArray<HTMLElement>('[data-explore-block]').forEach((block) => {
         const items = block.querySelectorAll<HTMLElement>('[data-explore-item]')
@@ -198,7 +209,6 @@ export function ExploreExperience({
         tl.from(block.querySelectorAll('[data-explore-lead]'), {
           y: 40,
           opacity: 0,
-          filter: 'blur(8px)',
           duration: 0.95,
           ease: 'power3.out',
           stagger: 0.12,
@@ -220,13 +230,16 @@ export function ExploreExperience({
         }
       })
 
-      return () => triggers.forEach((trigger) => trigger.kill())
+      return () => {
+        triggers.forEach((trigger) => trigger.kill())
+        melo.setChapter(null)
+      }
     },
     { scope: root, dependencies: [topic.slug] },
   )
 
   return (
-    <div ref={root} className="pointer-events-auto relative bg-void">
+    <div ref={root} className="pointer-events-auto relative isolate bg-abyss">
       {/* Reading progress, sitting just under the fixed header. */}
       <div className="pointer-events-none fixed inset-x-0 top-[4.6rem] z-[31] h-px bg-white/10">
         <div
@@ -237,37 +250,13 @@ export function ExploreExperience({
       </div>
 
       {/* ── hero ─────────────────────────────────────────────────────────── */}
+      {/* In the root's stacking context, not a wrapper of its own: a wrapper
+          would paint the sky's lower edge over the chapter strip below it. */}
+      <RoomSky sky={topic.tint} accent={topic.accent} />
       <header
         data-explore-hero
-        className="room-section relative overflow-hidden pb-[var(--room-rhythm)] pt-28 md:pt-40"
+        className="room-section room-hero relative pb-[var(--room-rhythm)]"
       >
-        {/* Two washes in the beat's own accent. This is what keeps six rooms
-            built from one template from looking like one room six times. */}
-        <div
-          className="pointer-events-none absolute inset-0 -z-10"
-          style={{
-            background: `radial-gradient(70% 55% at 18% 0%, ${topic.accent}1f, transparent 70%), radial-gradient(60% 50% at 90% 18%, ${topic.tint[0]}55, transparent 72%)`,
-          }}
-        />
-
-        <span
-          data-explore-ghost
-          aria-hidden="true"
-          // top-24/md:top-32 rather than the negative offset this had: the
-          // number is absolutely positioned, so it ignores the header's own
-          // pt-28/md:pt-40 padding and was sitting right at the box's literal
-          // top edge — which is also where the fixed site header covers it and
-          // where this box's own `overflow-hidden` clips it, so the glyph read
-          // as sliced in half. Starting inside the padded area clears both.
-          className="pointer-events-none absolute top-24 right-4 select-none font-display leading-none text-bone/[0.04] md:top-32 md:right-12"
-          // Held well below the old 26vw. A watermark should be felt at the
-          // edge of vision, not read — at 26vw this was 500px of type on a
-          // desktop and became the loudest thing on the page.
-          style={{ fontSize: 'clamp(5rem, 13vw, 11rem)' }}
-        >
-          {topic.index}
-        </span>
-
         <div className="mx-auto max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -281,7 +270,7 @@ export function ExploreExperience({
               href="/"
               onClick={requestReturn}
               {...hoverable}
-              className="group inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.22em] text-bone/45 transition-colors hover:text-ember"
+              className="group inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.22em] text-bone/70 transition-colors hover:text-ember"
             >
               <ArrowLeft
                 size={12}
@@ -309,7 +298,7 @@ export function ExploreExperience({
             colours, so six rooms still read as one site.
           */}
           <div className="mt-8 grid gap-10 md:mt-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16">
-            <div>
+            <div data-tour="room-intro">
               {topic.mark ? (
                 <motion.img
                   src={topic.mark}
@@ -325,7 +314,7 @@ export function ExploreExperience({
                 initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, ease: EASE, delay: 0.12 }}
-                className="eyebrow"
+                className="eyebrow !text-ember-soft"
               >
                 {topic.eyebrow}
               </motion.p>
@@ -334,7 +323,7 @@ export function ExploreExperience({
                 initial={{ opacity: 0, y: 42, filter: 'blur(12px)' }}
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 transition={{ duration: 1.1, ease: EASE, delay: 0.2 }}
-                className="mt-6 font-display text-[clamp(2.1rem,4.6vw,3.6rem)] leading-[1.06] text-bone"
+                className="mt-6 font-display text-[clamp(2.1rem,4.6vw,3.6rem)] font-semibold leading-[1.06] text-bone"
               >
                 {topic.title}
               </motion.h1>
@@ -361,13 +350,15 @@ export function ExploreExperience({
                     className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                   />
                 </Link>
-                <a
-                  href={`#${topic.chapters[0]?.id ?? 'chapters'}`}
-                  {...hoverable}
-                  className="font-mono text-[10px] uppercase tracking-[0.22em] text-bone/45 transition-colors hover:text-bone"
-                >
-                  {topic.readMoreLabel ?? 'Start reading'} &darr;
-                </a>
+                {topic.chapters.length ? (
+                  <a
+                    href={`#${topic.chapters[0].id}`}
+                    {...hoverable}
+                    className="font-mono text-[10px] uppercase tracking-[0.22em] text-bone/70 transition-colors hover:text-bone"
+                  >
+                    {topic.readMoreLabel ?? 'Start reading'} &darr;
+                  </a>
+                ) : null}
               </motion.div>
             </div>
 
@@ -402,7 +393,7 @@ export function ExploreExperience({
                   breadcrumb above and the chapter numerals below both use. */}
               <div
                 aria-hidden="true"
-                className="absolute -bottom-6 -left-6 flex h-20 w-20 items-center justify-center rounded-full border-[6px] shadow-xl"
+                className="absolute -bottom-6 -left-2 flex h-16 w-16 items-center justify-center rounded-full border-[5px] shadow-xl sm:-left-6 sm:h-20 sm:w-20 sm:border-[6px]"
                 style={{ borderColor: '#0d0906', backgroundColor: topic.accent }}
               >
                 <span className="numeral text-[1.1rem] text-ink" style={{ ['--numeral-accent' as string]: '#0d0906' }}>
@@ -432,6 +423,7 @@ export function ExploreExperience({
       {topic.chapters.length > 0 ? (
       <nav
         aria-label="In this room"
+        data-tour="room-chapters"
         className="room-section room-section--tight mx-auto flex max-w-6xl flex-wrap items-center gap-x-2 gap-y-3 px-5 sm:px-6 md:px-10"
       >
         <p className="mr-3 font-mono text-[9px] uppercase tracking-[0.28em] text-bone/30">
@@ -508,7 +500,7 @@ export function ExploreExperience({
                         ) : null}
                         <h2
                           data-explore-lead
-                          className="mt-2 font-display text-[clamp(1.6rem,3vw,2.5rem)] leading-[1.12] text-bone"
+                          className="mt-2 font-display text-[clamp(1.6rem,3vw,2.5rem)] font-medium leading-[1.12] text-bone"
                         >
                           {chapter.heading}
                         </h2>
@@ -627,6 +619,7 @@ export function ExploreExperience({
       {topic.quote ? (
         <section
           data-explore-block
+          data-melo-cue="quote"
           className="room-section room-band relative overflow-hidden"
         >
           <div
@@ -667,7 +660,7 @@ export function ExploreExperience({
                   {link.label}
                 </span>
                 <span className="flex items-center gap-4 text-sm text-sand/55">
-                  {link.note}
+                  {link.note ?? null}
                   <ArrowUpRight
                     size={16}
                     className="shrink-0 text-bone/40 transition-transform duration-500 group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-ember"
@@ -731,32 +724,48 @@ export function ExploreExperience({
 
       {/* ── the rest of the tour ─────────────────────────────────────────── */}
       <footer className="room-section room-section--end safe-bottom">
-        <div className="grid gap-4 border-t border-white/10 pt-8 sm:grid-cols-2">
+        <div data-tour="room-next" data-melo-cue="end" className="grid gap-4 border-t border-white/10 pt-8 sm:grid-cols-2">
           <Link
             href={`/explore/${prev.slug}`}
             {...hoverable}
-            className="group rounded-2xl border border-white/10 p-6 transition-colors hover:border-white/25"
+            className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-ink/40 p-5 transition-colors hover:border-white/25 md:p-6"
           >
-            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-bone/35">
-              &larr; Previous room
-            </p>
-            <p className="mt-3 flex items-center gap-2 font-display text-2xl text-bone transition-colors group-hover:text-ember">
-              <span className="numeral numeral--lg text-[0.8em]">{prev.index}</span>
-              {prev.word}
-            </p>
+            <img
+              src={`/brand/melo/face-${Number(prev.index)}.webp`}
+              alt=""
+              loading="lazy"
+              className="h-12 w-12 shrink-0 rounded-full border border-white/15 object-cover opacity-80 transition-opacity group-hover:opacity-100 md:h-14 md:w-14"
+            />
+            <span className="min-w-0">
+              <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-bone/40">
+                &larr; Previous room
+              </span>
+              <span className="mt-2 flex items-center gap-2 font-display text-xl text-bone transition-colors group-hover:text-ember md:text-2xl">
+                <span className="numeral numeral--lg text-[0.8em]">{prev.index}</span>
+                {prev.word}
+              </span>
+            </span>
           </Link>
           <Link
             href={`/explore/${next.slug}`}
             {...hoverable}
-            className="group rounded-2xl border border-white/10 p-6 transition-colors hover:border-white/25 sm:text-right"
+            className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-ink/40 p-5 transition-colors hover:border-white/25 sm:flex-row-reverse sm:text-right md:p-6"
           >
-            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-bone/35">
-              Next room &rarr;
-            </p>
-            <p className="mt-3 flex items-center gap-2 font-display text-2xl text-bone transition-colors group-hover:text-ember sm:justify-end">
-              <span className="numeral numeral--lg text-[0.8em]">{next.index}</span>
-              {next.word}
-            </p>
+            <img
+              src={`/brand/melo/face-${Number(next.index)}.webp`}
+              alt=""
+              loading="lazy"
+              className="h-12 w-12 shrink-0 rounded-full border border-ember/40 object-cover transition-transform group-hover:scale-105 md:h-14 md:w-14"
+            />
+            <span className="min-w-0">
+              <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-bone/40">
+                Next room &rarr;
+              </span>
+              <span className="mt-2 flex items-center gap-2 font-display text-xl text-bone transition-colors group-hover:text-ember sm:justify-end md:text-2xl">
+                <span className="numeral numeral--lg text-[0.8em]">{next.index}</span>
+                {next.word}
+              </span>
+            </span>
           </Link>
         </div>
 

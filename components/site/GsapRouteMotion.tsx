@@ -19,6 +19,32 @@ export function GsapRouteMotion({ children }: { children: ReactNode }) {
       const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
       if (prefersReduced) return
 
+      const trackProgress = () =>
+        ScrollTrigger.create({
+          trigger: page,
+          start: 'top top',
+          end: 'bottom bottom',
+          onUpdate: (self) => {
+            if (progress.current) {
+              progress.current.style.transform = `scaleX(${self.progress})`
+            }
+          },
+        })
+
+      /*
+       * Phones and tablets get the page as it is, with no reveal-on-scroll.
+       * Two reasons, both seen on real devices. The blur these reveals start
+       * from is the most expensive thing on the page to animate, and mid-scroll
+       * it reads as a dark smudge travelling down the screen rather than as
+       * text arriving. And a 'top 80%' trigger measured before the address bar
+       * collapses can end up never firing, which leaves a block at opacity 0
+       * for good — the same failure ExploreExperience guards against.
+       */
+      if (window.matchMedia('(max-width: 1023px)').matches) {
+        const t = trackProgress()
+        return () => t.kill()
+      }
+
       /* ── Intro timeline ──────────────────────────────────────── */
       const intro = gsap.timeline({ defaults: { ease: 'power3.out' } })
       intro
@@ -93,7 +119,6 @@ export function GsapRouteMotion({ children }: { children: ReactNode }) {
           })
           .from(heading, {
             x: -50, opacity: 0, duration: 0.9, ease: 'power3.out',
-            filter: 'blur(6px)',
           }, '-=0.7')
           .from(body, {
             y: 25, opacity: 0, duration: 0.75, ease: 'power2.out',
@@ -110,7 +135,6 @@ export function GsapRouteMotion({ children }: { children: ReactNode }) {
           beatTl.from(items, {
             y: 40, opacity: 0, scale: 0.96,
             stagger: 0.12, duration: 0.7, ease: 'power2.out',
-            filter: 'blur(4px)',
           }, '-=0.5')
         }
 
@@ -141,16 +165,7 @@ export function GsapRouteMotion({ children }: { children: ReactNode }) {
       })
 
       /* ── Scroll progress rail ─────────────────────────────────── */
-      const progressTrigger = ScrollTrigger.create({
-        trigger: page,
-        start: 'top top',
-        end: 'bottom bottom',
-        onUpdate: (self) => {
-          if (progress.current) {
-            progress.current.style.transform = `scaleX(${self.progress})`
-          }
-        },
-      })
+      const progressTrigger = trackProgress()
 
       /* ── Footer reveal ───────────────────────────────────────── */
       const footer = page.querySelector<HTMLElement>('footer')

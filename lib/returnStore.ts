@@ -31,6 +31,33 @@ import { SECTIONS, SECTION_COUNT } from './sections'
 const SECTION_KEY = 'nexr:last-section'
 const INTENT_KEY = 'nexr:return-intent'
 
+/*
+ * Who is listening for changes to the remembered beat.
+ *
+ * The beat is written by ScrollProvider as the scene is left — in an effect
+ * that runs after the new page's own effects, because React runs a parent's
+ * effects after its children's. Anything that read the value once on mount
+ * (the Back button in the header, Melo's "Back to …") read it a moment too
+ * early and showed no way back at all. Subscribing instead of reading once
+ * makes the order irrelevant.
+ */
+const listeners = new Set<() => void>()
+let version = 0
+
+function notify() {
+  version += 1
+  listeners.forEach((l) => l())
+}
+
+export function subscribeReturn(listener: () => void) {
+  listeners.add(listener)
+  return () => {
+    listeners.delete(listener)
+  }
+}
+
+export const returnVersion = () => version
+
 /** sessionStorage throws in some privacy modes; never let that break a click. */
 function safeGet(key: string): string | null {
   try {
@@ -61,6 +88,7 @@ export function rememberSection(index: number) {
   if (!Number.isFinite(index)) return
   const clamped = Math.min(Math.max(Math.round(index), 0), SECTION_COUNT - 1)
   safeSet(SECTION_KEY, String(clamped))
+  notify()
 }
 
 /** The remembered beat, or null if there is nothing sensible stored. */
@@ -96,4 +124,5 @@ export function consumeReturnIntent(): number | null {
 export function clearReturn() {
   safeRemove(INTENT_KEY)
   safeRemove(SECTION_KEY)
+  notify()
 }

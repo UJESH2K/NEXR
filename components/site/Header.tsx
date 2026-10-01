@@ -140,6 +140,7 @@ export function Header() {
         <button
           type="button"
           onClick={openContactModal}
+          data-tour="header-demo"
           className="btn-primary btn-primary--compact group"
         >
           <span className="lg:hidden">Book a demo</span>
@@ -152,6 +153,7 @@ export function Header() {
 
         <button
           onClick={() => setOpen((value) => !value)}
+          data-tour="header-menu"
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 text-bone/70 lg:hidden"
           aria-label={open ? 'Close navigation' : 'Open navigation'}
           aria-expanded={open}

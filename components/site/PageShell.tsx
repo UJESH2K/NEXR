@@ -5,6 +5,7 @@ import { sectionById } from '@/lib/sections'
 import { requestReturn } from '@/lib/returnStore'
 import { PageFade } from './PageFade'
 import { GsapRouteMotion } from './GsapRouteMotion'
+import { RoomSky } from './RoomSky'
 
 export function PageShell({
   eyebrow,
@@ -38,8 +39,10 @@ export function PageShell({
   return (
     <PageFade>
       <GsapRouteMotion>
-      <article className="safe-bottom pointer-events-auto min-h-svh overflow-hidden bg-void px-5 pb-20 pt-28 sm:px-6 md:px-10 md:pb-28 md:pt-32">
+      <article className="safe-bottom pointer-events-auto relative isolate min-h-svh overflow-hidden bg-abyss px-5 pb-20 pt-28 sm:px-6 md:px-10 md:pb-28 md:pt-32">
+        <RoomSky sky={section.sky} accent={section.accent} />
         <header
+          data-tour="page-intro"
           className={
             align === 'center'
               ? 'mx-auto max-w-4xl border-b border-white/10 pb-16 text-center'
@@ -48,7 +51,7 @@ export function PageShell({
         >
           <p
             data-route-eyebrow
-            className={`eyebrow ${align === 'center' ? 'justify-center' : ''}`}
+            className={`eyebrow !text-ember-soft ${align === 'center' ? 'justify-center' : ''}`}
           >
             {eyebrow}
           </p>
@@ -65,7 +68,7 @@ export function PageShell({
             ) : null}
             <h1
               data-route-title
-              className="display text-balance text-[clamp(2.7rem,7vw,6.8rem)] text-bone"
+              className="text-balance font-display text-[clamp(2.4rem,5.6vw,5rem)] font-semibold leading-[1.05] text-bone"
             >
               {title}
             </h1>
@@ -159,7 +162,7 @@ export function Beat({
       data-route-beat
       className="scroll-mt-32 border-t border-bone/12 py-14 first:border-0 first:pt-0"
     >
-      <h2 data-beat-heading className="display text-[clamp(1.7rem,3.4vw,2.75rem)] text-bone">
+      <h2 data-beat-heading className="font-display text-[clamp(1.7rem,3.4vw,2.75rem)] font-medium leading-[1.12] text-bone">
         {heading}
       </h2>
       {accent ? (

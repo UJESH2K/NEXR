@@ -197,11 +197,33 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
    * by the time this runs, hence the ref holding the previous one.
    */
   const previousPath = useRef(pathname)
+  const tappedAt = useRef(0)
   useEffect(() => {
-    if (previousPath.current === '/' && pathname !== '/') {
+    if (previousPath.current === '/' && pathname !== '/' && Date.now() - tappedAt.current > 3000) {
       rememberSection(scroll.activeCardIndex)
     }
     previousPath.current = pathname
+  }, [pathname])
+
+  /*
+   * Record the beat at the tap, too, and prefer it.
+   *
+   * By the time the route has changed, the navigation's own scroll to the top
+   * of the new page can already have reached the home tracker and dragged the
+   * active beat backwards — on phones it reliably did, so "Back to" returned
+   * people one beat early. The beat on screen when they tapped is the one they
+   * were reading. Scroll-driven exits (a card expanding into its route) have
+   * no tap, and still fall back to the effect above.
+   */
+  useEffect(() => {
+    if (pathname !== '/') return
+    const onTap = () => {
+      if (!scroll.started) return
+      rememberSection(scroll.activeCardIndex)
+      tappedAt.current = Date.now()
+    }
+    document.addEventListener('click', onTap, true)
+    return () => document.removeEventListener('click', onTap, true)
   }, [pathname])
 
   // ── Route changes ────────────────────────────────────────────────────────
@@ -230,26 +252,56 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
       setStartedTick((n) => n + 1)
       lenis?.start()
 
-      // Two frames of grace before measuring. On a client-side navigation the
-      // home track has only just mounted, and ScrollTrigger cannot size a
-      // spacer the browser has not laid out yet — refreshing too early leaves
-      // the trigger measuring a zero-height document and the jump lands at 0.
-      let raf = requestAnimationFrame(() => {
-        raf = requestAnimationFrame(() => {
-          ScrollTrigger.refresh()
-          const span = document.documentElement.scrollHeight - window.innerHeight
-          if (span <= 0) return
-          // Straight to the beat's rest point rather than an animated scroll:
-          // easing through five beats they did not ask to see again is exactly
-          // the trip this feature exists to save them.
-          lenis?.scrollTo(((returnTo + SECTION_REST_POINT) / SECTION_COUNT) * span, {
-            immediate: true,
-            force: true,
-          })
+      // Measure only once the home track is really there. Arriving from a
+      // room, the room is still mounted while it fades out, so for the first
+      // half second the document is the room's height, not the scene's — a
+      // jump computed then lands a beat or two early. So: wait for the track,
+      // then for the height to hold still for a few frames, then jump.
+      let raf = 0
+      let last = -1
+      let still = 0
+      let frames = 0
+      // The copy stays hidden until the jump lands, so the room dissolves
+      // straight into the beat they left instead of flashing beat 01 first.
+      const root = document.documentElement
+      root.dataset.returning = ''
+      const reveal = () => {
+        delete root.dataset.returning
+      }
+      const settle = () => {
+        frames += 1
+        const track = document.getElementById('home-track')
+        const height = document.documentElement.scrollHeight
+        if (track && height === last) still += 1
+        else {
+          still = 0
+          last = height
+        }
+        if (still < 3 && frames < 240) {
+          raf = requestAnimationFrame(settle)
+          return
+        }
+        ScrollTrigger.refresh()
+        const span = document.documentElement.scrollHeight - window.innerHeight
+        if (span <= 0) {
+          reveal()
+          return
+        }
+        // Straight to the beat's rest point rather than an animated scroll:
+        // easing through five beats they did not ask to see again is exactly
+        // the trip this feature exists to save them.
+        lenis?.scrollTo(((returnTo + SECTION_REST_POINT) / SECTION_COUNT) * span, {
+          immediate: true,
+          force: true,
         })
-      })
+        raf = requestAnimationFrame(reveal)
+      }
+      raf = requestAnimationFrame(settle)
 
-      return () => cancelAnimationFrame(raf)
+      return () => {
+        cancelAnimationFrame(raf)
+        reveal()
+      }
     }
 
     lenis?.start()
