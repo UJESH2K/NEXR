@@ -11,7 +11,9 @@ import { SOCIAL_LINKS } from '@/components/ui/SocialIcons'
 
 /**
  * The instrument panel around the frame: the progress rail, the big word pinned
- * to the bottom, and the corner readouts.
+ * to the bottom, and the socials in the corner. The rail is the only counter —
+ * a percentage readout and a second beat number used to sit here too, and
+ * three sets of figures on one frame read as a dashboard, not a story.
  *
  * There is no sound control here any more, because there is no sound. A
  * synthesised bed was tried twice — a filtered drone, then a reverberant pad
@@ -32,25 +34,14 @@ export function SceneHud() {
   const fill = useRef<HTMLSpanElement>(null)
   const mobileFill = useRef<HTMLSpanElement>(null)
   const bar = useRef<HTMLSpanElement>(null)
-  const readout = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
-    let shownPercent = -1
-
     const tick = () => {
       const p = scroll.homeProgress
 
       if (fill.current) fill.current.style.transform = `scaleX(${p})`
       if (mobileFill.current) mobileFill.current.style.transform = `scaleX(${p})`
       if (bar.current) bar.current.style.transform = `scaleY(${p})`
-
-      // The readout only touches the DOM when the rounded value changes, which
-      // is a handful of writes per scroll rather than one per frame.
-      const percent = Math.round(p * 100)
-      if (readout.current && percent !== shownPercent) {
-        shownPercent = percent
-        readout.current.textContent = String(percent).padStart(3, '0')
-      }
     }
 
     gsap.ticker.add(tick)
@@ -137,9 +128,8 @@ export function SceneHud() {
             transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
             className="flex flex-col items-center"
           >
-            <span className="numeral numeral--lg text-[13px]">
-              {section.index}
-            </span>
+            {/* No number above the word: the rail at the top already says
+                which beat this is, and two counters is one too many. */}
             {/* Deliberately smaller than the reference's: the figure's feet
                 reach about 86% of the frame height, and at 11vw this word's
                 cap height climbed into the rock and then into the shoes.
@@ -178,12 +168,6 @@ export function SceneHud() {
         </div>
 
         <div className="flex items-center gap-5">
-          <span
-            ref={readout}
-            className="numeral text-[9px] opacity-70"
-          >
-            000
-          </span>
           {/* Real brand marks rather than two-letter abbreviations. "LI / IG /
               YT" reads as a legend to be decoded; a logo is recognised without
               being read, which is the entire job of a corner link. */}
