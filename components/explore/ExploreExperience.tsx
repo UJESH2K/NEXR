@@ -757,32 +757,19 @@ export function ExploreExperience({
           </Link>
         </div>
 
-        <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
-          <Link
-            href="/explore"
-            {...hoverable}
-            className="group inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.22em] text-bone/45 transition-colors hover:text-ember"
-          >
-            All six rooms
-            <ArrowRight
-              size={12}
-              className="transition-transform group-hover:translate-x-1"
-            />
-          </Link>
-          {/* Third and last way back, and like the other two it carries the
-              return intent — so whichever one a reader finds, they land on the
-              beat they came from rather than at the top of the scene. */}
-          <Link
-            href="/"
-            onClick={requestReturn}
-            {...hoverable}
-            className="group inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.22em] text-bone/45 transition-colors hover:text-ember"
-          >
-            <ArrowLeft
-              size={12}
-              className="transition-transform group-hover:-translate-x-1"
-            />
+        {/* The last row of the page, as real buttons: back on the left (as on
+            every other page), all six rooms on the right. Third and last way
+            back, and like the other two it carries the return intent — so
+            whichever one a reader finds, they land on the beat they came from
+            rather than at the top of the scene. */}
+        <div className="page-end mt-6">
+          <Link href="/" onClick={requestReturn} {...hoverable} className="end-btn group">
+            <ArrowLeft size={15} className="shrink-0 transition-transform group-hover:-translate-x-1" />
             Back to the experience
+          </Link>
+          <Link href="/explore" {...hoverable} className="end-btn group">
+            All six rooms
+            <ArrowRight size={15} className="shrink-0 transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
       </footer>

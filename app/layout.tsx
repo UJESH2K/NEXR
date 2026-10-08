@@ -5,6 +5,7 @@ import { ChromeScrim } from '@/components/site/ChromeScrim'
 import { RouteBackdrop } from '@/components/site/RouteBackdrop'
 import { CursorFollower } from '@/components/ui/cursor-follower'
 import { ContactModal } from '@/components/site/ContactModal'
+import { Curtain } from '@/components/site/Curtain'
 import { Header } from '@/components/site/Header'
 import { SkipLink } from '@/components/site/SkipLink'
 import { SiteGuide } from '@/components/site/SiteGuide'
@@ -100,12 +101,17 @@ export default function RootLayout({
           script rather than a component. The scrollTo covers the case where the
           browser had already moved before this line ran.
         */}
+        {/* Also marks the route before first paint, so CSS can keep the load
+            curtain on the home page only — see Curtain. */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "try{history.scrollRestoration='manual'}catch(e){}window.scrollTo(0,0)",
+              "try{history.scrollRestoration='manual'}catch(e){}window.scrollTo(0,0);document.documentElement.dataset.route=location.pathname==='/'?'home':'page'",
           }}
         />
+        {/* The load curtain is server HTML, so it is in the very first paint —
+            there is no frame of the site before it. Preloader drives it. */}
+        <Curtain />
         <SkipLink />
         <CursorFollower />
         <ScrollProvider>

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { ArrowLeft, ArrowUpRight } from 'lucide-react'
 import Image from 'next/image'
 import type { ReactNode } from 'react'
 import { sectionById } from '@/lib/sections'
@@ -121,21 +122,20 @@ export function PageShell({
 
         <div className="mx-auto mt-14 max-w-6xl md:mt-20">{children}</div>
 
-        <footer className="mx-auto mt-20 flex max-w-4xl flex-wrap items-center justify-between gap-4 border-t border-bone/12 pt-8 md:mt-24">
-          <Link
-            href="/"
-            onClick={requestReturn}
-            className="group inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.24em] text-bone/55 transition-colors hover:text-ember"
-          >
-            <span className="inline-block transition-transform group-hover:-translate-x-1">&larr;</span>
+        {/* The end of the page, said plainly: one panel, two real buttons —
+            the way back on the left, the way forward on the right. They used
+            to be two faint lines of mono type that read as captions. */}
+        <footer className="page-end mx-auto mt-20 max-w-4xl md:mt-24">
+          <Link href="/" onClick={requestReturn} className="end-btn group">
+            <ArrowLeft size={15} className="shrink-0 transition-transform group-hover:-translate-x-1" />
             Back to the experience
           </Link>
-          <Link
-            href="/contact"
-            className="group inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.24em] text-bone/55 transition-colors hover:text-ember"
-          >
+          <Link href="/contact" className="btn-primary group justify-center">
             Book a Demo
-            <span className="inline-block transition-transform group-hover:translate-x-1">&rarr;</span>
+            <ArrowUpRight
+              size={14}
+              className="shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+            />
           </Link>
         </footer>
 
