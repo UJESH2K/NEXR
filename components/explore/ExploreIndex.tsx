@@ -6,7 +6,7 @@ import { motion } from 'framer-motion'
 import { ArrowLeft, ArrowUpRight } from 'lucide-react'
 import { EXPLORE_TOPICS } from '@/lib/explore'
 import { setCursor, resetCursor } from '@/lib/cursorStore'
-import { RoomSky } from '@/components/site/RoomSky'
+import { RoomSignature, RoomSky } from '@/components/site/RoomSky'
 
 /**
  * The index of the six rooms.
@@ -162,6 +162,7 @@ export function ExploreIndex() {
           </p>
         </div>
       </div>
+      <RoomSignature className="-mx-5 -mb-20 mt-16 sm:-mx-6 md:-mx-10 md:-mb-24 md:mt-20" />
     </div>
   )
 }

@@ -51,72 +51,80 @@ export function Header() {
 
   return (
     <header
-      className={`safe-top fixed inset-x-0 top-0 flex items-start justify-between gap-3 px-4 py-4 md:px-10 md:py-5 ${
+      // Three zones on every interior page: the brand and the way back on the
+      // left, the routes centred, the conversation on the right. The outer
+      // columns are equal (1fr each), so the route list sits on the true
+      // centre of the window rather than wherever the left edge pushes it,
+      // and every control shares one height and one centre line.
+      className={`safe-top fixed inset-x-0 top-0 grid grid-cols-[1fr_auto] items-center gap-4 px-4 py-4 md:px-10 md:py-5 lg:grid-cols-[1fr_auto_1fr] ${
         overScene
           ? 'bg-transparent'
           : 'border-b border-white/10 bg-void/55 backdrop-blur-md'
       }`}
       style={{ zIndex: 'var(--z-chrome)' }}
     >
-      <Link
-        href="/"
-        aria-label="NEXR home"
-        className="group inline-flex shrink-0 items-center gap-3"
-      >
-        <Image
-          src="/brand/meloworld-mark.webp"
-          alt=""
-          width={192}
-          height={139}
-          priority
-          // Belt and braces with ChromeScrim. The scrim guarantees a dark ground
-          // under the header, and this keeps the mark readable even if a future
-          // beat brightens the top of the frame — which is exactly what happened
-          // the last time the sky was allowed to get light.
-          style={
-            overScene
-              ? { filter: 'drop-shadow(0 2px 10px rgb(20 9 5 / 0.75))' }
-              : undefined
-          }
-          className={`w-auto transition-opacity duration-300 group-hover:opacity-80 ${
-            overScene ? 'h-8 md:h-9' : 'h-7'
-          }`}
-        />
-        {/* Kept for anyone with images off, and for the accessible name. It is
-            hidden visually over the scene, where the mark stands alone, and on
-            phones, where the mark plus a wordmark plus a control does not fit
-            across the width. */}
-        <span
-          className={
-            overScene
-              ? 'sr-only'
-              : 'hidden font-display text-lg uppercase tracking-[0.32em] text-bone lg:inline'
-          }
+      <div className="flex min-w-0 items-center gap-5">
+        <Link
+          href="/"
+          aria-label="NEXR home"
+          className="group inline-flex h-11 shrink-0 items-center gap-3"
         >
-          Nexr
-        </span>
-      </Link>
+          <Image
+            src="/brand/meloworld-mark.webp"
+            alt=""
+            width={192}
+            height={139}
+            priority
+            // Belt and braces with ChromeScrim. The scrim guarantees a dark ground
+            // under the header, and this keeps the mark readable even if a future
+            // beat brightens the top of the frame — which is exactly what happened
+            // the last time the sky was allowed to get light.
+            style={
+              overScene
+                ? { filter: 'drop-shadow(0 2px 10px rgb(20 9 5 / 0.75))' }
+                : undefined
+            }
+            className={`w-auto transition-opacity duration-300 group-hover:opacity-80 ${
+              overScene ? 'h-8 md:h-9' : 'h-7'
+            }`}
+          />
+          {/* Kept for anyone with images off, and for the accessible name. It is
+              hidden visually over the scene, where the mark stands alone, and
+              below wide desktops, where it would crowd the way-back control. */}
+          <span
+            className={
+              overScene
+                ? 'sr-only'
+                : 'hidden font-display text-lg uppercase leading-none tracking-[0.32em] text-bone xl:inline'
+            }
+          >
+            Nexr
+          </span>
+        </Link>
 
-      <nav className="flex min-w-0 items-center gap-3 md:gap-8">
-        {/* Home and, once there is somewhere to return to, Back — on the scene
-            itself these are meaningless (you cannot go back to where you
-            already are), so the pair only mounts on every other route. */}
+        {/* Back and Home, beside the logo — where people look for a way back.
+            On the scene itself they are meaningless (you cannot go back to
+            where you already are), so they only mount on every other route. */}
         {!overScene ? <HeaderNav /> : null}
+      </div>
 
-        {/* The route list is hidden over the scene. The HUD already runs a
-            six-tick progress rail across the top centre, and two rows of
-            navigation at the same height collide on anything narrower than a
-            very wide desktop. The wordmark, the CTA and the mobile menu button
-            stay, so nothing becomes unreachable. */}
-        <ul className={`items-center gap-6 ${overScene ? 'hidden' : 'hidden lg:flex'}`}>
+      {/* The route list is hidden over the scene. The HUD already runs a
+          six-tick progress rail across the top centre, and two rows of
+          navigation at the same height collide. The wordmark, the CTA and the
+          mobile menu button stay, so nothing becomes unreachable. */}
+      {overScene ? (
+        <span className="hidden lg:block" aria-hidden="true" />
+      ) : (
+        <ul className="hidden h-11 items-center gap-5 lg:flex xl:gap-8">
           {NAV.map((item) => {
             const active = pathname === item.href
             return (
-              <li key={item.href}>
+              <li key={item.href} className="flex h-full items-center">
                 <Link
                   href={item.href}
-                  className={`font-mono text-[11px] uppercase tracking-[0.2em] transition-colors ${
-                    active ? 'text-ember' : 'text-bone/55 hover:text-bone'
+                  aria-current={active ? 'page' : undefined}
+                  className={`header-link font-mono text-[11px] uppercase leading-none tracking-[0.18em] transition-colors ${
+                    active ? 'text-ember' : 'text-bone/60 hover:text-bone'
                   }`}
                 >
                   {item.label}
@@ -125,14 +133,16 @@ export function Header() {
             )
           })}
         </ul>
+      )}
 
+      <div className="flex items-center justify-end gap-3">
         {/* Same treatment as Explore. Two primary controls in one frame have to
             look like the same control, or the page reads as two designs.
 
-            The label shortens on a phone rather than the button shrinking: at
-            390px "Start a conversation" pushed the menu button off the screen
-            entirely, and a call to action nobody can reach is worse than a
-            terse one. */}
+            The label shortens below wide desktops rather than the button
+            shrinking: at 390px "Start a conversation" pushed the menu button
+            off the screen entirely, and between 1024 and 1280 it crowded the
+            centred route list. */}
         {/* Opens the quick-contact popup rather than navigating — see
             ContactModal. /contact still exists, and is what "book a full
             demo" inside the popup goes to; this is the fast path for someone
@@ -143,8 +153,8 @@ export function Header() {
           data-tour="header-demo"
           className="btn-primary btn-primary--compact group"
         >
-          <span className="lg:hidden">Book a demo</span>
-          <span className="hidden lg:inline">Start a conversation</span>
+          <span className="xl:hidden">Book a demo</span>
+          <span className="hidden xl:inline">Start a conversation</span>
           <MoveUpRight
             size={13}
             className="shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
@@ -154,13 +164,13 @@ export function Header() {
         <button
           onClick={() => setOpen((value) => !value)}
           data-tour="header-menu"
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 text-bone/70 lg:hidden"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/15 text-bone/70 lg:hidden"
           aria-label={open ? 'Close navigation' : 'Open navigation'}
           aria-expanded={open}
         >
           {open ? <X size={17} /> : <Menu size={17} />}
         </button>
-      </nav>
+      </div>
 
       <AnimatePresence>
         {open ? (

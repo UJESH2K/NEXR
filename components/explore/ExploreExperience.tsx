@@ -12,7 +12,7 @@ import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-react'
 import type { ExploreTopic } from '@/lib/explore'
 import { setCursor, resetCursor } from '@/lib/cursorStore'
 import { ImageSlot } from './ImageSlot'
-import { RoomSky } from '@/components/site/RoomSky'
+import { RoomSignature, RoomSky } from '@/components/site/RoomSky'
 import { melo } from '@/lib/melo/store'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -163,18 +163,6 @@ export function ExploreExperience({
           },
         })
       }
-
-      gsap.to('[data-explore-ghost]', {
-        yPercent: 26,
-        opacity: 0,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: '[data-explore-hero]',
-          start: 'top top',
-          end: 'bottom top',
-          scrub: 1,
-        },
-      })
 
       // Blocks reveal once, on their own trigger — desktop only, see above.
       if (skipReveal) {
@@ -798,6 +786,8 @@ export function ExploreExperience({
           </Link>
         </div>
       </footer>
+
+      <RoomSignature />
     </div>
   )
 }

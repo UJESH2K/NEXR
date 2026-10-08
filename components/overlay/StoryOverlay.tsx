@@ -1,11 +1,12 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import gsap from 'gsap'
 
 import { motion } from 'framer-motion'
 import { SECTIONS, type Section } from '@/lib/sections'
-import { scrollCommands } from '@/lib/scrollStore'
+import { scroll, scrollCommands, smoothstep } from '@/lib/scrollStore'
 import { useEntered } from '@/lib/useEntered'
 import { useScrollSnapshot } from '@/lib/useScrollSnapshot'
 import { setCursor, resetCursor } from '@/lib/cursorStore'
@@ -158,9 +159,9 @@ function Hero({ visible }: { visible: boolean }) {
   )
 }
 
-function Beat({ section, visible }: { section: Section; visible: boolean }) {
+function Beat({ section, visible, index }: { section: Section; visible: boolean; index: number }) {
   return (
-    <div className="beat-layer" data-visible={visible ? 'true' : 'false'}>
+    <div className="beat-layer" data-visible={visible ? 'true' : 'false'} data-beat-index={index}>
 
       {/*
         Always the left. The figure gestures to her left at every pose, so this
@@ -287,11 +288,63 @@ function AudienceTabs({ tiles }: { tiles: NonNullable<Section['tiles']> }) {
   )
 }
 
+/**
+ * Above the first beat, the wordmark has the frame to itself.
+ *
+ * Scrolling back up past beat 01 is a move toward the title, so the title
+ * should take over: as the NEXR wordmark rises in the scene (GhostWordmark),
+ * the first beat's copy blurs, fades and sinks out of its way, and the two
+ * never share the frame. Both read the same curve off `sectionFloat`, so they
+ * stay in step at any scroll speed.
+ *
+ * Written to the DOM from the gsap ticker, like the HUD: this runs every
+ * frame while scrolling, and a React render per frame would be the expensive
+ * way to move three CSS properties.
+ */
+function useTitleHandover(root: React.RefObject<HTMLDivElement | null>) {
+  useEffect(() => {
+    const host = root.current
+    if (!host) return
+    const copy = host.querySelector<HTMLElement>('[data-beat-index="0"] .story-col')
+    const scrim = host.querySelector<HTMLElement>('.story-scrim')
+    let last = -1
+
+    const tick = () => {
+      const k = scroll.started ? 1 - smoothstep(0.04, 0.3, scroll.sectionFloat) : 0
+      if (Math.abs(k - last) < 0.002) return
+      last = k
+      if (!copy) return
+      if (k < 0.002) {
+        copy.style.removeProperty('opacity')
+        copy.style.removeProperty('transform')
+        copy.style.removeProperty('filter')
+        copy.style.removeProperty('pointer-events')
+        scrim?.style.removeProperty('opacity')
+        return
+      }
+      copy.style.opacity = String(1 - k)
+      copy.style.transform = `translate3d(0, ${(k * 56).toFixed(1)}px, 0)`
+      copy.style.filter = `blur(${(k * 9).toFixed(2)}px)`
+      // Invisible links must not stay clickable.
+      copy.style.pointerEvents = k > 0.5 ? 'none' : ''
+      if (scrim) scrim.style.opacity = String(1 - k)
+    }
+
+    gsap.ticker.add(tick)
+    return () => {
+      gsap.ticker.remove(tick)
+    }
+  }, [root])
+}
+
 export function StoryOverlay() {
   const { activeCard, started } = useScrollSnapshot()
+  const root = useRef<HTMLDivElement>(null)
+  useTitleHandover(root)
 
   return (
     <div
+      ref={root}
       className="overlay-layer fixed inset-0"
       style={{ zIndex: 'var(--z-overlay)' }}
     >
@@ -308,6 +361,7 @@ export function StoryOverlay() {
         <Beat
           key={section.id}
           section={section}
+          index={index}
           visible={started && index === activeCard}
         />
       ))}

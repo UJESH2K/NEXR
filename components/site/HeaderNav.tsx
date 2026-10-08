@@ -5,19 +5,17 @@ import { setCursor, resetCursor } from '@/lib/cursorStore'
 import { useSceneReturn } from '@/lib/useSceneReturn'
 
 /**
- * The same Back / Home pair Melo carries, in the top bar.
+ * The same Back / Home pair Melo carries, in the top bar, beside the logo.
  *
- * Melo's widget is pinned to the corner for the whole page, but the header
- * scrolls out of view on anything longer than one screen — and a long room is
- * exactly where "I don't know where I am" shows up. This puts the identical
- * two controls where the logo already lives, so they are visible the instant
- * a visitor looks up rather than only at the bottom of wherever they happen to
- * be scrolled to.
+ * Melo's widget is pinned to the corner for the whole page, but a long room
+ * is exactly where "I don't know where I am" shows up, and the top-left is
+ * where people look for a way back. So the two controls sit there as one
+ * capsule — one shape, one height, one border — rather than two loose circles
+ * floating between the logo and the routes.
  *
- * Icon-only. The header is already carrying the logo, the route list, the
- * call to action and the menu button; a third labelled pill here is the one
- * that would not fit. Melo's own panel still carries the full "Back to 03
- * MeloWorld" label — this is the fast, glanceable version of the same thing.
+ * Labelled on wide screens, icon-only below that so the centred route list
+ * keeps its room. The tooltips and accessible names always carry the full
+ * wording, and Melo's panel still says "Back to 03 MeloWorld" in full.
  */
 export function HeaderNav() {
   const { topic, goBack, goHome } = useSceneReturn()
@@ -28,19 +26,26 @@ export function HeaderNav() {
   }
 
   return (
-    <div data-tour="header-return" className="hidden items-center gap-1.5 border-r border-white/10 pr-3 md:flex md:mr-1">
+    <div
+      data-tour="header-return"
+      className="hidden h-11 items-center rounded-full border border-white/12 bg-white/[0.03] p-1 md:flex"
+    >
       {topic ? (
-        <button
-          type="button"
-          data-tour="header-back"
-          onClick={goBack}
-          {...hoverable}
-          aria-label={`Back to ${topic.word}`}
-          title={`Back to ${topic.word}`}
-          className="flex h-9 w-9 items-center justify-center rounded-full border border-white/12 text-bone/60 transition-colors duration-300 hover:border-ember/50 hover:text-ember"
-        >
-          <ArrowLeft size={14} />
-        </button>
+        <>
+          <button
+            type="button"
+            data-tour="header-back"
+            onClick={goBack}
+            {...hoverable}
+            aria-label={`Back to ${topic.word}`}
+            title={`Back to ${topic.word}`}
+            className="header-return-btn"
+          >
+            <ArrowLeft size={14} className="shrink-0" />
+            <span className="header-return-label">Back</span>
+          </button>
+          <span aria-hidden="true" className="mx-0.5 h-4 w-px bg-white/12" />
+        </>
       ) : null}
       <button
         type="button"
@@ -49,9 +54,10 @@ export function HeaderNav() {
         {...hoverable}
         aria-label="Start from the beginning"
         title="Start from the beginning"
-        className="flex h-9 w-9 items-center justify-center rounded-full border border-white/12 text-bone/60 transition-colors duration-300 hover:border-ember/50 hover:text-ember"
+        className="header-return-btn"
       >
-        <Home size={14} />
+        <Home size={14} className="shrink-0" />
+        <span className="header-return-label">Home</span>
       </button>
     </div>
   )

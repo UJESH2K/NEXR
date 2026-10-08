@@ -5,7 +5,7 @@ import { sectionById } from '@/lib/sections'
 import { requestReturn } from '@/lib/returnStore'
 import { PageFade } from './PageFade'
 import { GsapRouteMotion } from './GsapRouteMotion'
-import { RoomSky } from './RoomSky'
+import { RoomSignature, RoomSky } from './RoomSky'
 
 export function PageShell({
   eyebrow,
@@ -138,6 +138,8 @@ export function PageShell({
             <span className="inline-block transition-transform group-hover:translate-x-1">&rarr;</span>
           </Link>
         </footer>
+
+        <RoomSignature className="-mx-5 -mb-20 mt-16 sm:-mx-6 md:-mx-10 md:-mb-28 md:mt-20" />
       </article>
       </GsapRouteMotion>
     </PageFade>

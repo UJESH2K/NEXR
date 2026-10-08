@@ -4,7 +4,10 @@ import { useEffect, useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import {
   CanvasTexture,
+  MathUtils,
+  PerspectiveCamera,
   SRGBColorSpace,
+  Vector3,
   type Mesh,
   type MeshBasicMaterial,
 } from 'three'
@@ -32,7 +35,15 @@ const HEIGHT = 52
 const Z = -34
 const Y = 6
 
-function wordTexture(word: string): CanvasTexture {
+/** How much of the frame width the word may take when it has to shrink. */
+const FIT = 0.9
+
+const _toPlane = new Vector3()
+const _forward = new Vector3()
+
+type Word = { texture: CanvasTexture; /** inked width as a share of the plane */ share: number }
+
+function wordTexture(word: string): Word {
   const canvas = document.createElement('canvas')
   // Sized to the plane's aspect so the type is never stretched, and large
   // enough that the word stays crisp when it spans the whole viewport.
@@ -54,13 +65,14 @@ function wordTexture(word: string): CanvasTexture {
   const texture = new CanvasTexture(canvas)
   texture.colorSpace = SRGBColorSpace
   texture.anisotropy = 4
-  return texture
+  const share = ctx ? ctx.measureText(word).width / canvas.width : 0.75
+  return { texture, share }
 }
 
 export function GhostWordmark({ word = 'NEXR' }: { word?: string }) {
   const mesh = useRef<Mesh>(null)
   const material = useRef<MeshBasicMaterial>(null)
-  const [texture, setTexture] = useState<CanvasTexture | null>(null)
+  const [drawn, setDrawn] = useState<Word | null>(null)
 
   useEffect(() => {
     let live = true
@@ -69,8 +81,8 @@ export function GhostWordmark({ word = 'NEXR' }: { word?: string }) {
     // serif fallback into the texture and never correct itself.
     const draw = () => {
       if (!live) return
-      setTexture((previous) => {
-        previous?.dispose()
+      setDrawn((previous) => {
+        previous?.texture.dispose()
         return wordTexture(word)
       })
     }
@@ -83,40 +95,59 @@ export function GhostWordmark({ word = 'NEXR' }: { word?: string }) {
     }
   }, [word])
 
-  useEffect(() => () => texture?.dispose(), [texture])
+  useEffect(() => () => drawn?.texture.dispose(), [drawn])
 
-  useFrame((_, delta) => {
+  useFrame((state, delta) => {
     const node = mesh.current
-    if (!node || !material.current) return
+    if (!node || !material.current || !drawn) return
     const dt = Math.min(delta, 0.1)
 
-    // Present only on the opening frame, gone by the time the first beat lands.
-    const target = 1 - smoothstep(0.0, 0.45, scroll.sectionFloat)
+    // Fit the whole word on a narrow screen. At its desktop size the word is
+    // wider than a phone's view at this depth, so a portrait screen only ever
+    // showed a cropped "EX". Measure how wide the view is where the word
+    // stands and shrink it to fit; on a wide screen it already fits, so the
+    // scale stays at 1 and nothing changes.
+    const cam = state.camera as PerspectiveCamera
+    cam.getWorldDirection(_forward)
+    const depth = _toPlane.copy(node.position).sub(cam.position).dot(_forward)
+    const viewW = 2 * depth * Math.tan(MathUtils.degToRad(cam.fov / 2)) * cam.aspect
+    const fit = Math.min(1, (viewW * FIT) / (WIDTH * drawn.share))
+    // Snapped on the first frame so a phone never sees it shrink into place;
+    // eased after that, for a window being resized.
+    node.scale.setScalar(node.userData.fitted ? damp(node.scale.x, fit, 6, dt) : fit)
+    node.userData.fitted = true
+
+    // Present only above the first beat, and fully gone by the time beat 01
+    // comes to rest — the same curve StoryOverlay uses to move beat 01's copy
+    // out of its way, so the word and the text never share the frame.
+    const target = clamp01(1 - smoothstep(0.04, 0.3, scroll.sectionFloat))
     material.current.opacity = damp(
       material.current.opacity,
       // Low, because it now reads as light rather than shadow — see the colour
       // below. A dark word needs weight to be seen; a bright one needs
       // restraint, or it competes with the figure standing in front of it.
-      clamp01(target) * 0.17,
+      target * 0.17,
       5,
       dt,
     )
     node.visible = material.current.opacity > 0.004
 
-    // A whisper of parallax against the figure, which sells the gap between
-    // them better than any amount of blur would.
+    // It rises into place as it appears and sinks as it leaves, while the
+    // first beat's copy does the opposite. Plus a whisper of parallax against
+    // the figure, which sells the gap between them better than blur would.
+    const shown = material.current.opacity / 0.17
     node.position.x = damp(node.position.x, scroll.pointerX * -2.2, 3, dt)
-    node.position.y = damp(node.position.y, Y - scroll.pointerY * 1.2, 3, dt)
+    node.position.y = damp(node.position.y, Y - (1 - shown) * 7 - scroll.pointerY * 1.2, 4, dt)
   })
 
-  if (!texture) return null
+  if (!drawn) return null
 
   return (
     <mesh ref={mesh} position={[0, Y, Z]}>
       <planeGeometry args={[WIDTH, HEIGHT]} />
       <meshBasicMaterial
         ref={material}
-        map={texture}
+        map={drawn.texture}
         transparent
         opacity={0}
         depthWrite={false}

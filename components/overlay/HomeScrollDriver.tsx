@@ -47,7 +47,11 @@ export function HomeScrollDriver() {
           snapTo: (value: number) => {
             const nearest = Math.round(value * SECTION_COUNT - SECTION_REST_POINT)
             const clamped = Math.min(Math.max(nearest, 0), SECTION_COUNT - 1)
-            return (clamped + SECTION_REST_POINT) / SECTION_COUNT
+            const rest = (clamped + SECTION_REST_POINT) / SECTION_COUNT
+            // The very top is a resting place of its own: the NEXR wordmark
+            // alone with the figure, before the first beat's copy comes in.
+            if (clamped === 0 && value < rest / 2) return 0
+            return rest
           },
           delay: 0.12,
           duration: { min: 0.45, max: 0.9 },

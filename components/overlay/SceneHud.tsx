@@ -61,13 +61,11 @@ export function SceneHud() {
       style={{ zIndex: 'var(--z-chrome)' }}
     >
       {/* ── progress, phones ─────────────────────────────────────────────── */}
-      {/* The six-tick rail needs about 340px of clear width and the phone
-          header already owns that row, so small screens get the same
+      {/* The six-tick rail needs about 340px of clear width and below desktop
+          the header's button and menu already own that row — on a tablet the
+          rail ran straight into them — so phones and tablets get the same
           information as one hairline under the header instead. */}
-      <div
-        className="absolute inset-x-0 top-0 h-px bg-bone/15 md:hidden"
-        style={{ top: 'calc(4.25rem + env(safe-area-inset-top))' }}
-      >
+      <div className="hud-hairline absolute inset-x-0 h-px bg-bone/15 lg:hidden">
         <span
           ref={mobileFill}
           className="block h-full w-full origin-left scale-x-0 bg-ember"
@@ -75,7 +73,7 @@ export function SceneHud() {
       </div>
 
       {/* ── progress rail, top centre ────────────────────────────────────── */}
-      <div className="absolute left-1/2 top-6 hidden -translate-x-1/2 items-center gap-4 md:flex">
+      <div className="absolute left-1/2 top-6 hidden -translate-x-1/2 items-center gap-4 lg:flex">
         <span className="numeral text-[10px]">01</span>
 
         <div className="relative h-px w-[min(34vw,340px)] bg-bone/20">
