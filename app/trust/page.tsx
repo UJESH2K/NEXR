@@ -34,13 +34,13 @@ const STATS = [
 ]
 
 /** This page's own beat, so its placeholders match the scene rather than a colour chosen by hand. */
-const PAGE_TINT = sectionById('clinical').sky
+const PAGE_TINT = sectionById('trust').sky
 
 export default function TrustPage() {
   return (
     <PageShell
       eyebrow="05 / Trust Centre"
-      beatId="clinical"
+      beatId="trust"
       title="Where clinical expertise meets immersive technology."
       lede="Technology supports credibility; it does not replace it. Every session is handled by trained professionals working to real clinical protocols."
     >

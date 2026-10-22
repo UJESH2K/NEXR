@@ -164,7 +164,7 @@ export function BeatAside({
       >
         <TiltCard accent={section.accent} className="beat-card--action">
           <p className="font-mono text-[9px] uppercase tracking-[0.28em] text-bone/40">
-            Book a demo
+            Book A Demo
           </p>
 
           <p className="mt-5 font-display text-[17px] italic leading-[1.55] text-bone/85">
@@ -177,7 +177,7 @@ export function BeatAside({
             onMouseLeave={resetCursor}
             className="btn-primary group mt-7 w-full justify-center"
           >
-            Book a demo
+            Book A Demo
             <ArrowUpRight
               size={13}
               className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"

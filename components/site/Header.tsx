@@ -9,11 +9,14 @@ import { Menu, MoveUpRight, X } from 'lucide-react'
 import { HeaderNav } from './HeaderNav'
 import { openContactModal } from '@/lib/contactModalStore'
 
+// Order is the script's: Explore | Meloworld | VR Wellness | Approach | Trust.
+// It follows the home page's own run of beats, so the bar reads as the same
+// story the scroll tells rather than a second, differently ordered one.
 const NAV = [
   { label: 'Explore', href: '/explore' },
-  { label: 'Approach', href: '/approach' },
   { label: 'MeloWorld', href: '/platform/meloworld' },
   { label: 'VR Wellness', href: '/platform/vr-wellness' },
+  { label: 'Approach', href: '/approach' },
   { label: 'Trust', href: '/trust' },
 ]
 
@@ -136,13 +139,12 @@ export function Header() {
       )}
 
       <div className="flex items-center justify-end gap-3">
-        {/* Same treatment as Explore. Two primary controls in one frame have to
-            look like the same control, or the page reads as two designs.
-
-            The label shortens below wide desktops rather than the button
-            shrinking: at 390px "Start a conversation" pushed the menu button
-            off the screen entirely, and between 1024 and 1280 it crowded the
-            centred route list. */}
+        {/* The script names the top-page call to action "Book A Demo", so it
+            reads the same at every width. The label used to grow into "Start a
+            conversation" above 1280px, which was the only reason this carried
+            two spans: at 390px that wording pushed the menu button off the
+            screen entirely, and between 1024 and 1280 it crowded the centred
+            route list. One short label has neither problem. */}
         {/* Opens the quick-contact popup rather than navigating — see
             ContactModal. /contact still exists, and is what "book a full
             demo" inside the popup goes to; this is the fast path for someone
@@ -153,8 +155,7 @@ export function Header() {
           data-tour="header-demo"
           className="btn-primary btn-primary--compact group"
         >
-          <span className="xl:hidden">Book a demo</span>
-          <span className="hidden xl:inline">Start a conversation</span>
+          Book A Demo
           <MoveUpRight
             size={13}
             className="shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"

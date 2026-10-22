@@ -7,16 +7,18 @@
  * and the HUD rail draws one tick per entry. Adding a seventh beat means adding
  * one object here and nothing else.
  *
- * The narrative the script hands us has eight blocks — hero, problem, belief,
- * ecosystem, products, audience, credibility, call to action — and the scene has
- * six poses. The hero lives in StoryOverlay rather than here, the ecosystem line
- * rides in as the kicker on the MeloWorld beat, and the audience statement is
- * the kicker on the credibility beat. Nothing from the script is dropped.
+ * The script hands us six numbered blocks — NEXR, MeloWorld, VR Wellness, Our
+ * Approach, Built on Trust, Let's Talk — and the scene has six poses, so the
+ * two line up one to one. There is no separate opening title frame any more:
+ * the page starts on beat 01. The audience block the script leaves unnumbered
+ * rides along as the aside on the VR Wellness beat, which is where the script
+ * places it and the only reading that keeps 04 as Our Approach rather than 05.
+ * Nothing from the script is dropped.
  */
 
 export type Section = {
   id: string
-  /** Small mono label above the big word, reference-style ("01 / The gap"). */
+  /** Small mono label above the big word, reference-style ("01 / NEXR"). */
   index: string
   /** The large serif word pinned to the bottom of the frame. */
   word: string
@@ -31,8 +33,9 @@ export type Section = {
    * Card blocks drawn on the far side of the figure, one per entry.
    *
    * These carry a title as well as a line of copy because the script's card
-   * blocks are named things — "Workplaces", "Schools & Colleges", "Healthcare"
-   * — and a bare sentence loses the name that makes the set scannable.
+   * blocks are named things — "Workplaces", "Educational Institutes",
+   * "Healthcare" — and a bare sentence loses the name that makes the set
+   * scannable.
    */
   tiles?: { title: string; body: string; href: string }[]
   /** Pull quote set beside the beat, used to close the page. */
@@ -94,76 +97,53 @@ export type Section = {
 
 export const SECTIONS: Section[] = [
   {
-    id: 'gap',
+    id: 'nexr',
     index: '01',
-    word: 'The Gap',
-    // S2 — THE PROBLEM. The PDF gives this as one two-line headline rather
-    // than a kicker-then-headline pair, so both lines live in `headline` and
-    // wrap naturally rather than being split across two type sizes.
-    headline: 'We\u2019ve solved for availability. Have we solved for approachability?',
+    word: 'NEXR',
+    // 01 / NEXR. The opening beat, and now the first thing on the page: the
+    // held title frame that used to sit above it has been removed, so this is
+    // where the visit starts.
+    headline: 'Step into wellbeing. On your terms.',
     body:
-      'Having support available is only one part of the journey. What matters is how comfortable someone feels taking that first step. Reaching out can be difficult when you\u2019re unsure what to say, who to speak to, or whether you\u2019re ready at all. Sometimes, people simply need a little time, privacy, or a different way to begin. Wellbeing works better when the way in feels as personal as the need itself.',
-    cta: { label: 'Explore the gap', route: '/explore/gap' },
+      'Experience a more private way to prioritize your well-being through immersive VR experiences and anonymous access to expert support, all designed around you.',
+    cta: { label: 'Explore NEXR', route: '/explore' },
     images: ['/models/imgs/gap.webp'],
     sky: ['#9f6021', '#311c08'],
     fog: '#84501d',
     accent: '#ff7901',
   },
   {
-    id: 'belief',
+    id: 'meloworld',
     index: '02',
-    word: 'Belief',
-    // S3 — BELIEF.
-    kicker: 'Stop making people fit wellbeing.',
-    headline: 'Make wellbeing fit people.',
+    word: 'MeloWorld',
+    // 02 / MELOWORLD.
+    headline: 'A safe space to begin with',
     body:
-      'People don\u2019t experience wellbeing in the same way. The right starting point could be a private space, a guided experience, a conversation with a professional, or simply the opportunity to understand what you\u2019re feeling first. At NEXR, we believe wellbeing should adapt to the person, the setting and the need. Because wellbeing should work around people, not the other way around.',
-    cta: { label: 'Explore our belief', route: '/explore/belief' },
-    images: ['/models/imgs/OurApproach.webp'],
+      'Share what’s on your mind in an immersive VR environment, speak with professionals through virtual characters, and get guidance anonymously, without the pressure of revealing your identity or fear of being judged.',
+    cta: { label: 'Explore Meloworld', route: '/platform/meloworld' },
+    images: ['/models/imgs/meloworld.webp'],
+    mark: '/brand/meloworld-mark.webp',
     sky: ['#a25f20', '#321c08'],
     fog: '#87501d',
     accent: '#ff8118',
   },
   {
-    id: 'meloworld',
-    index: '03',
-    word: 'MeloWorld',
-    // S5 — PRODUCTS / MELOWORLD.
-    headline: 'A private space to begin.',
-    body:
-      'An anonymous virtual environment where people can explore their wellbeing, move at their own pace and connect with qualified mental health professionals when they\u2019re ready.',
-    cta: { label: 'Explore MeloWorld', route: '/explore/meloworld' },
-    images: ['/models/imgs/meloworld.webp'],
-    mark: '/brand/meloworld-mark.webp',
-    sky: ['#a65f20', '#341c08'],
-    fog: '#89501c',
-    accent: '#ff8a2a',
-  },
-  {
-    id: 'vr-wellness',
-    index: '04',
-    word: 'VR Wellness',
-    // S6 — PRODUCTS / VR WELLNESS.
-    headline: 'Experience it before you face it.',
-    body:
-      'Guided virtual experiences designed around specific wellbeing, learning and therapeutic needs, from relaxation and emotional regulation to confidence-building and gradual exposure.',
-    cta: { label: 'Explore VR Wellness', route: '/explore/vr-wellness' },
-    images: ['/models/imgs/vrworld.webp'],
-    sky: ['#a95e1f', '#361c08'],
-    fog: '#8c4f1c',
-    accent: '#ff8422',
-  },
-  {
     /*
-     * S7 — WHERE NEXR FITS. There are six poses in the character's clip and
-     * therefore six beats, and this is the one the audience block occupies.
+     * 03 / VR WELLNESS.
+     *
+     * This beat also carries the three audiences. The script places that block
+     * immediately after the VR Wellness copy and leaves it unnumbered, and the
+     * numbering only stays consistent — 04 is Our Approach, not 05 — if the
+     * audiences ride along with a beat rather than taking one of their own. So
+     * they sit in the aside beside this beat (and in the tab strip below it on
+     * a phone), with their copy unchanged apart from the renamed first tile.
      */
-    id: 'clinical',
-    index: '05',
-    word: 'Who It\u2019s For',
-    headline: 'Designed for people. Built for organisations.',
+    id: 'vr-wellness',
+    index: '03',
+    word: 'VR Wellness',
+    headline: 'A new way to face what life brings.',
     body:
-      'NEXR adapts to the people and environments it serves, bringing new ways to engage with wellbeing into everyday spaces.',
+      'Explore immersive VR experiences designed to help you practice relaxation, build confidence, and develop emotional resilience in a guided virtual environment.',
     tiles: [
       {
         title: 'Workplaces',
@@ -171,7 +151,7 @@ export const SECTIONS: Section[] = [
         href: '/for/workplaces',
       },
       {
-        title: 'Schools & Colleges',
+        title: 'Educational Institutes',
         body: 'Give students safe, engaging ways to understand their wellbeing, build emotional skills and access support when they need it.',
         href: '/for/education',
       },
@@ -181,7 +161,36 @@ export const SECTIONS: Section[] = [
         href: '/for/healthcare',
       },
     ],
-    cta: { label: 'Explore the evidence', route: '/explore/clinical' },
+    cta: { label: 'Explore Solutions', route: '/platform/vr-wellness' },
+    images: ['/models/imgs/vrworld.webp'],
+    sky: ['#a65f20', '#341c08'],
+    fog: '#89501c',
+    accent: '#ff8a2a',
+  },
+  {
+    id: 'approach',
+    index: '04',
+    word: 'Our Approach',
+    // 04 / OUR APPROACH.
+    kicker: 'Wellbeing doesn’t need another rulebook.',
+    headline: 'Different people. Different needs. A more human approach.',
+    body:
+      'Not everyone finds support in the same way. We combine immersive VR experiences, anonymity, and expert guidance to give people more choice in how they engage with wellbeing. Less pressure to take a prescribed path. More freedom to find what feels right for them.',
+    cta: { label: 'Discover Our Approach', route: '/approach' },
+    images: ['/models/imgs/OurApproach.webp'],
+    sky: ['#a95e1f', '#361c08'],
+    fog: '#8c4f1c',
+    accent: '#ff8422',
+  },
+  {
+    id: 'trust',
+    index: '05',
+    word: 'Built on Trust',
+    // 05 / BUILT ON TRUST.
+    headline: 'Feel safe enough to take the first step.',
+    body:
+      'Your wellbeing journey should begin with comfort, not concern. NEXR brings together anonymous access, immersive virtual spaces, and expert guidance to help you explore what’s on your mind without the pressure of being judged or sharing more than you’re comfortable with.',
+    cta: { label: 'Our Standards', route: '/trust' },
     images: ['/models/imgs/clinicallygrounded.webp'],
     sky: ['#ad5d1f', '#381c08'],
     fog: '#8f4f1c',
@@ -190,13 +199,17 @@ export const SECTIONS: Section[] = [
   {
     id: 'contact',
     index: '06',
-    word: 'Let\u2019s Talk',
-    // CLOSING CTA — common for all sub pages.
-    headline: 'The next way into wellbeing starts here.',
+    word: 'Let’s Talk',
+    // 06 / LET'S TALK.
+    headline: 'Make space for a better kind of wellbeing',
     body:
-      'Discover how NEXR can bring a new approach to your organisation, institution or practice.',
+      'Discover how NEXR brings immersive VR experiences, anonymous access, and expert guidance together to make wellbeing more private, engaging, and accessible across workplaces, educational institutions, and healthcare settings.',
+    // The script rewrites this beat's headline, body and call to action but
+    // says nothing about the pull quote, so the approved line stays. It is
+    // also what draws the closing "Book a demo" card in the aside — see
+    // BeatAside, which keys that card off `quote`.
     quote: 'Better wellbeing starts when the way in feels right.',
-    cta: { label: 'Book a Demo', route: '/contact' },
+    cta: { label: 'Book A Demo', route: '/contact' },
     images: ['/models/imgs/letsconnect.webp'],
     sky: ['#b05c1e', '#391c08'],
     fog: '#924e1b',

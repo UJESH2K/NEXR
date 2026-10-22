@@ -62,15 +62,6 @@ export const scroll = {
   /** 0..1 asset load progress, and whether the load curtain has lifted. */
   loadProgress: 0,
   entered: false,
-  /**
-   * Whether the visitor has pressed Explore.
-   *
-   * The page is deliberately unscrollable until they do. The opening frame is a
-   * held shot — the figure, the room and one line of copy — and letting a stray
-   * wheel event slide it away before anyone has read it wastes the only moment
-   * the composition gets on its own.
-   */
-  started: false,
   /** Whether the ambient bed is audible. Written by the HUD's sound toggle. */
   audioOn: false,
 
@@ -141,10 +132,8 @@ export type ScrollSnapshot = {
   activeCard: number
   mode: ScrollMode
   armedCard: number | null
-  /** True once the visitor has scrolled off the hero. */
+  /** True once the visitor has scrolled off the top of the track. */
   past: boolean
-  /** True once Explore has been pressed and scrolling is unlocked. */
-  started: boolean
 }
 
 const listeners = new Set<() => void>()
@@ -154,7 +143,6 @@ let snapshot: ScrollSnapshot = {
   mode: 'home',
   armedCard: null,
   past: false,
-  started: false,
 }
 
 export const getSnapshot = () => snapshot
@@ -170,7 +158,6 @@ const SERVER_SNAPSHOT: ScrollSnapshot = {
   mode: 'home',
   armedCard: null,
   past: false,
-  started: false,
 }
 
 export const getServerSnapshot = (): ScrollSnapshot => SERVER_SNAPSHOT
@@ -192,8 +179,7 @@ export function syncSnapshot() {
     snapshot.activeCard === scroll.activeCardIndex &&
     snapshot.mode === scroll.mode &&
     snapshot.armedCard === scroll.armedCard &&
-    snapshot.past === past &&
-    snapshot.started === scroll.started
+    snapshot.past === past
   ) {
     return
   }
@@ -203,7 +189,6 @@ export function syncSnapshot() {
     mode: scroll.mode,
     armedCard: scroll.armedCard,
     past,
-    started: scroll.started,
   }
   listeners.forEach((l) => l())
 }
@@ -218,9 +203,6 @@ export function resetScrollState() {
   scroll.expandedCard = null
   scroll.activeCardIndex = 0
   scroll.currentSegment = 0
-  // Coming back to the home route re-arms the held opening shot, so the visitor
-  // lands on the composition rather than mid-beat.
-  scroll.started = false
   syncSnapshot()
 }
 
@@ -235,6 +217,4 @@ export const scrollCommands = {
   disarm: () => {},
   /** Scroll the document to a given section index, used by the HUD rail. */
   goToSection: (_index: number) => {},
-  /** Unlock scrolling and move to the first beat. Bound to Explore. */
-  start: () => {},
 }

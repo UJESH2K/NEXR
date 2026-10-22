@@ -55,9 +55,17 @@ export type RouteContext = {
   tour: TourStep[]
 }
 
-/** The three audiences, straight from the "Who It's For" beat. */
-export const AUDIENCES = (sectionById('clinical').tiles ?? []).map((t) => ({ label: t.title, href: t.href }))
-export const AUDIENCE_LABEL = sectionById('clinical').word
+/**
+ * The three audiences, straight from the beat that carries them.
+ *
+ * That is the VR Wellness beat now — the script places the audience block
+ * directly after the VR Wellness copy rather than giving it a beat of its own.
+ * The label is written here rather than read off the beat's `word` for the
+ * same reason: the host beat is called "VR Wellness", which is not what this
+ * list of three is.
+ */
+export const AUDIENCES = (sectionById('vr-wellness').tiles ?? []).map((t) => ({ label: t.title, href: t.href }))
+export const AUDIENCE_LABEL = 'Who It’s For'
 
 const BACK_STEP: TourStep = {
   target: '[data-tour="header-back"]',
@@ -189,7 +197,7 @@ const PAGES: Record<string, PageEntry> = {
     pose: 5,
   },
   '/for/education': {
-    label: 'Schools & Colleges',
+    label: 'Educational Institutes',
     message:
       'Give students safe, engaging ways to understand their wellbeing, build emotional skills and access support when they need it.',
     pose: 5,
@@ -275,7 +283,7 @@ export function audiencesBubble(): MeloBubble {
     kind: 'nudge',
     pose: EXPRESSION.offer,
     label: AUDIENCE_LABEL,
-    text: sectionById('clinical').headline,
+    text: sectionById('vr-wellness').headline,
     links: AUDIENCES,
   }
 }

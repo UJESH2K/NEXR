@@ -46,8 +46,6 @@ type ScrollApi = {
   disarm: () => void
   /** Scroll to a beat's dwell. Used by the HUD rail. */
   goToSection: (index: number) => void
-  /** Unlock scrolling and move to the first beat. Bound to Explore. */
-  start: () => void
 }
 
 const ScrollContext = createContext<ScrollApi>({
@@ -55,7 +53,6 @@ const ScrollContext = createContext<ScrollApi>({
   armCard: () => {},
   disarm: () => {},
   goToSection: () => {},
-  start: () => {},
 })
 
 export const useScrollApi = () => useContext(ScrollContext)
@@ -66,10 +63,6 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
   const navigatedRef = useRef(false)
-  // scroll.started lives on the mutable store, which React cannot observe. This
-  // counter is bumped alongside it purely so the lock effect below re-runs and
-  // detaches its key handler once the page is unlocked.
-  const [startedTick, setStartedTick] = useState(0)
 
   // One global pointer source for the camera, sky, panels and cursor. Mounted
   // here because this provider already wraps everything that reads it, and
@@ -218,7 +211,6 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (pathname !== '/') return
     const onTap = () => {
-      if (!scroll.started) return
       rememberSection(scroll.activeCardIndex)
       tappedAt.current = Date.now()
     }
@@ -234,22 +226,16 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
 
       // Only an explicit back-to-the-scene control sets this, and reading it
       // clears it. Every other way home — the logo, a bookmark, a fresh tab —
-      // gets the opening frame, which is the whole reason the intent is stored
-      // separately from the remembered beat.
+      // starts the story at beat 01, which is the whole reason the intent is
+      // stored separately from the remembered beat.
       const returnTo = consumeReturnIntent()
 
       if (returnTo === null) {
-        setStartedTick((n) => n + 1)
         lenis?.scrollTo(0, { immediate: true })
         ScrollTrigger.refresh()
         return
       }
 
-      // Coming back to a beat: the opening frame has already been seen, so skip
-      // the hold and put them where they were.
-      scroll.started = true
-      syncSnapshot()
-      setStartedTick((n) => n + 1)
       lenis?.start()
 
       // Measure only once the home track is really there. Arriving from a
@@ -347,78 +333,9 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
     [lenis],
   )
 
-  const start = useCallback(() => {
-    if (scroll.started) return
-    scroll.started = true
-    syncSnapshot()
-    setStartedTick((n) => n + 1)
-    lenis?.start()
-    // A beat's pause before moving, so the unlock is felt as a release rather
-    // than as the button yanking the page.
-    window.setTimeout(() => goToSection(0), 120)
-  }, [lenis, goToSection])
-
-  /**
-   * Hold the page still until Explore is pressed.
-   *
-   * Lenis.stop() swallows wheel and touch, but not the keyboard, the scrollbar
-   * or a programmatic jump — and a browser restoring scroll position on reload
-   * would drop the visitor into the middle of a beat they never chose. So the
-   * keys are blocked here too, and the position is pinned to the top.
-   */
-  useEffect(() => {
-    if (reduced || !lenis) return
-    if (scroll.started || pathname !== '/') return
-
-    lenis.stop()
-    lenis.scrollTo(0, { immediate: true, force: true })
-
-    /**
-     * Hold position every frame, not just once.
-     *
-     * The inline script in the root layout turns off the browser's own scroll
-     * restoration, which is the real fix. This is the backstop for everything
-     * that runs after it: an extension, a focus jump into an offscreen element,
-     * a bfcache restore, or simply a browser that restored before the script
-     * parsed. One comparison per frame, and it stops the moment Explore is
-     * pressed, so it costs nothing for the rest of the visit.
-     */
-    const pin = () => {
-      if (scroll.started) return
-      if (window.scrollY !== 0) lenis.scrollTo(0, { immediate: true, force: true })
-    }
-
-    gsap.ticker.add(pin)
-
-    const KEYS = new Set([
-      ' ',
-      'PageDown',
-      'PageUp',
-      'ArrowDown',
-      'ArrowUp',
-      'Home',
-      'End',
-    ])
-
-    const onKey = (event: KeyboardEvent) => {
-      if (scroll.started) return
-      // Never swallow keys aimed at a control — Explore itself is a button, and
-      // Space is how a keyboard user presses it.
-      const target = event.target as HTMLElement | null
-      if (target?.closest('button, a, input, textarea, select')) return
-      if (KEYS.has(event.key)) event.preventDefault()
-    }
-
-    window.addEventListener('keydown', onKey, { passive: false })
-    return () => {
-      gsap.ticker.remove(pin)
-      window.removeEventListener('keydown', onKey)
-    }
-  }, [reduced, lenis, pathname, startedTick])
-
   const api = useMemo<ScrollApi>(
-    () => ({ lenis, armCard, disarm, goToSection, start }),
-    [lenis, armCard, disarm, goToSection, start],
+    () => ({ lenis, armCard, disarm, goToSection }),
+    [lenis, armCard, disarm, goToSection],
   )
 
   // Publish the commands to the store so meshes inside the canvas, which render
@@ -427,14 +344,12 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
     scrollCommands.armCard = armCard
     scrollCommands.disarm = disarm
     scrollCommands.goToSection = goToSection
-    scrollCommands.start = start
     return () => {
       scrollCommands.armCard = () => {}
       scrollCommands.disarm = () => {}
       scrollCommands.goToSection = () => {}
-      scrollCommands.start = () => {}
     }
-  }, [armCard, disarm, goToSection, start])
+  }, [armCard, disarm, goToSection])
 
   return <ScrollContext.Provider value={api}>{children}</ScrollContext.Provider>
 }

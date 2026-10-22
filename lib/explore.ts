@@ -515,7 +515,7 @@ export const EXPLORE_TOPICS: ExploreTopic[] = [
         aspect: '4/3',
       },
       {
-        label: 'Schools & Colleges',
+        label: 'Educational Institutes',
         slot: '/explore/clinical/02.webp',
         aspect: '4/3',
       },

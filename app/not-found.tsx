@@ -9,7 +9,7 @@ export default function NotFound() {
   return (
     <PageShell
       eyebrow="404"
-      beatId="gap"
+      beatId="nexr"
       align="center"
       title="This page doesn’t exist."
       lede="The link may be out of date. Everything NEXR does is one scroll away from the home experience."

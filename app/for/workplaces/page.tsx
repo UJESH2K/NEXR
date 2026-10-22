@@ -22,7 +22,7 @@ export default function ForWorkplacesPage() {
   return (
     <PageShell
       eyebrow="Where NEXR Fits"
-      beatId="clinical"
+      beatId="vr-wellness"
       align="center"
       title="Workplaces"
       lede="Create more approachable ways for employees to explore wellbeing, build healthier habits and access professional support."

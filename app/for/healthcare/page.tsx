@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 /**
  * S7 — WHERE NEXR FITS / HEALTHCARE.
  *
- * Same trim as the Workplaces and Schools & Colleges pages: the brief marks
+ * Same trim as the Workplaces and Educational Institutes pages: the brief marks
  * this page's own content "Sub pages - pending", so the invented tiles and
  * paragraphs an earlier pass wrote in have been removed. This carries only
  * the one line the brief actually gives it.
@@ -20,7 +20,7 @@ export default function ForHealthcarePage() {
   return (
     <PageShell
       eyebrow="Where NEXR Fits"
-      beatId="clinical"
+      beatId="vr-wellness"
       align="center"
       title="Healthcare"
       lede="Extend the toolkit available to mental health professionals with immersive environments and digital experiences that can complement existing care."

@@ -39,13 +39,13 @@ const STATS = [
 ]
 
 /** This page's own beat, so its placeholders match the scene rather than a colour chosen by hand. */
-const PAGE_TINT = sectionById('belief').sky
+const PAGE_TINT = sectionById('approach').sky
 
 export default function ApproachPage() {
   return (
     <PageShell
       eyebrow="Our Approach"
-      beatId="belief"
+      beatId="approach"
       title="The barrier isn't always the support. It's the way in."
       lede="For decades, wellbeing has been designed around systems, appointments and treatments. We believe it should be designed around people."
     >

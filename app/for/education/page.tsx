@@ -3,17 +3,18 @@ import Link from 'next/link'
 import { PageShell } from '@/components/site/PageShell'
 
 export const metadata: Metadata = {
-  title: 'Schools & Colleges — NEXR',
+  title: 'Educational Institutes — NEXR',
   description:
     'Give students safe, engaging ways to understand their wellbeing, build emotional skills and access support when they need it.',
 }
 
 /**
- * S7 — WHERE NEXR FITS / SCHOOLS & COLLEGES.
+ * WHERE NEXR FITS / EDUCATIONAL INSTITUTES.
  *
- * The brief renames this audience from "Education" to "Schools & Colleges" —
- * reflected here in the title and metadata. The route stays at /for/education
- * so nothing that already links here breaks; only the visible name changes.
+ * The script renames this audience again, from "Schools & Colleges" to
+ * "Educational Institutes" — reflected here in the title and metadata. The
+ * route stays at /for/education so nothing that already links here breaks;
+ * only the visible name changes.
  *
  * As with the Workplaces and Healthcare pages, the brief marks this page's own
  * content "Sub pages - pending". The invented tiles and paragraphs an earlier
@@ -23,9 +24,9 @@ export default function ForEducationPage() {
   return (
     <PageShell
       eyebrow="Where NEXR Fits"
-      beatId="clinical"
+      beatId="vr-wellness"
       align="center"
-      title="Schools & Colleges"
+      title="Educational Institutes"
       lede="Give students safe, engaging ways to understand their wellbeing, build emotional skills and access support when they need it."
     >
       <div className="flex justify-center">

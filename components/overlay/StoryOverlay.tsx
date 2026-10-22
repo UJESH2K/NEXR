@@ -1,21 +1,22 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
-import gsap from 'gsap'
+import { useState } from 'react'
 
-import { motion } from 'framer-motion'
 import { SECTIONS, type Section } from '@/lib/sections'
-import { scroll, scrollCommands, smoothstep } from '@/lib/scrollStore'
-import { useEntered } from '@/lib/useEntered'
 import { useScrollSnapshot } from '@/lib/useScrollSnapshot'
 import { setCursor, resetCursor } from '@/lib/cursorStore'
-import { ExploreButton } from '@/components/ui/ExploreButton'
 import { BeatAside } from './BeatAside'
 import { AudienceDoodle, audienceFromHref } from '@/components/ui/AudienceDoodle'
 
 /**
- * The words: the opening title treatment, and the per-beat copy.
+ * The words: the per-beat copy.
+ *
+ * **There is no opening title frame.** The page used to hold on a hero — the
+ * figure, the room and one line — with scrolling locked until Explore was
+ * pressed. The script now opens on beat 01 itself, so the hold, its button and
+ * the handover that moved beat 01's copy out of the wordmark's way are all
+ * gone: the first beat is simply the first thing on the page.
  *
  * **Each beat appears as one block, in one motion.** The copy is driven by
  * document scroll with a snap, exactly as the rest of the scene is — this file
@@ -36,127 +37,9 @@ import { AudienceDoodle, audienceFromHref } from '@/components/ui/AudienceDoodle
  * Alternation is a nice idea that this particular character cannot support.
  */
 
-const EASE = [0.16, 1, 0.3, 1] as const
-
 const hoverable = {
   onMouseEnter: () => setCursor({ active: true }),
   onMouseLeave: () => resetCursor(),
-}
-
-/** Shared entrance for the hero, staggered by the caller through `delay`. */
-const rise = {
-  hidden: { opacity: 0, y: 22 },
-  shown: { opacity: 1, y: 0 },
-}
-
-function Hero({ visible }: { visible: boolean }) {
-  // The entrance is staged off the load curtain rather than off mount: it runs
-  // for about a second and a half, and mount happens while the curtain is still
-  // opaque. It lives on the inner elements because the layer owns opacity.
-  const entered = useEntered()
-  const show = entered && visible ? 'shown' : 'hidden'
-
-  return (
-    <div className="beat-layer" data-visible={visible ? 'true' : 'false'}>
-      {/* Under 1024px the copy sits beneath the figure rather than beside it,
-          so it needs a ground to read against. Desktop hides this. */}
-      <div className="story-scrim" aria-hidden="true" />
-
-      {/* The figure owns the middle of the frame. `--char-half` is the widest a
-          flanking column can be without reaching it — see globals.css. */}
-      <div className="story-col absolute bottom-[14vh] left-[clamp(20px,3vw,72px)] lg:bottom-[18vh]">
-        <motion.span
-          initial="hidden"
-          animate={show}
-          variants={{ hidden: { scaleX: 0 }, shown: { scaleX: 1 } }}
-          transition={{ duration: 0.9, ease: EASE, delay: 0.3 }}
-          className="mb-7 block h-px w-10 origin-left bg-bone/60"
-        />
-
-        {/* Set word by word so the line assembles rather than appearing. Each
-            word carries its own blur, which makes the movement read as focus
-            pulling in rather than as a slide. */}
-        <h1 className="font-display text-[clamp(2rem,8vw,3.6rem)] leading-[1.05] text-bone">
-          {['Wellbeing,', 'reimagined.'].map((word, i) => (
-            <motion.span
-              key={word}
-              initial="hidden"
-              animate={show}
-              variants={{
-                hidden: { opacity: 0, y: 30, filter: 'blur(12px)' },
-                shown: { opacity: 1, y: 0, filter: 'blur(0px)' },
-              }}
-              transition={{ duration: 1.1, ease: EASE, delay: 0.4 + i * 0.13 }}
-              className="mr-[0.28em] inline-block"
-            >
-              {word}
-            </motion.span>
-          ))}
-        </h1>
-
-        {/* The script's second line. On a wide frame it lives in the right-hand
-            column; there is no right-hand column on a phone, so it follows the
-            title instead rather than being dropped. */}
-        <motion.p
-          initial="hidden"
-          animate={show}
-          variants={rise}
-          transition={{ duration: 1, ease: EASE, delay: 0.85 }}
-          className="mt-4 text-[13.5px] leading-[1.7] text-bone/70 lg:hidden"
-        >
-          A new way to experience, access and practise wellbeing.{' '}
-          <span className="font-display italic text-ember-soft">
-            Private spaces, immersive experiences and professional support,
-            brought together in one ecosystem.
-          </span>
-        </motion.p>
-
-        <motion.div
-          initial="hidden"
-          animate={show}
-          variants={rise}
-          transition={{ duration: 1, ease: EASE, delay: 0.95 }}
-          className="mt-7 lg:mt-9"
-        >
-          <ExploreButton onPress={() => scrollCommands.start()} />
-        </motion.div>
-      </div>
-
-      {/* The script's right-hand line. Held to large screens: below that the
-          layout drops both columns into the same block along the bottom, and
-          two of them would land on top of each other. */}
-      <div className="story-col absolute right-[clamp(20px,3vw,72px)] top-1/2 hidden -translate-y-1/2 lg:block">
-        <motion.p
-          initial="hidden"
-          animate={show}
-          variants={rise}
-          transition={{ duration: 1.1, ease: EASE, delay: 0.75 }}
-          className="text-[15px] leading-[1.85] text-bone/75"
-        >
-          A new way to experience, access and practise wellbeing.
-        </motion.p>
-
-        <motion.p
-          initial="hidden"
-          animate={show}
-          variants={rise}
-          transition={{ duration: 1.1, ease: EASE, delay: 0.92 }}
-          className="mt-3 font-display text-[19px] italic leading-[1.6] text-ember/90"
-        >
-          Private spaces, immersive experiences and professional support,
-          brought together in one ecosystem.
-        </motion.p>
-
-        <motion.span
-          initial="hidden"
-          animate={show}
-          variants={{ hidden: { scaleX: 0 }, shown: { scaleX: 1 } }}
-          transition={{ duration: 0.9, ease: EASE, delay: 1.1 }}
-          className="mt-7 block h-px w-16 origin-left bg-bone/25"
-        />
-      </div>
-    </div>
-  )
 }
 
 function Beat({ section, visible, index }: { section: Section; visible: boolean; index: number }) {
@@ -288,63 +171,11 @@ function AudienceTabs({ tiles }: { tiles: NonNullable<Section['tiles']> }) {
   )
 }
 
-/**
- * Above the first beat, the wordmark has the frame to itself.
- *
- * Scrolling back up past beat 01 is a move toward the title, so the title
- * should take over: as the NEXR wordmark rises in the scene (GhostWordmark),
- * the first beat's copy blurs, fades and sinks out of its way, and the two
- * never share the frame. Both read the same curve off `sectionFloat`, so they
- * stay in step at any scroll speed.
- *
- * Written to the DOM from the gsap ticker, like the HUD: this runs every
- * frame while scrolling, and a React render per frame would be the expensive
- * way to move three CSS properties.
- */
-function useTitleHandover(root: React.RefObject<HTMLDivElement | null>) {
-  useEffect(() => {
-    const host = root.current
-    if (!host) return
-    const copy = host.querySelector<HTMLElement>('[data-beat-index="0"] .story-col')
-    const scrim = host.querySelector<HTMLElement>('.story-scrim')
-    let last = -1
-
-    const tick = () => {
-      const k = scroll.started ? 1 - smoothstep(0.04, 0.3, scroll.sectionFloat) : 0
-      if (Math.abs(k - last) < 0.002) return
-      last = k
-      if (!copy) return
-      if (k < 0.002) {
-        copy.style.removeProperty('opacity')
-        copy.style.removeProperty('transform')
-        copy.style.removeProperty('filter')
-        copy.style.removeProperty('pointer-events')
-        scrim?.style.removeProperty('opacity')
-        return
-      }
-      copy.style.opacity = String(1 - k)
-      copy.style.transform = `translate3d(0, ${(k * 56).toFixed(1)}px, 0)`
-      copy.style.filter = `blur(${(k * 9).toFixed(2)}px)`
-      // Invisible links must not stay clickable.
-      copy.style.pointerEvents = k > 0.5 ? 'none' : ''
-      if (scrim) scrim.style.opacity = String(1 - k)
-    }
-
-    gsap.ticker.add(tick)
-    return () => {
-      gsap.ticker.remove(tick)
-    }
-  }, [root])
-}
-
 export function StoryOverlay() {
-  const { activeCard, started } = useScrollSnapshot()
-  const root = useRef<HTMLDivElement>(null)
-  useTitleHandover(root)
+  const { activeCard } = useScrollSnapshot()
 
   return (
     <div
-      ref={root}
       className="overlay-layer fixed inset-0"
       style={{ zIndex: 'var(--z-overlay)' }}
     >
@@ -352,17 +183,16 @@ export function StoryOverlay() {
           out and back in, and a scrim that went with them blinked off and on
           at every change — on a phone, a dark band flickering mid-scroll.
           Phone layout only; it is not drawn at desktop widths. */}
-      <div className="story-scrim" data-visible={started ? 'true' : 'false'} aria-hidden="true" />
-      {/* The opening frame holds until Explore is pressed; from then on exactly
-          one beat is visible, and which one is a discrete value that changes
-          once per gesture. */}
-      <Hero visible={!started} />
+      <div className="story-scrim" data-visible="true" aria-hidden="true" />
+      {/* Exactly one beat is visible, and which one is a discrete value that
+          changes once per gesture. Beat 01 is visible from the top of the
+          page, because the top of the page is now beat 01. */}
       {SECTIONS.map((section, index) => (
         <Beat
           key={section.id}
           section={section}
           index={index}
-          visible={started && index === activeCard}
+          visible={index === activeCard}
         />
       ))}
     </div>
