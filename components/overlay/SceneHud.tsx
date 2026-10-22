@@ -4,16 +4,21 @@ import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { AnimatePresence, motion } from 'framer-motion'
 import { SECTIONS, SECTION_COUNT } from '@/lib/sections'
-import { scroll, scrollCommands } from '@/lib/scrollStore'
+import { scroll } from '@/lib/scrollStore'
 import { useScrollSnapshot } from '@/lib/useScrollSnapshot'
 import { setCursor, resetCursor } from '@/lib/cursorStore'
 import { SOCIAL_LINKS } from '@/components/ui/SocialIcons'
+import { BeatPill } from './BeatPill'
 
 /**
- * The instrument panel around the frame: the progress rail, the big word pinned
- * to the bottom, and the socials in the corner. The rail is the only counter —
- * a percentage readout and a second beat number used to sit here too, and
- * three sets of figures on one frame read as a dashboard, not a story.
+ * The instrument panel around the frame: the beat navigator at the top, the big
+ * word pinned to the bottom, and the socials in the corner. The navigator is
+ * the only counter — a percentage readout and a second beat number used to sit
+ * here too, and three sets of figures on one frame read as a dashboard, not a
+ * story.
+ *
+ * The navigator is its own component (BeatPill) because it is the one piece of
+ * this that is interactive and stateful; everything else here is a readout.
  *
  * There is no sound control here any more, because there is no sound. A
  * synthesised bed was tried twice — a filtered drone, then a reverberant pad
@@ -21,9 +26,9 @@ import { SOCIAL_LINKS } from '@/components/ui/SocialIcons'
  * Silence is the better default, and a control for something that does not
  * exist is worse than no control.
  *
- * Everything continuous in here — the rail fill, the tick highlights — is
- * written straight to the DOM from the gsap ticker rather than through React
- * state. That is deliberate: this component sits over a canvas already running
+ * Everything continuous in here — the progress bar's fill, and the navigator's
+ * hairline — is written straight to the DOM from the gsap ticker rather than
+ * through React state. That is deliberate: this component sits over a canvas already running
  * a frame loop, and re-rendering an overlay tree sixty times a second is the
  * fastest way to make a smooth scene feel cheap. React is only told when the
  * active section actually changes.
@@ -31,17 +36,13 @@ import { SOCIAL_LINKS } from '@/components/ui/SocialIcons'
 
 export function SceneHud() {
   const { activeCard, past } = useScrollSnapshot()
-  const fill = useRef<HTMLSpanElement>(null)
-  const mobileFill = useRef<HTMLSpanElement>(null)
   const bar = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
     const tick = () => {
-      const p = scroll.homeProgress
-
-      if (fill.current) fill.current.style.transform = `scaleX(${p})`
-      if (mobileFill.current) mobileFill.current.style.transform = `scaleX(${p})`
-      if (bar.current) bar.current.style.transform = `scaleY(${p})`
+      // Whole-page progress. The navigator's own hairline is per beat, so the
+      // two answer different questions rather than repeating one.
+      if (bar.current) bar.current.style.transform = `scaleY(${scroll.homeProgress})`
     }
 
     gsap.ticker.add(tick)
@@ -60,58 +61,14 @@ export function SceneHud() {
       className="overlay-layer fixed inset-0"
       style={{ zIndex: 'var(--z-chrome)' }}
     >
-      {/* ── progress, phones ─────────────────────────────────────────────── */}
-      {/* The six-tick rail needs about 340px of clear width and below desktop
-          the header's button and menu already own that row — on a tablet the
-          rail ran straight into them — so phones and tablets get the same
-          information as one hairline under the header instead. */}
-      <div className="hud-hairline absolute inset-x-0 h-px bg-bone/15 lg:hidden">
-        <span
-          ref={mobileFill}
-          className="block h-full w-full origin-left scale-x-0 bg-ember"
-        />
-      </div>
-
-      {/* ── progress rail, top centre ────────────────────────────────────── */}
-      <div className="absolute left-1/2 top-6 hidden -translate-x-1/2 items-center gap-4 lg:flex">
-        <span className="numeral text-[10px]">01</span>
-
-        <div className="relative h-px w-[min(34vw,340px)] bg-bone/20">
-          <span
-            ref={fill}
-            className="absolute inset-y-0 left-0 w-full origin-left bg-bone"
-          />
-
-          {/* One tick per beat, doubling as a jump target. */}
-          {SECTIONS.map((s, i) => (
-            <button
-              key={s.id}
-              type="button"
-              onClick={() => scrollCommands.goToSection(i)}
-              {...hoverable}
-              aria-label={`Go to ${s.word}`}
-              className="group absolute top-1/2 -translate-x-1/2 -translate-y-1/2 p-3"
-              style={{ left: `${((i + 0.5) / SECTION_COUNT) * 100}%` }}
-            >
-              <span
-                className={`block h-1.5 w-1.5 rounded-full transition-all duration-500 ${
-                  i === activeCard
-                    ? 'scale-125 bg-ember'
-                    : 'bg-bone/35 group-hover:bg-bone/80'
-                }`}
-              />
-            </button>
-          ))}
-        </div>
-
-        <span className="numeral text-[10px]">
-          {String(SECTION_COUNT).padStart(2, '0')}
-        </span>
-      </div>
+      {/* ── the beat navigator, top centre ─────────────────────── */}
+      <BeatPill />
 
       {/* ── the big word, bottom centre ──────────────────────────────────── */}
-      {/* Held back until the visitor scrolls: on the hero the frame already has
-          a headline, and two display-size words would fight. */}
+      {/* Held back until the visitor scrolls. The NEXR wordmark stands in the
+          scene at the top of the page and fades as the first beat settles, and
+          this rising as that goes is the handover between them; both arriving
+          at once would be two display-size words fighting. */}
       {/* Hidden below lg: on a phone the copy block occupies the bottom of the
           frame, the word landed on top of it, and the beat's own label already
           says which section this is. */}
@@ -126,8 +83,8 @@ export function SceneHud() {
             transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
             className="flex flex-col items-center"
           >
-            {/* No number above the word: the rail at the top already says
-                which beat this is, and two counters is one too many. */}
+            {/* No number above the word: the navigator at the top already
+                says which beat this is, and two counters is one too many. */}
             {/* Deliberately smaller than the reference's: the figure's feet
                 reach about 86% of the frame height, and at 11vw this word's
                 cap height climbed into the rock and then into the shoes.
