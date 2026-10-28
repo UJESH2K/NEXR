@@ -18,8 +18,6 @@
 
 export type Section = {
   id: string
-  /** Small mono label above the big word, reference-style ("01 / NEXR"). */
-  index: string
   /** The large serif word pinned to the bottom of the frame. */
   word: string
   /**
@@ -38,8 +36,15 @@ export type Section = {
    * scannable.
    */
   tiles?: { title: string; body: string; href: string }[]
-  /** Pull quote set beside the beat, used to close the page. */
-  quote?: string
+  /**
+   * Marks the closing beat, whose call to action is drawn as a card in the
+   * aside column rather than as a text link.
+   *
+   * This was a `quote` field and the card was built around a pull quote.
+   * That line was not in the approved script, so it is gone; a flag is what
+   * is left, because the card is layout rather than copy.
+   */
+  closing?: boolean
   cta: { label: string; route: string }
   /** Panel artwork drawn around the character during this beat. */
   images: string[]
@@ -98,7 +103,6 @@ export type Section = {
 export const SECTIONS: Section[] = [
   {
     id: 'nexr',
-    index: '01',
     word: 'NEXR',
     // 01 / NEXR. The opening beat, and now the first thing on the page: the
     // held title frame that used to sit above it has been removed, so this is
@@ -114,13 +118,12 @@ export const SECTIONS: Section[] = [
   },
   {
     id: 'meloworld',
-    index: '02',
     word: 'MeloWorld',
     // 02 / MELOWORLD.
     headline: 'A safe space to begin with',
     body:
       'Share what’s on your mind in an immersive VR environment, speak with professionals through virtual characters, and get guidance anonymously, without the pressure of revealing your identity or fear of being judged.',
-    cta: { label: 'Explore Meloworld', route: '/platform/meloworld' },
+    cta: { label: 'Explore Meloworld', route: '/explore/meloworld' },
     images: ['/models/imgs/meloworld.webp'],
     mark: '/brand/meloworld-mark.webp',
     sky: ['#a25f20', '#321c08'],
@@ -139,7 +142,6 @@ export const SECTIONS: Section[] = [
      * a phone), with their copy unchanged apart from the renamed first tile.
      */
     id: 'vr-wellness',
-    index: '03',
     word: 'VR Wellness',
     headline: 'A new way to face what life brings.',
     body:
@@ -148,20 +150,20 @@ export const SECTIONS: Section[] = [
       {
         title: 'Workplaces',
         body: 'Create more approachable ways for employees to explore wellbeing, build healthier habits and access professional support.',
-        href: '/for/workplaces',
+        href: '/explore/vr-wellness#workplaces',
       },
       {
         title: 'Educational Institutes',
         body: 'Give students safe, engaging ways to understand their wellbeing, build emotional skills and access support when they need it.',
-        href: '/for/education',
+        href: '/explore/vr-wellness#education',
       },
       {
         title: 'Healthcare',
         body: 'Extend the toolkit available to mental health professionals with immersive environments and digital experiences that can complement existing care.',
-        href: '/for/healthcare',
+        href: '/explore/vr-wellness#healthcare',
       },
     ],
-    cta: { label: 'Explore Solutions', route: '/platform/vr-wellness' },
+    cta: { label: 'Explore Solutions', route: '/explore/vr-wellness' },
     images: ['/models/imgs/vrworld.webp'],
     sky: ['#a65f20', '#341c08'],
     fog: '#89501c',
@@ -169,7 +171,6 @@ export const SECTIONS: Section[] = [
   },
   {
     id: 'approach',
-    index: '04',
     word: 'Our Approach',
     // 04 / OUR APPROACH.
     kicker: 'Wellbeing doesn’t need another rulebook.',
@@ -184,7 +185,6 @@ export const SECTIONS: Section[] = [
   },
   {
     id: 'trust',
-    index: '05',
     word: 'Built on Trust',
     // 05 / BUILT ON TRUST.
     headline: 'Feel safe enough to take the first step.',
@@ -198,17 +198,15 @@ export const SECTIONS: Section[] = [
   },
   {
     id: 'contact',
-    index: '06',
     word: 'Let’s Talk',
     // 06 / LET'S TALK.
     headline: 'Make space for a better kind of wellbeing',
     body:
       'Discover how NEXR brings immersive VR experiences, anonymous access, and expert guidance together to make wellbeing more private, engaging, and accessible across workplaces, educational institutions, and healthcare settings.',
-    // The script rewrites this beat's headline, body and call to action but
-    // says nothing about the pull quote, so the approved line stays. It is
-    // also what draws the closing "Book a demo" card in the aside — see
-    // BeatAside, which keys that card off `quote`.
-    quote: 'Better wellbeing starts when the way in feels right.',
+    // The script gives this beat a headline, a body and a call to action and
+    // nothing else, so that is all it carries. The flag only tells BeatAside
+    // to draw that call to action as the closing card.
+    closing: true,
     cta: { label: 'Book A Demo', route: '/contact' },
     images: ['/models/imgs/letsconnect.webp'],
     sky: ['#b05c1e', '#391c08'],

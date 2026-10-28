@@ -21,7 +21,7 @@ import { setCursor, resetCursor } from '@/lib/cursorStore'
  * Three states:
  *
  *   - **Condensed**, which is how it sits while you read: a live dot, the
- *     count, the name of the beat you are in, and a hairline along the bottom
+ *     name of the beat you are in, and a hairline along the bottom
  *     that fills as you move through that beat and starts again at the next.
  *   - **Open**, on hover or keyboard focus: the capsule widens and every beat
  *     appears in one row, with a marker behind the one you are in that slides
@@ -35,8 +35,6 @@ import { setCursor, resetCursor } from '@/lib/cursorStore'
  * which beat owns it, so the hairline is written from the gsap ticker like the
  * rest of the HUD and React is only told when the beat itself changes.
  */
-
-const pad = (n: number) => String(n).padStart(2, '0')
 
 export function BeatPill() {
   const { activeCard } = useScrollSnapshot()
@@ -156,24 +154,11 @@ export function BeatPill() {
           type="button"
           className="beatpill__handle"
           aria-expanded={listed}
-          aria-label={`Beat ${pad(activeCard + 1)} of ${pad(
-            SECTION_COUNT,
-          )}, ${active.word}. Show every beat`}
+          aria-label={`${active.word}. Show every part of the story`}
           onClick={() => setListed((value) => !value)}
         />
 
         <span className="beatpill__dot" aria-hidden="true" />
-
-        <span className="beatpill__count" aria-hidden="true">
-          <span>
-            {/* Keyed on the index so the numeral re-animates when it changes,
-                which is what makes the count read as a counter. */}
-            <span key={activeCard} className="beatpill__num">
-              {pad(activeCard + 1)}
-            </span>
-            /{pad(SECTION_COUNT)}
-          </span>
-        </span>
 
         <div className="beatpill__track">
           <span ref={mark} className="beatpill__mark" aria-hidden="true" />
@@ -219,7 +204,6 @@ export function BeatPill() {
               aria-current={i === activeCard ? 'true' : undefined}
               className={i === activeCard ? 'is-active' : undefined}
             >
-              <span className="beatnav__index">{section.index}</span>
               <span className="beatnav__word">{section.word}</span>
             </button>
           </li>

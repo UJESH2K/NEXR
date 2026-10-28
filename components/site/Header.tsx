@@ -7,24 +7,25 @@ import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Menu, MoveUpRight, X } from 'lucide-react'
 import { HeaderNav } from './HeaderNav'
+import { NavPill, type NavItem } from './NavPill'
 import { openContactModal } from '@/lib/contactModalStore'
 
-// Order is the script's: Explore | Meloworld | VR Wellness | Approach | Trust.
-// It follows the home page's own run of beats, so the bar reads as the same
-// story the scroll tells rather than a second, differently ordered one.
-const NAV = [
-  { label: 'Explore', href: '/explore' },
-  { label: 'MeloWorld', href: '/platform/meloworld' },
-  { label: 'VR Wellness', href: '/platform/vr-wellness' },
+// Order is the content document's: Explore | Meloworld | VR Wellness |
+// Approach | Trust.
+const NAV: NavItem[] = [
+  {
+    label: 'Explore',
+    href: '/explore',
+    match: (p) => p === '/explore' || p === '/explore/gap' || p === '/explore/belief',
+  },
+  { label: 'MeloWorld', href: '/explore/meloworld' },
+  { label: 'VR Wellness', href: '/explore/vr-wellness' },
   { label: 'Approach', href: '/approach' },
   { label: 'Trust', href: '/trust' },
 ]
 
-const SOCIALS = [
-  { label: 'LinkedIn', href: 'https://www.linkedin.com' },
-  { label: 'Instagram', href: 'https://www.instagram.com' },
-  { label: 'YouTube', href: 'https://www.youtube.com' },
-]
+const isActive = (item: NavItem, pathname: string) =>
+  item.match ? item.match(pathname) : pathname === item.href
 
 export function Header() {
   const pathname = usePathname()
@@ -61,7 +62,10 @@ export function Header() {
       // and every control shares one height and one centre line.
       className={`safe-top fixed inset-x-0 top-0 grid grid-cols-[1fr_auto] items-center gap-4 px-4 py-4 md:px-10 md:py-5 lg:grid-cols-[1fr_auto_1fr] ${
         overScene
-          ? 'bg-transparent'
+          ? // Over the scene the bar is see-through to the pointer as well as
+            // to the eye: the beat navigator shares this row, and an empty
+            // header column sitting on top of it used to swallow its hover.
+            'pointer-events-none bg-transparent [&_a]:pointer-events-auto [&_button]:pointer-events-auto [&_nav]:pointer-events-auto'
           : 'border-b border-white/10 bg-void/55 backdrop-blur-md'
       }`}
       style={{ zIndex: 'var(--z-chrome)' }}
@@ -111,31 +115,14 @@ export function Header() {
         {!overScene ? <HeaderNav /> : null}
       </div>
 
-      {/* The route list is hidden over the scene. The HUD already runs a
-          six-tick progress rail across the top centre, and two rows of
-          navigation at the same height collide. The wordmark, the CTA and the
-          mobile menu button stay, so nothing becomes unreachable. */}
+      {/* The route capsule. Over the scene the centre of this row belongs to
+          the beat navigator, so the routes live in the menu there instead. */}
       {overScene ? (
         <span className="hidden lg:block" aria-hidden="true" />
       ) : (
-        <ul className="hidden h-11 items-center gap-5 lg:flex xl:gap-8">
-          {NAV.map((item) => {
-            const active = pathname === item.href
-            return (
-              <li key={item.href} className="flex h-full items-center">
-                <Link
-                  href={item.href}
-                  aria-current={active ? 'page' : undefined}
-                  className={`header-link font-mono text-[11px] uppercase leading-none tracking-[0.18em] transition-colors ${
-                    active ? 'text-ember' : 'text-bone/60 hover:text-bone'
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              </li>
-            )
-          })}
-        </ul>
+        <div className="hidden justify-center lg:flex">
+          <NavPill items={NAV} pathname={pathname} />
+        </div>
       )}
 
       <div className="flex items-center justify-end gap-3">
@@ -165,7 +152,7 @@ export function Header() {
         <button
           onClick={() => setOpen((value) => !value)}
           data-tour="header-menu"
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/15 text-bone/70 lg:hidden"
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/15 bg-void/30 text-bone/70 backdrop-blur-sm transition-colors hover:border-ember/60 hover:text-ember ${overScene ? '' : 'lg:hidden'}`}
           aria-label={open ? 'Close navigation' : 'Open navigation'}
           aria-expanded={open}
         >
@@ -180,7 +167,7 @@ export function Header() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-            className="safe-bottom absolute inset-x-3 top-[4.6rem] max-h-[calc(100svh-6rem)] overflow-y-auto rounded-3xl border border-white/10 bg-[#090b09]/97 p-4 shadow-2xl backdrop-blur-xl lg:hidden"
+            className={`safe-bottom absolute inset-x-3 top-[4.6rem] max-h-[calc(100svh-6rem)] overflow-y-auto rounded-3xl border border-white/10 bg-abyss/95 p-4 shadow-2xl backdrop-blur-xl lg:left-auto lg:right-10 lg:w-80 ${overScene ? '' : 'lg:hidden'}`}
           >
             <ul className="space-y-1">
               {NAV.map((item) => (
@@ -188,7 +175,8 @@ export function Header() {
                   <Link
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    className="block rounded-2xl px-4 py-4 font-mono text-xs uppercase tracking-[0.2em] text-bone/75 hover:bg-white/5 hover:text-ember"
+                    aria-current={isActive(item, pathname) ? 'page' : undefined}
+                    className="block rounded-2xl px-4 py-4 font-mono text-xs uppercase tracking-[0.2em] text-bone/75 hover:bg-white/5 hover:text-ember aria-[current=page]:text-ember"
                   >
                     {item.label}
                   </Link>
@@ -210,19 +198,6 @@ export function Header() {
               </li>
             </ul>
 
-            <div className="mt-4 flex items-center gap-5 border-t border-white/10 px-4 pt-4">
-              {SOCIALS.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="font-mono text-[10px] uppercase tracking-[0.18em] text-bone/45 hover:text-ember"
-                >
-                  {social.label}
-                </a>
-              ))}
-            </div>
           </motion.nav>
         ) : null}
       </AnimatePresence>

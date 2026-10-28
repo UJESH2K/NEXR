@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowUpRight, Mail, X } from 'lucide-react'
 import { CONTACT_EMAIL } from '@/lib/contact'
+import { CLOSING } from '@/lib/explore'
 import { setCursor, resetCursor } from '@/lib/cursorStore'
 import { closeContactModal, useContactModalOpen } from '@/lib/contactModalStore'
 import { Portal } from './Portal'
@@ -63,7 +64,7 @@ export function ContactModal() {
             style={{ zIndex: 'var(--z-sheet)' }}
             role="dialog"
             aria-modal="true"
-            aria-label="Start a conversation"
+            aria-label="Book A Demo"
           >
             <button
               type="button"
@@ -94,19 +95,18 @@ export function ContactModal() {
                 <X size={15} />
               </button>
 
-              <p className="eyebrow relative">Start a conversation</p>
+              <p className="eyebrow relative">Let&rsquo;s Talk</p>
 
               <h2 className="relative mt-4 font-display text-[clamp(1.5rem,4vw,1.9rem)] leading-[1.2] text-bone">
-                Tell us what you&rsquo;re trying to solve.
+                {CLOSING.heading}
               </h2>
 
               <p className="relative mt-3 text-sm leading-relaxed text-sand/70">
-                Send a note directly — no form, no waiting on a callback
-                queue. A person reads every message that arrives here.
+                {CLOSING.body}
               </p>
 
               <a
-                href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Starting a conversation with NEXR')}`}
+                href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Book a demo')}`}
                 {...hoverable}
                 className="btn-primary group relative mt-7 w-full justify-center"
               >
@@ -126,7 +126,7 @@ export function ContactModal() {
                 {...hoverable}
                 className="group relative mt-6 flex items-center justify-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-bone/55 transition-colors hover:text-ember"
               >
-                Book a full demo instead
+                Open the demo form
                 <ArrowUpRight
                   size={13}
                   className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"

@@ -1,18 +1,29 @@
 'use client'
 
 import Link from 'next/link'
-import { requestReturn } from '@/lib/returnStore'
-import { ConnectConstellation } from './ConnectConstellation'
 import { useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-react'
-import type { ExploreTopic } from '@/lib/explore'
+import {
+  ArrowLeft,
+  ArrowRight,
+  ArrowUpRight,
+  BriefcaseBusiness,
+  Compass,
+  GraduationCap,
+  HeartHandshake,
+  Lock,
+  Sparkles,
+  Stethoscope,
+  UserRound,
+} from 'lucide-react'
+import type { ExploreChapter, ExploreTopic } from '@/lib/explore'
 import { setCursor, resetCursor } from '@/lib/cursorStore'
-import { ImageSlot } from './ImageSlot'
-import { RoomSignature, RoomSky } from '@/components/site/RoomSky'
+import { requestReturn } from '@/lib/returnStore'
+import { RoomSky } from '@/components/site/RoomSky'
+import { ClosingCta } from '@/components/site/ClosingCta'
 import { melo } from '@/lib/melo/store'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -20,21 +31,13 @@ gsap.registerPlugin(ScrollTrigger)
 /**
  * A room off the home experience.
  *
- * The scene sells a beat in one paragraph; this is where the argument behind it
- * gets room. The design brief it answers is "worth exploring on its own", which
- * here means three things:
+ * The page is built from a small kit of distinct sections rather than one
+ * repeated block, so a long read keeps changing shape: a statement split for
+ * the opening chapter, a framed image beside the middle one, a lit panel for
+ * the last, then the room's own card set (a bento grid, a path of steps, or
+ * audience cards). Nothing is numbered — every block is named.
  *
- *   - The page keeps the beat's identity. Index, word and accent colour all come
- *     from the same record the 3D scene reads, so the room is recognisably the
- *     one the visitor clicked rather than a generic article template.
- *   - Nothing arrives all at once. Every block is revealed on its own trigger,
- *     the hero art moves against the scroll, and the chapter rail tracks where
- *     the reader is, so a long page still feels like moving through something.
- *   - It never dead-ends. Every exit is a real route: deeper reading, the next
- *     room, the demo, or back to the scene.
- *
- * All motion is skipped under prefers-reduced-motion, which leaves a page that
- * is simply already in its final state.
+ * All motion is skipped under prefers-reduced-motion.
  */
 
 const EASE = [0.16, 1, 0.3, 1] as const
@@ -44,14 +47,345 @@ const hoverable = {
   onMouseLeave: () => resetCursor(),
 }
 
+type Neighbour = { slug: string; word: string; face: string }
+
+/* ── hero media ─────────────────────────────────────────────────────────── */
+
+function HeroMedia({ topic }: { topic: ExploreTopic }) {
+  if (topic.video?.youtubeId) {
+    return (
+      <figure
+        data-explore-art
+        className="relative aspect-video w-full overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl shadow-black/50"
+      >
+        <iframe
+          src={`https://www.youtube-nocookie.com/embed/${topic.video.youtubeId}?rel=0`}
+          title={topic.video.title}
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+          className="pointer-events-auto absolute inset-0 h-full w-full border-0"
+        />
+      </figure>
+    )
+  }
+
+  return (
+    <figure
+      data-explore-art
+      className="relative aspect-[4/5] w-full max-w-md overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl shadow-black/50 sm:mx-auto lg:mx-0 lg:max-w-none"
+      style={{ backgroundImage: `linear-gradient(135deg, ${topic.tint[0]}, ${topic.tint[1]})` }}
+    >
+      <img src={topic.hero} alt="" className="h-full w-full object-cover opacity-90 mix-blend-luminosity" />
+      <div className="absolute inset-0 bg-gradient-to-t from-void/85 via-void/10 to-transparent" />
+      <figcaption className="absolute inset-x-6 bottom-6 flex items-center gap-3 md:inset-x-8 md:bottom-8">
+        <span
+          aria-hidden="true"
+          className="h-2 w-2 shrink-0 rounded-full"
+          style={{ backgroundColor: topic.accent, boxShadow: `0 0 0 4px ${topic.accent}33` }}
+        />
+        <span className="font-display text-lg text-bone">{topic.word}</span>
+      </figcaption>
+    </figure>
+  )
+}
+
+/* ── chapters: three different shapes ───────────────────────────────────── */
+
+/** A paragraph short enough to be a closing line is set as one. */
+const isCoda = (paragraph: string, i: number, all: string[]) =>
+  all.length > 1 && i === all.length - 1 && paragraph.length < 130
+
+function Paragraphs({ chapter, accent }: { chapter: ExploreChapter; accent: string }) {
+  return (
+    <div className="space-y-5">
+      {chapter.paragraphs.map((paragraph, i, all) =>
+        isCoda(paragraph, i, all) ? (
+          <p
+            key={paragraph.slice(0, 24)}
+            data-explore-lead
+            className="border-l-2 pl-5 font-display text-[clamp(1.15rem,1.8vw,1.4rem)] italic leading-[1.5] text-bone/90"
+            style={{ borderColor: accent }}
+          >
+            {paragraph}
+          </p>
+        ) : (
+          <p
+            key={paragraph.slice(0, 24)}
+            data-explore-lead
+            className="max-w-[62ch] text-[15.5px] leading-[1.85] text-sand/75"
+          >
+            {paragraph}
+          </p>
+        ),
+      )}
+    </div>
+  )
+}
+
+/** Heading held on the left while the argument runs on the right. */
+function StatementChapter({ chapter, accent }: { chapter: ExploreChapter; accent: string }) {
+  return (
+    <section id={chapter.id} data-explore-block className="room-chapter">
+      <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+        <div className="lg:sticky lg:top-32 lg:self-start">
+          <span aria-hidden="true" className="block h-px w-14" style={{ backgroundColor: accent }} />
+          <h2
+            data-explore-lead
+            className="mt-6 text-balance font-display text-[clamp(1.8rem,3.4vw,2.8rem)] font-medium leading-[1.1] text-bone"
+          >
+            {chapter.heading}
+          </h2>
+        </div>
+        <Paragraphs chapter={chapter} accent={accent} />
+      </div>
+    </section>
+  )
+}
+
+/** A framed picture beside the copy. */
+function FramedChapter({
+  chapter,
+  accent,
+  tint,
+}: {
+  chapter: ExploreChapter
+  accent: string
+  tint: [string, string]
+}) {
+  return (
+    <section id={chapter.id} data-explore-block className="room-chapter">
+      <div className="grid items-center gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:gap-16">
+        <figure
+          data-explore-item
+          className="explore-frame--tilt relative aspect-[4/3] overflow-hidden rounded-[1.75rem] border border-white/10 shadow-2xl shadow-black/40"
+          style={{ backgroundImage: `linear-gradient(135deg, ${tint[0]}, ${tint[1]})` }}
+        >
+          {chapter.image ? (
+            <img src={chapter.image} alt="" loading="lazy" className="h-full w-full object-cover opacity-90 mix-blend-luminosity" />
+          ) : null}
+          <div
+            className="absolute inset-0"
+            style={{ background: `linear-gradient(200deg, transparent 40%, ${tint[1]}d9)` }}
+          />
+          <span
+            aria-hidden="true"
+            className="absolute bottom-0 left-0 h-1 w-1/3"
+            style={{ backgroundColor: accent }}
+          />
+        </figure>
+        <div>
+          <h2
+            data-explore-lead
+            className="text-balance font-display text-[clamp(1.7rem,3vw,2.5rem)] font-medium leading-[1.12] text-bone"
+          >
+            {chapter.heading}
+          </h2>
+          <div className="mt-6">
+            <Paragraphs chapter={chapter} accent={accent} />
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/** A lit, centred panel — the room's conclusion. */
+function SpotlightChapter({ chapter, accent }: { chapter: ExploreChapter; accent: string }) {
+  return (
+    <section id={chapter.id} data-explore-block className="room-chapter">
+      <div
+        data-explore-item
+        className="relative isolate overflow-hidden rounded-[2rem] border border-white/10 bg-ink/60 px-6 py-12 sm:px-10 md:px-16 md:py-16"
+      >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-10"
+          style={{ background: `radial-gradient(60% 80% at 50% 0%, ${accent}24, transparent 70%)` }}
+        />
+        <div className="mx-auto max-w-3xl text-center">
+          <h2
+            data-explore-lead
+            className="text-balance font-display text-[clamp(1.8rem,3.4vw,2.7rem)] font-medium leading-[1.1] text-bone"
+          >
+            {chapter.heading}
+          </h2>
+          <div className="mt-7 space-y-5 text-left sm:text-center">
+            {chapter.paragraphs.map((paragraph, i, all) =>
+              isCoda(paragraph, i, all) ? (
+                <p
+                  key={paragraph.slice(0, 24)}
+                  data-explore-lead
+                  className="font-display text-[clamp(1.15rem,1.8vw,1.45rem)] italic leading-[1.5]"
+                  style={{ color: accent }}
+                >
+                  {paragraph}
+                </p>
+              ) : (
+                <p
+                  key={paragraph.slice(0, 24)}
+                  data-explore-lead
+                  className="mx-auto max-w-[64ch] text-[15.5px] leading-[1.85] text-sand/75"
+                >
+                  {paragraph}
+                </p>
+              ),
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function Chapter({ chapter, i, count, topic }: { chapter: ExploreChapter; i: number; count: number; topic: ExploreTopic }) {
+  if (chapter.image) return <FramedChapter chapter={chapter} accent={topic.accent} tint={topic.tint} />
+  if (i === count - 1 && count > 1) return <SpotlightChapter chapter={chapter} accent={topic.accent} />
+  return <StatementChapter chapter={chapter} accent={topic.accent} />
+}
+
+/* ── highlights: one component per layout ───────────────────────────────── */
+
+const BENTO_ICONS = [UserRound, Lock, Compass, Sparkles]
+
+function Bento({ topic }: { topic: ExploreTopic }) {
+  const h = topic.highlights!
+  return (
+    <section data-explore-block className="room-chapter">
+      <h2 data-explore-lead className="font-display text-[clamp(1.7rem,3vw,2.4rem)] font-medium text-bone">
+        {h.heading}
+      </h2>
+      <ul className="mt-10 grid gap-4 sm:grid-cols-2">
+        {h.items.map((item, i) => {
+          const Icon = BENTO_ICONS[i % BENTO_ICONS.length]
+          return (
+            <li
+              key={item.title}
+              data-explore-item
+              className="bento-card group relative overflow-hidden rounded-[1.5rem] border border-white/10 bg-ink/55 p-7 md:p-8"
+            >
+              <span
+                aria-hidden="true"
+                className="flex h-11 w-11 items-center justify-center rounded-2xl"
+                style={{ backgroundColor: `${topic.accent}1c`, color: topic.accent }}
+              >
+                <Icon size={19} strokeWidth={1.6} />
+              </span>
+              <h3 className="mt-6 font-display text-[1.4rem] leading-snug text-bone">{item.title}</h3>
+              <p className="mt-3 max-w-[40ch] text-[14.5px] leading-[1.75] text-sand/70">{item.body}</p>
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute -bottom-16 -right-16 h-40 w-40 rounded-full opacity-0 blur-2xl transition-opacity duration-700 group-hover:opacity-100"
+                style={{ backgroundColor: `${topic.accent}2e` }}
+              />
+            </li>
+          )
+        })}
+      </ul>
+    </section>
+  )
+}
+
+/** A path, not a list of numbers: the order is carried by the line itself. */
+function Steps({ topic }: { topic: ExploreTopic }) {
+  const h = topic.highlights!
+  return (
+    <section data-explore-block className="room-chapter">
+      <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+        <div className="lg:sticky lg:top-32 lg:self-start">
+          <h2 data-explore-lead className="font-display text-[clamp(1.8rem,3.2vw,2.6rem)] font-medium leading-[1.1] text-bone">
+            {h.heading}
+          </h2>
+        </div>
+        <ol className="relative">
+          <span
+            aria-hidden="true"
+            className="absolute bottom-6 left-[11px] top-3 w-px"
+            style={{ background: `linear-gradient(${topic.accent}, ${topic.accent}10)` }}
+          />
+          {h.items.map((item, i) => (
+            <li key={item.title} data-explore-item className="relative pb-10 pl-12 last:pb-0">
+              <span
+                aria-hidden="true"
+                className="absolute left-0 top-1 flex h-6 w-6 items-center justify-center rounded-full border-2 bg-abyss"
+                style={{ borderColor: topic.accent }}
+              >
+                <span
+                  className="h-2 w-2 rounded-full"
+                  style={{ backgroundColor: i === h.items.length - 1 ? topic.accent : `${topic.accent}80` }}
+                />
+              </span>
+              <div className="rounded-[1.25rem] border border-white/10 bg-ink/50 p-6 md:p-7">
+                <h3 className="font-display text-[1.35rem] leading-snug text-bone">{item.title}</h3>
+                <p className="mt-3 text-[14.5px] leading-[1.75] text-sand/70">{item.body}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  )
+}
+
+const AUDIENCE_ICONS = [BriefcaseBusiness, GraduationCap, Stethoscope]
+
+function Audiences({ topic }: { topic: ExploreTopic }) {
+  const h = topic.highlights!
+  return (
+    <section data-explore-block className="room-chapter">
+      <h2 data-explore-lead className="font-display text-[clamp(1.7rem,3vw,2.4rem)] font-medium text-bone">
+        {h.heading}
+      </h2>
+      <ul className="mt-10 grid gap-4 lg:grid-cols-3">
+        {h.items.map((item, i) => {
+          const Icon = AUDIENCE_ICONS[i % AUDIENCE_ICONS.length]
+          return (
+            <li
+              key={item.title}
+              id={item.id}
+              data-explore-item
+              className="audience-card group relative flex scroll-mt-32 flex-col overflow-hidden rounded-[1.5rem] border border-white/10 bg-ink/55 p-7 md:p-8"
+            >
+              <span
+                aria-hidden="true"
+                className="flex h-12 w-12 items-center justify-center rounded-full border"
+                style={{ borderColor: `${topic.accent}55`, color: topic.accent }}
+              >
+                <Icon size={20} strokeWidth={1.6} />
+              </span>
+              <h3 className="mt-7 font-display text-[1.5rem] leading-snug text-bone">{item.title}</h3>
+              <p className="mt-3 flex-1 text-[14.5px] leading-[1.75] text-sand/70">{item.body}</p>
+              <Link
+                href="/contact"
+                {...hoverable}
+                className="mt-8 inline-flex items-center gap-2 self-start rounded-full border border-white/15 px-4 py-2.5 text-[13px] font-medium text-bone/85 transition-colors hover:border-ember hover:text-ember"
+              >
+                Book a demo
+                <ArrowUpRight size={14} />
+              </Link>
+              <span
+                aria-hidden="true"
+                className="absolute inset-x-0 top-0 h-px origin-left scale-x-0 transition-transform duration-700 group-hover:scale-x-100"
+                style={{ backgroundColor: topic.accent }}
+              />
+            </li>
+          )
+        })}
+      </ul>
+    </section>
+  )
+}
+
+/* ── the page ───────────────────────────────────────────────────────────── */
+
 export function ExploreExperience({
   topic,
   next,
   prev,
 }: {
   topic: ExploreTopic
-  next: { slug: string; word: string; index: string }
-  prev: { slug: string; word: string; index: string }
+  next: Neighbour
+  prev: Neighbour
 }) {
   const root = useRef<HTMLDivElement>(null)
   const progress = useRef<HTMLDivElement>(null)
@@ -63,42 +397,13 @@ export function ExploreExperience({
       if (!page) return
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
-      // Below 1024px, skip the reveal-on-scroll timeline entirely rather than
-      // trust it to fire correctly. It depends on ScrollTrigger's 'top 82%'
-      // boundary staying accurate relative to the page's own layout, and on a
-      // phone that layout keeps moving under it: the address bar collapsing
-      // mid-scroll resizes the viewport, and images/webfonts finishing late
-      // shift where every block actually sits. Either one can leave the
-      // trigger's start point stale by the time a reader scrolls past it, and
-      // a `play none none none` timeline that never enters stays at its
-      // `.from()` state forever — the block is there, just invisible, which
-      // reads as the room being broken rather than merely unanimated. Desktop
-      // keeps the reveal; a phone gets the same fully-visible content the
-      // reduced-motion path already gives everyone else.
+      // Phones skip the reveal: a viewport that resizes under the reader
+      // (collapsing address bar, late fonts) can leave a trigger stale and a
+      // block stuck invisible.
       const skipReveal = window.matchMedia('(max-width: 1023px)').matches
-
       const triggers: ScrollTrigger[] = []
 
-      /*
-       * One ScrollTrigger drives both the reading progress and the chapter
-       * rail.
-       *
-       * The rail used to own a trigger per chapter, and that is what threw
-       * "Cannot read properties of undefined (reading 'end')" on the way into a
-       * room. Creating a ScrollTrigger makes ScrollTrigger walk its global list
-       * of existing triggers and force-refresh any that are not initialised
-       * yet; if that list changes length while the walk is in progress — a
-       * trigger killing itself, a refresh cascading into another create — the
-       * next index it reads is undefined. Six creates in a loop, each one
-       * walking a list the previous ones just extended, is the shape of code
-       * that hits it.
-       *
-       * The rail does not need triggers of its own. It needs to know which
-       * chapter owns the middle of the screen, which is a comparison against
-       * numbers we already have. So the offsets are measured once per refresh
-       * and compared on update: no extra triggers, no list to corrupt, and one
-       * subscriber to the scroll instead of seven.
-       */
+      // One trigger drives both the progress bar and the chapter strip.
       let bounds: { id: string; top: number }[] = []
       let shown = topic.chapters[0]?.id
 
@@ -107,8 +412,7 @@ export function ExploreExperience({
         bounds = topic.chapters
           .map((chapter) => {
             const node = page.querySelector<HTMLElement>(`#${chapter.id}`)
-            if (!node) return null
-            return { id: chapter.id, top: node.getBoundingClientRect().top + top }
+            return node ? { id: chapter.id, top: node.getBoundingClientRect().top + top } : null
           })
           .filter((entry): entry is { id: string; top: number } => entry !== null)
       }
@@ -118,26 +422,13 @@ export function ExploreExperience({
           trigger: page,
           start: 'top top',
           end: 'bottom bottom',
-          // Measured here rather than on every update: reading a rect per
-          // frame would force layout on a page that is also running parallax.
           onRefresh: measure,
           onUpdate: (self) => {
-            if (progress.current) {
-              progress.current.style.transform = `scaleX(${self.progress})`
-            }
-
-            // The chapter that has crossed the reading line most recently.
+            if (progress.current) progress.current.style.transform = `scaleX(${self.progress})`
             const line = window.scrollY + window.innerHeight * 0.45
             let reading: string | null = null
-            for (const entry of bounds) {
-              if (entry.top <= line) reading = entry.id
-            }
-            // The rail always lights one chip; Melo only counts a chapter as
-            // being read once it has actually reached the reading line.
+            for (const entry of bounds) if (entry.top <= line) reading = entry.id
             const active = reading ?? bounds[0]?.id
-
-            // React only hears about it when the answer actually changes,
-            // which is a handful of renders across the whole page.
             if (active && active !== shown) {
               shown = active
               setActiveChapter(active)
@@ -147,145 +438,78 @@ export function ExploreExperience({
         }),
       )
 
-      // Hero art drifts up against the scroll, and the oversized index number
-      // drifts down, so the two separate as the reader leaves the hero.
-      const art = page.querySelector<HTMLElement>('[data-explore-art]')
+      const art = page.querySelector<HTMLElement>('[data-explore-art] img')
       if (art) {
-        gsap.to(art.querySelector('img') ?? art, {
-          yPercent: -14,
+        gsap.to(art, {
+          yPercent: -10,
           scale: 1.08,
           ease: 'none',
-          scrollTrigger: {
-            trigger: art,
-            start: 'top bottom',
-            end: 'bottom top',
-            scrub: 1.1,
-          },
+          scrollTrigger: { trigger: art, start: 'top bottom', end: 'bottom top', scrub: 1.1 },
         })
       }
 
-      // Blocks reveal once, on their own trigger — desktop only, see above.
-      if (skipReveal) {
-        return () => {
-          triggers.forEach((trigger) => trigger.kill())
-          melo.setChapter(null)
-        }
+      const cleanup = () => {
+        triggers.forEach((trigger) => trigger.kill())
+        melo.setChapter(null)
       }
+      if (skipReveal) return cleanup
 
       gsap.utils.toArray<HTMLElement>('[data-explore-block]').forEach((block) => {
         const items = block.querySelectorAll<HTMLElement>('[data-explore-item]')
-
+        // toggleActions rather than `once`: a trigger that kills itself during
+        // another's refresh splices ScrollTrigger's list mid-iteration.
         const tl = gsap.timeline({
-          // play-once through toggleActions rather than `once: true`.
-          //
-          // `once` makes a ScrollTrigger kill itself the moment it is past its
-          // end — including from inside the refresh that another trigger's
-          // creation runs. That splices the global trigger array while
-          // ScrollTrigger is iterating it, and the next index it reads is
-          // undefined: "Cannot read properties of undefined (reading 'end')".
-          // Any block already scrolled past on load hits it, which is why it
-          // fired on every room. toggleActions plays the reveal exactly once
-          // and leaves the trigger alive, so the array never moves underneath
-          // the loop.
-          scrollTrigger: {
-            trigger: block,
-            start: 'top 82%',
-            toggleActions: 'play none none none',
-          },
+          scrollTrigger: { trigger: block, start: 'top 82%', toggleActions: 'play none none none' },
         })
-
-        tl.from(block.querySelectorAll('[data-explore-lead]'), {
-          y: 40,
-          opacity: 0,
-          duration: 0.95,
-          ease: 'power3.out',
-          stagger: 0.12,
-        })
-
+        const leads = block.querySelectorAll('[data-explore-lead]')
+        if (leads.length) {
+          tl.from(leads, { y: 32, opacity: 0, duration: 0.9, ease: 'power3.out', stagger: 0.1 })
+        }
         if (items.length) {
           tl.from(
             items,
-            {
-              y: 46,
-              opacity: 0,
-              scale: 0.97,
-              duration: 0.8,
-              ease: 'power2.out',
-              stagger: 0.1,
-            },
-            '-=0.55',
+            { y: 40, opacity: 0, duration: 0.8, ease: 'power2.out', stagger: 0.1 },
+            leads.length ? '-=0.55' : 0,
           )
         }
       })
 
-      return () => {
-        triggers.forEach((trigger) => trigger.kill())
-        melo.setChapter(null)
-      }
+      return cleanup
     },
     { scope: root, dependencies: [topic.slug] },
   )
 
+  const highlights = topic.highlights
+  const lede = Array.isArray(topic.lede) ? topic.lede : [topic.lede]
+  const firstAnchor = topic.chapters[0]?.id ?? (highlights ? 'room-highlights' : undefined)
+
   return (
     <div ref={root} className="pointer-events-auto relative isolate bg-abyss">
-      {/* Reading progress, sitting just under the fixed header. */}
+      {/* Reading progress, just under the fixed header. */}
       <div className="pointer-events-none fixed inset-x-0 top-[4.6rem] z-[31] h-px bg-white/10">
-        <div
-          ref={progress}
-          className="h-full origin-left scale-x-0"
-          style={{ backgroundColor: topic.accent }}
-        />
+        <div ref={progress} className="h-full origin-left scale-x-0" style={{ backgroundColor: topic.accent }} />
       </div>
 
-      {/* ── hero ─────────────────────────────────────────────────────────── */}
-      {/* In the root's stacking context, not a wrapper of its own: a wrapper
-          would paint the sky's lower edge over the chapter strip below it. */}
       <RoomSky sky={topic.tint} accent={topic.accent} />
-      <header
-        data-explore-hero
-        className="room-section room-hero relative pb-[var(--room-rhythm)]"
-      >
+
+      {/* ── hero ─────────────────────────────────────────────────────── */}
+      <header data-explore-hero className="room-section room-hero relative pb-[var(--room-rhythm)]">
         <div className="mx-auto max-w-6xl">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
+          <motion.nav
+            aria-label="Breadcrumb"
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: EASE }}
-            className="flex flex-wrap items-center gap-4"
+            className="flex flex-wrap items-center gap-2 text-[13px] text-bone/55"
           >
-            {/* Carries the same return intent as the pinned control, so the two
-                ways back cannot disagree about where "back" is. */}
-            <Link
-              href="/"
-              onClick={requestReturn}
-              {...hoverable}
-              className="group inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.22em] text-bone/70 transition-colors hover:text-ember"
-            >
-              <ArrowLeft
-                size={12}
-                className="transition-transform group-hover:-translate-x-1"
-              />
-              The experience
+            <Link href="/explore" {...hoverable} className="transition-colors hover:text-ember">
+              Explore
             </Link>
-            <span className="h-px w-8 bg-bone/20" />
-            <p
-              className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-bone/70"
-              style={{ ['--numeral-accent' as string]: topic.accent }}
-            >
-              <span className="numeral">{topic.index}</span>
-              <span className="text-bone/25">/</span>
-              {topic.word}
-            </p>
-          </motion.div>
+            <span aria-hidden="true" className="text-bone/25">/</span>
+            <span className="text-bone/85">{topic.word}</span>
+          </motion.nav>
 
-          {/*
-            Text on one side, the room's own image on the other — a portrait
-            card with a floating badge rather than the wide banner this used
-            to run full-bleed underneath the title. The reference brief asked
-            for this exact shape (an agency "about" hero); the badge and the
-            card both carry the room's own accent instead of the reference's
-            colours, so six rooms still read as one site.
-          */}
-          <div className="mt-8 grid gap-10 md:mt-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16">
+          <div className={`mt-8 grid gap-10 md:mt-12 lg:items-center lg:gap-16 ${topic.video?.youtubeId ? 'lg:grid-cols-[1fr_1.1fr]' : 'lg:grid-cols-[1.05fr_0.95fr]'}`}>
             <div data-tour="room-intro">
               {topic.mark ? (
                 <motion.img
@@ -298,483 +522,205 @@ export function ExploreExperience({
                 />
               ) : null}
 
-              <motion.p
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: EASE, delay: 0.12 }}
-                className="eyebrow !text-ember-soft"
-              >
-                {topic.eyebrow}
-              </motion.p>
+              {topic.eyebrow !== topic.word ? (
+                <motion.p
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, ease: EASE, delay: 0.12 }}
+                  className="text-[15px] font-medium text-ember-soft"
+                >
+                  {topic.eyebrow}
+                </motion.p>
+              ) : null}
 
               <motion.h1
-                initial={{ opacity: 0, y: 42, filter: 'blur(12px)' }}
+                initial={{ opacity: 0, y: 36, filter: 'blur(12px)' }}
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 transition={{ duration: 1.1, ease: EASE, delay: 0.2 }}
-                className="mt-6 font-display text-[clamp(2.1rem,4.6vw,3.6rem)] font-semibold leading-[1.06] text-bone"
+                className="mt-4 text-balance font-display text-[clamp(2.2rem,4.8vw,3.8rem)] font-semibold leading-[1.05] text-bone"
               >
                 {topic.title}
               </motion.h1>
 
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.9, ease: EASE, delay: 0.32 }}
-                className="mt-6 max-w-md text-[15px] leading-[1.85] text-sand/75"
-              >
-                {topic.lede}
-              </motion.p>
+              <div className="mt-7 max-w-[54ch] space-y-4">
+                {lede.map((paragraph, i) => (
+                  <motion.p
+                    key={paragraph.slice(0, 24)}
+                    initial={{ opacity: 0, y: 18 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.9, ease: EASE, delay: 0.32 + i * 0.08 }}
+                    className="text-[15.5px] leading-[1.85] text-sand/75"
+                  >
+                    {paragraph}
+                  </motion.p>
+                ))}
+              </div>
 
               <motion.div
-                initial={{ opacity: 0, y: 16 }}
+                initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, ease: EASE, delay: 0.45 }}
-                className="mt-8 flex flex-wrap items-center gap-5"
+                className="mt-9 flex flex-wrap items-center gap-3"
               >
-                <Link href={topic.cta.href} {...hoverable} className="btn-primary group">
-                  {topic.cta.label}
-                  <ArrowUpRight
-                    size={13}
-                    className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                  />
+                <Link href="/contact" {...hoverable} className="btn-primary group">
+                  Book a demo
+                  <ArrowUpRight size={14} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </Link>
-                {topic.chapters.length ? (
-                  <a
-                    href={`#${topic.chapters[0].id}`}
-                    {...hoverable}
-                    className="font-mono text-[10px] uppercase tracking-[0.22em] text-bone/70 transition-colors hover:text-bone"
-                  >
-                    {topic.readMoreLabel ?? 'Start reading'} &darr;
+                {firstAnchor ? (
+                  <a href={`#${firstAnchor}`} {...hoverable} className="btn-ghost group">
+                    {topic.readMoreLabel ?? 'Keep Reading'}
+                    <ArrowRight size={14} className="rotate-90 transition-transform group-hover:translate-y-0.5" />
                   </a>
                 ) : null}
               </motion.div>
             </div>
 
             <motion.div
-              initial={{ opacity: 0, y: 40, filter: 'blur(14px)' }}
+              initial={{ opacity: 0, y: 36, filter: 'blur(14px)' }}
               animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
               transition={{ duration: 1.1, ease: EASE, delay: 0.35 }}
-              className="relative"
             >
-              <div
-                data-explore-art
-                className="relative aspect-[4/5] w-full max-w-sm overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl shadow-black/50 sm:mx-auto lg:mx-0 lg:max-w-none"
-                style={{
-                  backgroundImage: `linear-gradient(135deg, ${topic.tint[0]}, ${topic.tint[1]})`,
-                }}
-              >
-                <img
-                  src={topic.hero}
-                  alt=""
-                  className="h-full w-full object-cover opacity-70 mix-blend-luminosity"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-void via-void/25 to-transparent" />
-                <p className="absolute bottom-6 left-6 font-mono text-[10px] uppercase tracking-[0.26em] text-bone/60 md:bottom-8 md:left-8">
-                  NEXR / {topic.word}
-                </p>
-              </div>
-
-              {/* The floating badge. Every reference of this layout has one —
-                  a small circle overlapping the card's corner, usually holding
-                  an arrow or an icon. Ours holds the room's own number, which
-                  is content rather than decoration: it is the same number the
-                  breadcrumb above and the chapter numerals below both use. */}
-              <div
-                aria-hidden="true"
-                className="absolute -bottom-6 -left-2 flex h-16 w-16 items-center justify-center rounded-full border-[5px] shadow-xl sm:-left-6 sm:h-20 sm:w-20 sm:border-[6px]"
-                style={{ borderColor: '#0d0906', backgroundColor: topic.accent }}
-              >
-                <span className="numeral text-[1.1rem] text-ink" style={{ ['--numeral-accent' as string]: '#0d0906' }}>
-                  {topic.index}
-                </span>
-              </div>
+              <HeroMedia topic={topic} />
             </motion.div>
           </div>
         </div>
       </header>
 
-      {/*
-        ── in this room ──────────────────────────────────────────────────
-
-        A horizontal strip rather than the sticky sidebar this used to be.
-        220px of fixed rail plus a max-w-2xl text column left roughly a third
-        of every wide screen permanently empty — visible in a screenshot of
-        this exact room, "Belief", where the paragraph sat in a narrow band
-        with the whole right half of the frame unused. Chapters below now use
-        that width themselves; this strip only has to name the stops.
-
-        Guarded on chapter count: a couple of rooms carry no chapters yet — see
-        the comment on the "clinical" and "contact" entries in lib/explore.ts —
-        and a nav strip labelled "In this room" pointing at nothing reads as
-        broken rather than simply short.
-      */}
+      {/* ── in this room ─────────────────────────────────────────────── */}
       {topic.chapters.length > 0 ? (
-      <nav
-        aria-label="In this room"
-        data-tour="room-chapters"
-        className="room-section room-section--tight mx-auto flex max-w-6xl flex-wrap items-center gap-x-2 gap-y-3 px-5 sm:px-6 md:px-10"
-      >
-        <p className="mr-3 font-mono text-[9px] uppercase tracking-[0.28em] text-bone/30">
-          In this room
-        </p>
-        {topic.chapters.map((chapter, i) => {
-          const active = chapter.id === activeChapter
-          return (
-            <a
-              key={chapter.id}
-              href={`#${chapter.id}`}
-              {...hoverable}
-              className="group inline-flex items-center gap-2 rounded-full border px-3.5 py-2 font-mono text-[11px] uppercase tracking-[0.16em] transition-all duration-500"
-              style={{
-                borderColor: active ? topic.accent : 'rgba(244,243,236,0.14)',
-                color: active ? 'var(--color-bone)' : 'rgba(244,243,236,0.5)',
-                backgroundColor: active ? `${topic.accent}14` : 'transparent',
-              }}
-            >
-              <span
-                className="numeral text-[0.85em]"
-                style={{ ['--numeral-accent' as string]: topic.accent }}
-              >
-                {String(i + 1).padStart(2, '0')}
-              </span>
-              <span className="transition-colors duration-500 group-hover:text-bone">
-                {chapter.navLabel ?? chapter.heading}
-              </span>
-            </a>
-          )
-        })}
-      </nav>
+        <nav
+          aria-label="In this room"
+          data-tour="room-chapters"
+          className="room-strip-wrap sticky top-[5.4rem] z-[25] mx-auto"
+        >
+          <div className="room-strip flex items-center gap-1.5 overflow-x-auto rounded-full border border-white/10 bg-abyss/80 p-1.5 backdrop-blur-md">
+            {topic.chapters.map((chapter) => {
+              const active = chapter.id === activeChapter
+              return (
+                <a
+                  key={chapter.id}
+                  href={`#${chapter.id}`}
+                  {...hoverable}
+                  aria-current={active ? 'true' : undefined}
+                  className="shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-[13px] font-medium transition-all duration-500"
+                  style={{
+                    color: active ? 'var(--color-ink)' : 'rgba(244,243,236,0.62)',
+                    backgroundColor: active ? topic.accent : 'transparent',
+                  }}
+                >
+                  {chapter.navLabel ?? chapter.heading}
+                </a>
+              )
+            })}
+          </div>
+        </nav>
       ) : null}
 
-      {/* ── chapters ─────────────────────────────────────────────────────── */}
-      <div className="room-section mx-auto max-w-6xl px-5 pb-20 sm:px-6 md:px-10 md:pb-24">
-        <div className="min-w-0">
-          {topic.chapters.map((chapter, i) => {
-            // One gallery frame per chapter, reused rather than duplicated —
-            // this used to be the whole `gallery` array shown a second time,
-            // on its own further down the page as "Inside {word}". Placing it
-            // beside the paragraph it illustrates uses the width the text was
-            // leaving empty, and it keeps every room at the same three or four
-            // images instead of showing each one twice.
-            const image = topic.gallery[i]
-            const imageOnLeft = i % 2 === 1
+      {/* ── chapters and cards ───────────────────────────────────────── */}
+      <div className="room-section mx-auto max-w-6xl">
+        {topic.chapters.map((chapter, i) => (
+          <Chapter key={chapter.id} chapter={chapter} i={i} count={topic.chapters.length} topic={topic} />
+        ))}
 
-            return (
-              <section
-                key={chapter.id}
-                id={chapter.id}
-                data-explore-block
-                className="room-chapter"
-              >
-                <div
-                  className={`grid gap-8 lg:items-center lg:gap-14 ${
-                    image ? 'lg:grid-cols-[1fr_23rem]' : ''
-                  }`}
-                >
-                  <div className={image && imageOnLeft ? 'lg:order-2' : undefined}>
-                    {/* Kicker and heading on the left, the chapter's own
-                        number pinned to the right of the same row — the
-                        count a reader tracks lives at the edge they read
-                        toward, not buried inline before the words it counts. */}
-                    <div className="flex items-start justify-between gap-6">
-                      <div className="min-w-0">
-                        {chapter.kicker ? (
-                          <p
-                            data-explore-lead
-                            className="text-[14px] leading-[1.6] text-bone/55"
-                          >
-                            {chapter.kicker}
-                          </p>
-                        ) : null}
-                        <h2
-                          data-explore-lead
-                          className="mt-2 font-display text-[clamp(1.6rem,3vw,2.5rem)] font-medium leading-[1.12] text-bone"
-                        >
-                          {chapter.heading}
-                        </h2>
-                      </div>
-                      <span
-                        data-explore-lead
-                        className="numeral numeral--lg shrink-0 text-[clamp(1.5rem,3vw,2.4rem)] leading-none opacity-70"
-                        style={{ ['--numeral-accent' as string]: topic.accent }}
-                      >
-                        {String(i + 1).padStart(2, '0')}
-                      </span>
-                    </div>
-
-                    <div className="mt-6 max-w-[62ch] space-y-5">
-                      {chapter.paragraphs.map((paragraph) => (
-                        <p
-                          key={paragraph.slice(0, 24)}
-                          data-explore-lead
-                          className="text-[15px] leading-[1.85] text-sand/70"
-                        >
-                          {paragraph}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-
-                  {image ? (
-                    <div className={imageOnLeft ? 'lg:order-1' : undefined}>
-                      <ImageSlot
-                        item={image}
-                        tint={topic.tint}
-                        accent={topic.accent}
-                        className="explore-frame--tilt"
-                      />
-                    </div>
-                  ) : null}
-                </div>
-              </section>
-            )
-          })}
-          {/* ── stats ───────────────────────────────────────────────────── */}
-          {topic.stats ? (
-            <section
-              data-explore-block
-              className="room-chapter"
-            >
-              <div className="grid grid-cols-2 gap-8 lg:grid-cols-4">
-                {topic.stats.map((stat) => (
-                  <div key={stat.label} data-explore-item>
-                    <p
-                      className="numeral numeral--lg text-[clamp(2rem,4vw,3.2rem)] leading-none"
-                      style={{ ['--numeral-accent' as string]: topic.accent }}
-                    >
-                      {stat.value}
-                    </p>
-                    <p className="mt-3 font-mono text-[10px] uppercase leading-[1.6] tracking-[0.18em] text-bone/45">
-                      {stat.label}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </section>
-          ) : null}
-
-          {/* ── highlights ──────────────────────────────────────────────── */}
-          {topic.highlights ? (
-            <section
-              data-explore-block
-              className="room-chapter"
-            >
-              <h2
-                data-explore-lead
-                className="font-display text-[clamp(1.5rem,2.6vw,2.1rem)] text-bone"
-              >
-                {topic.highlights.heading}
-              </h2>
-              <ul className="mt-8 grid gap-4 sm:grid-cols-2">
-                {topic.highlights.items.map((item, i) => (
-                  <li
-                    key={item.title}
-                    data-explore-item
-                    className="glow-hover group rounded-2xl border border-white/10 bg-ink/50 p-6 transition-colors duration-500 hover:border-white/25"
-                  >
-                    {/* A small circular badge rather than the plain rule this
-                        used to open with — the reference brief's own pillar
-                        cards ("VISION", "MISSION") each carry one, and it is
-                        what keeps a grid of cards from reading as a bare list. */}
-                    <span
-                      aria-hidden="true"
-                      className="flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-500 group-hover:scale-110"
-                      style={{
-                        borderColor: `${topic.accent}4d`,
-                        backgroundColor: `${topic.accent}14`,
-                        color: topic.accent,
-                      }}
-                    >
-                      <span className="numeral text-[0.8rem]" style={{ ['--numeral-accent' as string]: topic.accent }}>
-                        {String(i + 1).padStart(2, '0')}
-                      </span>
-                    </span>
-                    <h3 className="mt-5 font-display text-xl leading-snug text-bone">
-                      {item.title}
-                    </h3>
-                    <p className="mt-3 text-sm leading-[1.75] text-sand/65">
-                      {item.body}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ) : null}
-        </div>
+        {highlights ? (
+          <div id="room-highlights" className="scroll-mt-32">
+            {highlights.layout === 'bento' ? <Bento topic={topic} /> : null}
+            {highlights.layout === 'steps' ? <Steps topic={topic} /> : null}
+            {highlights.layout === 'audiences' ? <Audiences topic={topic} /> : null}
+          </div>
+        ) : null}
       </div>
 
-      {/* ── quote ────────────────────────────────────────────────────────── */}
+      {/* ── quote ────────────────────────────────────────────────────── */}
       {topic.quote ? (
-        <section
-          data-explore-block
-          data-melo-cue="quote"
-          className="room-section room-band relative overflow-hidden"
-        >
+        <section data-explore-block data-melo-cue="quote" className="room-section room-band relative overflow-hidden">
           <div
+            aria-hidden="true"
             className="pointer-events-none absolute inset-0 -z-10"
-            style={{
-              background: `radial-gradient(50% 70% at 50% 50%, ${topic.accent}14, transparent 72%)`,
-            }}
+            style={{ background: `radial-gradient(50% 70% at 50% 50%, ${topic.accent}18, transparent 72%)` }}
           />
-          <blockquote
-            data-explore-lead
-            className="mx-auto max-w-3xl text-center font-display text-[clamp(1.5rem,3.2vw,2.6rem)] italic leading-[1.35] text-bone/90"
-          >
-            &lsquo;{topic.quote}&rsquo;
-          </blockquote>
+          <figure className="mx-auto max-w-3xl text-center">
+            <HeartHandshake aria-hidden="true" size={26} strokeWidth={1.4} className="mx-auto" style={{ color: topic.accent }} />
+            <blockquote
+              data-explore-lead
+              className="mt-6 text-balance font-display text-[clamp(1.6rem,3.4vw,2.7rem)] italic leading-[1.3] text-bone/90"
+            >
+              {topic.quote}
+            </blockquote>
+          </figure>
         </section>
       ) : null}
 
-      {/* ── deeper reading ───────────────────────────────────────────────── */}
-      <section
-        data-explore-block
-        className="room-section"
-      >
-        <h2
-          data-explore-lead
-          className="font-mono text-[10px] uppercase tracking-[0.28em] text-bone/35"
-        >
-          Go deeper
-        </h2>
-        <ul className="mt-6 divide-y divide-white/10 border-y border-white/10">
-          {topic.deeper.map((link) => (
-            <li key={link.href} data-explore-item>
-              <Link
-                href={link.href}
-                {...hoverable}
-                className="group flex flex-col gap-2 py-6 transition-colors sm:flex-row sm:items-center sm:justify-between"
-              >
-                <span className="font-display text-[clamp(1.3rem,2.4vw,1.9rem)] text-bone transition-colors group-hover:text-ember">
-                  {link.label}
-                </span>
-                <span className="flex items-center gap-4 text-sm text-sand/55">
-                  {link.note ?? null}
-                  <ArrowUpRight
-                    size={16}
-                    className="shrink-0 text-bone/40 transition-transform duration-500 group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-ember"
-                  />
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* ── call to action ───────────────────────────────────────────────── */}
-      <section
-        data-explore-block
-        className="room-section"
-      >
-        <div
-          data-explore-item
-          className="relative overflow-hidden rounded-3xl border border-white/12 px-6 py-12 text-center sm:px-8 md:px-16 md:py-14"
-          style={{
-            backgroundImage: `linear-gradient(150deg, ${topic.tint[0]}, ${topic.tint[1]})`,
-          }}
-        >
-          <div
-            className="pointer-events-none absolute -top-24 left-1/2 h-56 w-56 -translate-x-1/2 rounded-full blur-3xl"
-            style={{ backgroundColor: `${topic.accent}22` }}
-          />
-          <h2 className="relative font-display text-[clamp(1.7rem,3.4vw,2.8rem)] leading-tight text-bone">
-            The next way into wellbeing starts here.
+      {/* ── keep exploring ───────────────────────────────────────────── */}
+      <section data-explore-block className="room-section">
+        <div className="flex flex-col gap-5 border-t border-white/10 pt-10 sm:flex-row sm:items-center sm:justify-between">
+          <h2 data-explore-lead className="font-display text-[clamp(1.4rem,2.4vw,1.9rem)] text-bone">
+            Keep exploring
           </h2>
-          <p className="relative mx-auto mt-4 max-w-xl text-sm leading-relaxed text-sand/70">
-            {topic.cta.note}
-          </p>
-          {/* CLOSING CTA — common for all sub pages. */}
-          <p className="relative mt-6 font-display text-base italic text-bone/60">
-            Better wellbeing starts when the way in feels right.
-          </p>
-          <Link
-            href={topic.cta.href}
-            {...hoverable}
-            className="btn-primary group relative mt-9"
-          >
-            {topic.cta.label}
-            <ArrowUpRight
-              size={13}
-              className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-            />
-          </Link>
+          <ul className="flex flex-wrap gap-3">
+            {topic.deeper.map((link) => (
+              <li key={link.href} data-explore-item>
+                <Link
+                  href={link.href}
+                  {...hoverable}
+                  className="group inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.03] px-5 py-3 text-[14px] font-medium text-bone/85 transition-colors hover:border-ember hover:text-ember"
+                >
+                  {link.label}
+                  <ArrowUpRight size={15} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
-      {/* ── where to carry on ────────────────────────────────────────────── */}
-      {/* Only on the closing room. It is the one place where "follow us" is an
-          answer to the question the reader actually has; on the other five it
-          would be an interruption between the argument and its call to action. */}
-      {topic.slug === 'contact' ? (
-        <section data-explore-block className="room-section">
-          <ConnectConstellation accent={topic.accent} />
-        </section>
-      ) : null}
+      {/* ── closing ──────────────────────────────────────────────────── */}
+      <div className="room-section">
+        <ClosingCta accent={topic.accent} tint={topic.tint} />
+      </div>
 
-      {/* ── the rest of the tour ─────────────────────────────────────────── */}
+      {/* ── the rest of the tour ─────────────────────────────────────── */}
       <footer className="room-section room-section--end safe-bottom">
-        <div data-tour="room-next" data-melo-cue="end" className="grid gap-4 border-t border-white/10 pt-8 sm:grid-cols-2">
-          <Link
-            href={`/explore/${prev.slug}`}
-            {...hoverable}
-            className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-ink/40 p-5 transition-colors hover:border-white/25 md:p-6"
-          >
-            <img
-              src={`/brand/melo/face-${Number(prev.index)}.webp`}
-              alt=""
-              loading="lazy"
-              className="h-12 w-12 shrink-0 rounded-full border border-white/15 object-cover opacity-80 transition-opacity group-hover:opacity-100 md:h-14 md:w-14"
-            />
-            <span className="min-w-0">
-              <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-bone/40">
-                &larr; Previous room
+        <div data-tour="room-next" data-melo-cue="end" className="grid gap-4 sm:grid-cols-2">
+          {[
+            { n: prev, label: 'Previous room', dir: 'prev' as const },
+            { n: next, label: 'Next room', dir: 'next' as const },
+          ].map(({ n, label, dir }) => (
+            <Link
+              key={dir}
+              href={`/explore/${n.slug}`}
+              {...hoverable}
+              className={`group flex items-center gap-4 rounded-2xl border border-white/10 bg-ink/40 p-5 transition-colors hover:border-white/25 md:p-6 ${
+                dir === 'next' ? 'sm:flex-row-reverse sm:text-right' : ''
+              }`}
+            >
+              <img
+                src={n.face}
+                alt=""
+                loading="lazy"
+                className="h-12 w-12 shrink-0 rounded-full border border-white/15 object-cover transition-transform group-hover:scale-105 md:h-14 md:w-14"
+              />
+              <span className="min-w-0">
+                <span className="block text-[13px] text-bone/45">{label}</span>
+                <span className="mt-1 block font-display text-xl text-bone transition-colors group-hover:text-ember md:text-2xl">
+                  {n.word}
+                </span>
               </span>
-              <span className="mt-2 flex items-center gap-2 font-display text-xl text-bone transition-colors group-hover:text-ember md:text-2xl">
-                <span className="numeral numeral--lg text-[0.8em]">{prev.index}</span>
-                {prev.word}
-              </span>
-            </span>
-          </Link>
-          <Link
-            href={`/explore/${next.slug}`}
-            {...hoverable}
-            className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-ink/40 p-5 transition-colors hover:border-white/25 sm:flex-row-reverse sm:text-right md:p-6"
-          >
-            <img
-              src={`/brand/melo/face-${Number(next.index)}.webp`}
-              alt=""
-              loading="lazy"
-              className="h-12 w-12 shrink-0 rounded-full border border-ember/40 object-cover transition-transform group-hover:scale-105 md:h-14 md:w-14"
-            />
-            <span className="min-w-0">
-              <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-bone/40">
-                Next room &rarr;
-              </span>
-              <span className="mt-2 flex items-center gap-2 font-display text-xl text-bone transition-colors group-hover:text-ember sm:justify-end md:text-2xl">
-                <span className="numeral numeral--lg text-[0.8em]">{next.index}</span>
-                {next.word}
-              </span>
-            </span>
-          </Link>
+            </Link>
+          ))}
         </div>
 
-        {/* The last row of the page, as real buttons: back on the left (as on
-            every other page), all six rooms on the right. Third and last way
-            back, and like the other two it carries the return intent — so
-            whichever one a reader finds, they land on the beat they came from
-            rather than at the top of the scene. */}
         <div className="page-end mt-6">
           <Link href="/" onClick={requestReturn} {...hoverable} className="end-btn group">
             <ArrowLeft size={15} className="shrink-0 transition-transform group-hover:-translate-x-1" />
             Back to the experience
           </Link>
           <Link href="/explore" {...hoverable} className="end-btn group">
-            All six rooms
+            All rooms
             <ArrowRight size={15} className="shrink-0 transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
       </footer>
-
-      <RoomSignature />
     </div>
   )
 }

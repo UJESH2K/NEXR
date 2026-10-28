@@ -1,4 +1,10 @@
-import { EXPLORE_TOPICS, getExploreTopic, getNextTopic, type ExploreTopic } from '@/lib/explore'
+import {
+  CLOSING as SHARED_CLOSING,
+  EXPLORE_TOPICS,
+  getExploreTopic,
+  getNextTopic,
+  type ExploreTopic,
+} from '@/lib/explore'
 import { sectionById } from '@/lib/sections'
 import type { MeloBubble, MeloPose } from './store'
 
@@ -17,12 +23,11 @@ import type { MeloBubble, MeloPose } from './store'
  * If a line needs changing, it changes here; no component holds copy of its own.
  */
 
-/** Closing CTA — the brief's own words, shared by every sub page. */
+/** Closing CTA — the content document's Let's Talk block, shared with every page. */
 export const CLOSING = {
-  headline: 'The next way into wellbeing starts here.',
-  note: 'Discover how NEXR can bring a new approach to your organisation, institution or practice.',
-  line: 'Better wellbeing starts when the way in feels right.',
-  action: 'Book a Demo',
+  headline: SHARED_CLOSING.heading,
+  note: SHARED_CLOSING.body,
+  action: SHARED_CLOSING.action,
 }
 
 /** Which expression suits which moment. Pose numbers match the scene's beats. */
@@ -119,7 +124,7 @@ function roomTour(topic: ExploreTopic): TourStep[] {
   const steps: TourStep[] = [
     {
       target: '[data-tour="room-intro"]',
-      title: `Room ${topic.index} · ${topic.word}`,
+      title: topic.word,
       text: 'Each part of the story on the home page opens into a room like this one. This is where it is told in full.',
       pose: EXPRESSION.point,
     },
@@ -135,7 +140,7 @@ function roomTour(topic: ExploreTopic): TourStep[] {
   steps.push(BACK_STEP, HOME_STEP, MENU_STEP, DEMO_STEP, {
     target: '[data-tour="room-next"]',
     title: 'Next room',
-    text: `At the end of the room, carry on to ${next.index} · ${next.word}, or step back to the one before.`,
+    text: `At the end of the room, carry on to ${next.word}, or step back to the one before.`,
     pose: EXPRESSION.offer,
   })
   steps.push(MELO_STEP)
@@ -159,8 +164,8 @@ const PAGE_TOUR: TourStep[] = [
 const INDEX_TOUR: TourStep[] = [
   {
     target: '[data-tour="explore-list"]',
-    title: 'All six rooms',
-    text: 'One room for each part of the story. Pick any of them to start reading.',
+    title: 'Every room',
+    text: 'One room for each part of the story. Point at a name to preview it, then pick one to start reading.',
     pose: EXPRESSION.point,
   },
   BACK_STEP,
@@ -176,39 +181,15 @@ type PageEntry = { label: string; message: string; pose: MeloPose }
 const PAGES: Record<string, PageEntry> = {
   '/approach': {
     label: 'Our Approach',
-    message: "The barrier isn't always the support. It's the way in.",
+    message: 'Different people. Different needs. A more human approach.',
     pose: 2,
   },
-  '/platform/meloworld': { label: 'MeloWorld', message: 'A private space to begin.', pose: 3 },
-  '/platform/vr-wellness': {
-    label: 'VR Wellness',
-    message: 'Experience it before you face it.',
-    pose: 4,
-  },
   '/trust': {
-    label: 'Trust Centre',
-    message: 'Where clinical expertise meets immersive technology.',
+    label: 'Built on Trust',
+    message: 'Feel safe enough to take the first step.',
     pose: 4,
   },
-  '/for/workplaces': {
-    label: 'Workplaces',
-    message:
-      'Create more approachable ways for employees to explore wellbeing, build healthier habits and access professional support.',
-    pose: 5,
-  },
-  '/for/education': {
-    label: 'Educational Institutes',
-    message:
-      'Give students safe, engaging ways to understand their wellbeing, build emotional skills and access support when they need it.',
-    pose: 5,
-  },
-  '/for/healthcare': {
-    label: 'Healthcare',
-    message:
-      'Extend the toolkit available to mental health professionals with immersive environments and digital experiences that can complement existing care.',
-    pose: 5,
-  },
-  '/contact': { label: "Let's Talk", message: CLOSING.headline, pose: 6 },
+  '/contact': { label: 'Let’s Talk', message: CLOSING.headline, pose: 6 },
 }
 
 export function routeContext(pathname: string): RouteContext {
@@ -219,11 +200,11 @@ export function routeContext(pathname: string): RouteContext {
       const isLast = topic.slug === EXPLORE_TOPICS[EXPLORE_TOPICS.length - 1].slug
       return {
         key: `room:${topic.slug}`,
-        pose: Number(topic.index) as MeloPose,
-        label: `${topic.index} · ${topic.word}`,
+        pose: (EXPLORE_TOPICS.indexOf(topic) + 1) as MeloPose,
+        label: topic.word,
         message: topic.title,
         room: topic,
-        next: isLast ? null : { href: `/explore/${next.slug}`, label: `Continue to ${next.index} · ${next.word}` },
+        next: isLast ? null : { href: `/explore/${next.slug}`, label: `Continue to ${next.word}` },
         isLast,
         isAudience: false,
         tour: roomTour(topic),
@@ -235,10 +216,10 @@ export function routeContext(pathname: string): RouteContext {
     return {
       key: 'page:/explore',
       pose: 1,
-      label: 'The six rooms',
+      label: 'Explore',
       message: 'Pick a room to start reading.',
       room: null,
-      next: { href: `/explore/${EXPLORE_TOPICS[0].slug}`, label: `Start with 01 · ${EXPLORE_TOPICS[0].word}` },
+      next: { href: `/explore/${EXPLORE_TOPICS[0].slug}`, label: `Start with ${EXPLORE_TOPICS[0].word}` },
       isLast: false,
       isAudience: false,
       tour: INDEX_TOUR,
@@ -254,7 +235,7 @@ export function routeContext(pathname: string): RouteContext {
     room: null,
     next: null,
     isLast: pathname === '/contact',
-    isAudience: pathname.startsWith('/for/'),
+    isAudience: false,
     tour: PAGE_TOUR,
   }
 }

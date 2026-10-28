@@ -1,43 +1,59 @@
 import type { Metadata } from 'next'
-import { PageShell } from '@/components/site/PageShell'
-import { CONTACT_EMAIL } from '@/lib/contact'
+import { BriefcaseBusiness, GraduationCap, Stethoscope } from 'lucide-react'
 
-export const metadata: Metadata = {
-  title: 'Contact — NEXR',
-  description:
-    'Discover how NEXR can bring a new approach to your organisation, institution or practice.',
-}
+import { pageMeta } from '@/lib/seo'
+import { CLOSING } from '@/lib/explore'
+import { PageShell, SectionHeading } from '@/components/site/PageShell'
+import { DemoForm } from '@/components/site/PageBlocks'
+
+export const metadata: Metadata = pageMeta({
+  title: 'Book A Demo',
+  description: CLOSING.body,
+  path: '/contact',
+  image: '/models/imgs/letsconnect.png',
+})
+
+const SETTINGS = [
+  { label: 'Workplaces', icon: BriefcaseBusiness, href: '/explore/vr-wellness#workplaces' },
+  { label: 'Educational Institutes', icon: GraduationCap, href: '/explore/vr-wellness#education' },
+  { label: 'Healthcare', icon: Stethoscope, href: '/explore/vr-wellness#healthcare' },
+]
 
 /**
- * CLOSING CTA — common for all sub pages.
- *
- * This page used to carry three invented "how can we help" routes with their
- * own fabricated descriptions, plus a paragraph about who NEXR is sold to that
- * was never in the brief. Trimmed to the one block the brief actually gives a
- * contact page: the closing headline, its note, and the italic line under it.
- * The direct email address is a functional necessity a text brief cannot
- * supply on its own, so it stays — everything sitting around it does not.
+ * Let's Talk. The Let's Talk block of the Animation page tab, and a demo
+ * request that composes an email (there is no form backend).
  */
 export default function ContactPage() {
   return (
     <PageShell
-      eyebrow="Let's Talk"
+      eyebrow="Let’s Talk"
       beatId="contact"
-      align="center"
-      title="The next way into wellbeing starts here."
-      lede="Discover how NEXR can bring a new approach to your organisation, institution or practice."
+      image="/models/imgs/art/approach.webp"
+      title={CLOSING.heading}
+      lede={CLOSING.body}
+      closing={false}
     >
-      <div className="flex flex-col items-center gap-6 text-center">
-        <a
-          href={`mailto:${CONTACT_EMAIL}`}
-          className="btn-primary group"
-        >
-          {CONTACT_EMAIL}
-        </a>
-        <p className="font-display text-lg italic text-bone/60">
-          Better wellbeing starts when the way in feels right.
-        </p>
-      </div>
+      <section data-route-beat className="grid gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:gap-16">
+        <div>
+          <SectionHeading>Book A Demo</SectionHeading>
+          <ul className="mt-8 space-y-3">
+            {SETTINGS.map(({ label, icon: Icon, href }) => (
+              <li key={label} data-beat-item>
+                <a
+                  href={href}
+                  className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-ink/40 p-4 transition-colors hover:border-white/25"
+                >
+                  <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-ember/12 text-ember">
+                    <Icon size={18} strokeWidth={1.6} />
+                  </span>
+                  <span className="text-[15px] font-medium text-bone/85 transition-colors group-hover:text-ember">{label}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <DemoForm />
+      </section>
     </PageShell>
   )
 }

@@ -7,7 +7,6 @@ import { SECTIONS, SECTION_COUNT } from '@/lib/sections'
 import { scroll } from '@/lib/scrollStore'
 import { useScrollSnapshot } from '@/lib/useScrollSnapshot'
 import { setCursor, resetCursor } from '@/lib/cursorStore'
-import { SOCIAL_LINKS } from '@/components/ui/SocialIcons'
 import { BeatPill } from './BeatPill'
 
 /**
@@ -108,7 +107,7 @@ export function SceneHud() {
         <div className="h-[clamp(1.2rem,4vh,3rem)]" />
       </div>
 
-      {/* ── vertical progress + socials, bottom right ─────────────────────── */}
+      {/* ── vertical progress, bottom right ─────────────────────────────── */}
       {/* Also desktop-only. These sat in the same corner as the copy block on a
           phone; the mobile menu carries the same links. */}
       <div
@@ -122,28 +121,6 @@ export function SceneHud() {
           />
         </div>
 
-        <div className="flex items-center gap-5">
-          {/* Real brand marks rather than two-letter abbreviations. "LI / IG /
-              YT" reads as a legend to be decoded; a logo is recognised without
-              being read, which is the entire job of a corner link. */}
-          <ul className="flex items-center gap-4">
-            {SOCIAL_LINKS.map(({ id, label, href, Icon }) => (
-              <li key={id}>
-                <a
-                  href={href}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  aria-label={label}
-                  title={label}
-                  {...hoverable}
-                  className="block text-bone/45 transition-colors duration-300 hover:text-ember"
-                >
-                  <Icon size={15} />
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
       </div>
     </div>
   )

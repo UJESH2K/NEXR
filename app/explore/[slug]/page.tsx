@@ -1,5 +1,3 @@
-import { existsSync } from 'node:fs'
-import { join } from 'node:path'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { ExploreExperience } from '@/components/explore/ExploreExperience'
@@ -9,11 +7,12 @@ import {
   getNextTopic,
   getPrevTopic,
 } from '@/lib/explore'
+import { pageMeta } from '@/lib/seo'
 
 /**
  * One route per beat of the home experience.
  *
- * Static at build time — there are six of them and the content is in the repo,
+ * Static at build time — there are only a few of them and the content is in the repo,
  * so there is nothing to render on demand.
  */
 export function generateStaticParams() {
@@ -27,12 +26,22 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params
   const topic = getExploreTopic(slug)
-  if (!topic) return { title: 'Explore — NEXR' }
+  if (!topic) return { title: 'Explore' }
 
-  return {
-    title: `${topic.word} — NEXR`,
-    description: topic.lede,
-  }
+  // The room's own first paragraph is its description. A lede written as
+  // several paragraphs contributes its first one, which is the sentence the
+  // page itself leads with.
+  const lede = Array.isArray(topic.lede) ? topic.lede[0] : topic.lede
+
+  return pageMeta({
+    // The room's name alone. The layout's template adds the brand, and a
+    // title carrying the full headline as well runs past the length a search
+    // result shows and gets cut mid-sentence.
+    title: topic.word,
+    description: lede,
+    path: `/explore/${topic.slug}`,
+    image: topic.hero.replace(/\.webp$/, '.png'),
+  })
 }
 
 export default async function ExploreTopicPage({
@@ -47,17 +56,11 @@ export default async function ExploreTopicPage({
   const next = getNextTopic(slug)
   const prev = getPrevTopic(slug)
 
-  // Artwork is dropped into /public by path; only point at the files that are
-  // actually there, so a missing one never costs a failed request.
-  const gallery = topic.gallery.map((item) =>
-    item.src || existsSync(join(process.cwd(), 'public', item.slot)) ? { ...item, src: item.src ?? item.slot } : item,
-  )
-
   return (
     <ExploreExperience
-      topic={{ ...topic, gallery }}
-      next={{ slug: next.slug, word: next.word, index: next.index }}
-      prev={{ slug: prev.slug, word: prev.word, index: prev.index }}
+      topic={topic}
+      next={{ slug: next.slug, word: next.word, face: next.face }}
+      prev={{ slug: prev.slug, word: prev.word, face: prev.face }}
     />
   )
 }

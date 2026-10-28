@@ -33,7 +33,7 @@ export type NexrCard = {
 export const CARDS: NexrCard[] = [
   {
     id: 'gap',
-    eyebrow: '01 / The workplace wellbeing gap',
+    eyebrow: 'The workplace wellbeing gap',
     title: 'The Gap',
     blurb:
       'Organisations invest more in wellbeing than ever. Yet burnout rises, programmes go unused and people hesitate.',
@@ -43,7 +43,7 @@ export const CARDS: NexrCard[] = [
   },
   {
     id: 'belief',
-    eyebrow: '02 / Our belief',
+    eyebrow: 'Our belief',
     title: 'Our Belief',
     blurb: 'Stop making people fit wellbeing. Make wellbeing fit people.',
     image: '/models/imgs/OurApproach.webp',
@@ -52,7 +52,7 @@ export const CARDS: NexrCard[] = [
   },
   {
     id: 'meloworld',
-    eyebrow: '03 / MeloWorld',
+    eyebrow: 'MeloWorld',
     title: 'MeloWorld',
     blurb:
       'A private, anonymous space where employees can take their first step towards support comfortably.',
@@ -62,7 +62,7 @@ export const CARDS: NexrCard[] = [
   },
   {
     id: 'vr-wellness',
-    eyebrow: '04 / VR Wellness',
+    eyebrow: 'VR Wellness',
     title: 'VR Wellness',
     blurb:
       'Immersive, guided experiences that help people work through challenges and build resilience at their own pace.',
@@ -72,22 +72,22 @@ export const CARDS: NexrCard[] = [
   },
   {
     id: 'clinical',
-    eyebrow: '05 / Psychologically safer workplaces',
+    eyebrow: 'Psychologically safer workplaces',
     title: 'Clinically Grounded',
     blurb:
       'Developed with mental health professionals, tested in clinical practice, designed for modern workplaces.',
     image: '/models/imgs/clinicallygrounded.webp',
-    route: '/explore/clinical',
+    route: '/trust',
     tint: ['#1f3a3a', '#080e0e'],
   },
   {
     id: 'contact',
-    eyebrow: '06 / Start the conversation',
+    eyebrow: 'Start the conversation',
     title: "Let's Talk",
     blurb:
       'The next way into wellbeing starts here. We will shape the right entry point for your people.',
     image: '/models/imgs/letsconnect.webp',
-    route: '/explore/contact',
+    route: '/contact',
     tint: ['#6b7a2e', '#12150a'],
   },
 ]

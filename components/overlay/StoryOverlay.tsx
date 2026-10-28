@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { ArrowUpRight } from 'lucide-react'
 import { useState } from 'react'
 
 import { SECTIONS, type Section } from '@/lib/sections'
@@ -60,8 +61,7 @@ function Beat({ section, visible, index }: { section: Section; visible: boolean;
             <img src={section.mark} alt="" className="h-6 w-auto" />
           ) : null}
           <p className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-bone/70">
-            <span className="numeral">{section.index}</span>
-            <span className="text-bone/25">/</span>
+            <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-ember" />
             {section.word}
           </p>
         </div>
@@ -88,21 +88,16 @@ function Beat({ section, visible, index }: { section: Section; visible: boolean;
             exclusive at every width, never both. */}
         {section.tiles ? <AudienceTabs tiles={section.tiles} /> : null}
 
-        {section.quote ? (
-          <p className="mt-6 border-l border-ember/40 pl-4 font-display text-[15px] italic leading-[1.6] text-bone/70 lg:hidden">
-            &lsquo;{section.quote}&rsquo;
-          </p>
-        ) : null}
-
         <Link
           href={section.cta.route}
           {...hoverable}
-          className="group pointer-events-auto mt-6 inline-flex min-h-11 items-center gap-4 lg:mt-8"
+          className="btn-ghost group pointer-events-auto mt-6 lg:mt-8"
         >
-          <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-bone/80 transition-colors group-hover:text-ember">
-            {section.cta.label}
-          </span>
-          <span className="block h-px w-12 origin-left bg-bone/35 transition-all duration-500 group-hover:w-20 group-hover:bg-ember" />
+          {section.cta.label}
+          <ArrowUpRight
+            size={14}
+            className="shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+          />
         </Link>
       </div>
 

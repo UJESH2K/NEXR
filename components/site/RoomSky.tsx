@@ -36,16 +36,20 @@ export function RoomSky({
 }
 
 /**
- * The NEXR wordmark, at the foot of a sub page.
+ * The NEXR wordmark, signing off the document.
  *
- * The scene opens on this word; the sub pages close on it. It sits below the
- * last line of content, fades out toward the bottom edge and is cut by it, so
- * it reads as a signature rather than as a heading — and it never sits behind
- * text it would compete with.
+ * The scene opens on this word; every interior page closes on it. It lives in
+ * the site footer and runs off the bottom edge of the page, so what shows is
+ * the top of the letters fading out — a watermark under the legal line rather
+ * than a heading, and never behind copy it would compete with.
+ *
+ * It used to end the article instead, which worked only while the article was
+ * the end of the page. Once the footer existed, the cut it relied on stopped
+ * being the page edge and became a hard line across the middle of the screen.
  */
-export function RoomSignature({ className = '' }: { className?: string }) {
+export function FooterSignature() {
   return (
-    <div aria-hidden="true" className={`room-signature ${className}`}>
+    <div aria-hidden="true" className="footer-signature">
       <span>NEXR</span>
     </div>
   )

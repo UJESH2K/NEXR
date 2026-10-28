@@ -111,12 +111,8 @@ export function PanelDetail() {
                 {section.mark ? (
                   <img src={section.mark} alt="" className="h-7 w-auto" />
                 ) : null}
-                <p
-                  className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-bone/70"
-                  style={{ ['--numeral-accent' as string]: section.accent }}
-                >
-                  <span className="numeral">{section.index}</span>
-                  <span className="text-bone/25">/</span>
+                <p className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-bone/70">
+                  <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: section.accent }} />
                   {section.word}
                 </p>
               </div>

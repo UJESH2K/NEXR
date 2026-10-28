@@ -7,9 +7,12 @@ import { CursorFollower } from '@/components/ui/cursor-follower'
 import { ContactModal } from '@/components/site/ContactModal'
 import { Curtain } from '@/components/site/Curtain'
 import { Header } from '@/components/site/Header'
+import { SiteFooter } from '@/components/site/SiteFooter'
 import { SkipLink } from '@/components/site/SkipLink'
 import { SiteGuide } from '@/components/site/SiteGuide'
 import { ScrollProvider } from '@/lib/ScrollProvider'
+import { CONTACT_EMAIL } from '@/lib/contact'
+import { SITE_NAME, SITE_URL, clamp } from '@/lib/seo'
 import './globals.css'
 
 // These CSS variables are what globals.css binds --font-sans/mono/display to.
@@ -50,10 +53,67 @@ const playfair = Playfair_Display({
   display: 'swap',
 })
 
+/**
+ * The site-wide defaults. Every route then overrides title, description and
+ * canonical for itself — see lib/seo.ts.
+ *
+ * `metadataBase` is what makes a relative canonical or Open Graph image
+ * resolve to an absolute URL. Without it Next emits relative preview URLs,
+ * which most social crawlers simply drop.
+ */
 export const metadata: Metadata = {
-  title: 'NEXR — Help shouldn’t cost you your privacy',
-  description:
-    'NEXR helps organisations remove the invisible barriers that stop employees from seeking support, through a connected workplace wellbeing ecosystem built around privacy, accessibility and immersive care.',
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: 'NEXR — Step into wellbeing. On your terms.',
+    // Pages pass a bare name ("MeloWorld") and get the brand added here, so
+    // the suffix is written once instead of on every route.
+    template: `%s — ${SITE_NAME}`,
+  },
+  description: clamp(
+    'Experience a more private way to prioritize your well-being through immersive VR experiences and anonymous access to expert support, all designed around you.',
+  ),
+  applicationName: SITE_NAME,
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    siteName: SITE_NAME,
+    title: 'NEXR — Step into wellbeing. On your terms.',
+    description: clamp(
+      'Experience a more private way to prioritize your well-being through immersive VR experiences and anonymous access to expert support, all designed around you.',
+    ),
+    url: SITE_URL,
+    images: [{ url: '/models/imgs/gap.png' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'NEXR — Step into wellbeing. On your terms.',
+    description: clamp(
+      'Experience a more private way to prioritize your well-being through immersive VR experiences and anonymous access to expert support, all designed around you.',
+    ),
+    images: ['/models/imgs/gap.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, 'max-image-preview': 'large' },
+  },
+}
+
+/**
+ * Who the site belongs to, in the one form search engines read directly.
+ *
+ * Only facts already published on the site go in here: the name, the home
+ * page, the mark and the address from lib/contact.ts. No claims, counts or
+ * ratings — structured data that says more than the page does is the kind
+ * search engines penalise.
+ */
+const ORGANISATION_JSON_LD = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: SITE_NAME,
+  url: SITE_URL,
+  logo: `${SITE_URL}/brand/meloworld-mark.webp`,
+  email: CONTACT_EMAIL,
 }
 
 // themeColor lives here rather than in metadata — Next moved it in v14.
@@ -111,6 +171,12 @@ export default function RootLayout({
         />
         {/* The load curtain is server HTML, so it is in the very first paint —
             there is no frame of the site before it. Preloader drives it. */}
+        <script
+          type="application/ld+json"
+          // The payload is a constant defined above, not anything a visitor
+          // can influence, so there is nothing here to escape.
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(ORGANISATION_JSON_LD) }}
+        />
         <Curtain />
         <SkipLink />
         <CursorFollower />
@@ -134,6 +200,10 @@ export default function RootLayout({
           >
             {children}
           </main>
+          {/* Outside <main>, so it is not part of the page's one landmark, and
+              after it in flow so it lands under whatever the route rendered.
+              It removes itself on the home route — see SiteFooter. */}
+          <SiteFooter />
         </ScrollProvider>
       </body>
     </html>

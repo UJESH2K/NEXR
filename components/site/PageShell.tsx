@@ -1,289 +1,135 @@
 import Link from 'next/link'
-import { ArrowLeft, ArrowUpRight } from 'lucide-react'
 import Image from 'next/image'
+import { ArrowLeft, ArrowUpRight } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { sectionById } from '@/lib/sections'
 import { requestReturn } from '@/lib/returnStore'
 import { PageFade } from './PageFade'
 import { GsapRouteMotion } from './GsapRouteMotion'
-import { RoomSignature, RoomSky } from './RoomSky'
+import { RoomSky } from './RoomSky'
+import { ClosingCta } from './ClosingCta'
 
+/**
+ * The frame for the interior pages (Approach, Trust, Let's Talk).
+ *
+ * A held title over a wide, cinematic image band, then the page's own
+ * sections, then the shared closing block and the way back. The colours and
+ * the band image come from the page's beat on the home scene, so a page reads
+ * as the inside of the beat that linked to it.
+ */
 export function PageShell({
   eyebrow,
+  kicker,
   title,
   lede,
-  /** Which beat this page tells at length. Its colours and hero image come
-   *  from here rather than being copied per page — see `sectionById`. */
   beatId,
-  /** Optional product mark drawn above the title, e.g. MeloWorld's. */
-  mark,
-  /** Centres the eyebrow and title instead of the default two-column grid.
-   *  For a page that reads as one held statement rather than a report — the
-   *  product pages want this; the longer argument pages (Approach, Trust)
-   *  read better as the grid, where the eyebrow sits beside a long title
-   *  instead of stacked above it. */
-  align = 'default',
+  image,
+  actions,
+  closing = true,
   children,
 }: {
   eyebrow: string
+  /** A quieter line that sets up the title, where the document writes one. */
+  kicker?: string
   title: string
   lede?: string
   beatId: string
-  mark?: string
-  align?: 'default' | 'center'
+  /** Overrides the beat's own image for the band. */
+  image?: string
+  actions?: ReactNode
+  /** The shared closing block. Off on the contact page, which is that block. */
+  closing?: boolean
   children: ReactNode
 }) {
   const section = sectionById(beatId)
-  const tints = section.sky
-  const hero = section.images[0]
+  const hero = image ?? section.images[0]
 
   return (
     <PageFade>
       <GsapRouteMotion>
-      <article className="safe-bottom pointer-events-auto relative isolate min-h-svh overflow-hidden bg-abyss px-5 pb-20 pt-28 sm:px-6 md:px-10 md:pb-28 md:pt-32">
-        <RoomSky sky={section.sky} accent={section.accent} />
-        <header
-          data-tour="page-intro"
-          className={
-            align === 'center'
-              ? 'mx-auto max-w-4xl border-b border-white/10 pb-16 text-center'
-              : 'mx-auto grid max-w-6xl gap-10 border-b border-white/10 pb-16 lg:grid-cols-[0.7fr_1.3fr] lg:items-end'
-          }
-        >
-          <p
-            data-route-eyebrow
-            className={`eyebrow !text-ember-soft ${align === 'center' ? 'justify-center' : ''}`}
+        <article className="safe-bottom pointer-events-auto relative isolate min-h-svh overflow-hidden bg-abyss px-5 pb-20 pt-28 sm:px-6 md:px-10 md:pb-28 md:pt-36">
+          <RoomSky sky={section.sky} accent={section.accent} />
+
+          <header data-tour="page-intro" className="mx-auto max-w-6xl">
+            <p data-route-eyebrow className="flex items-center gap-2.5 text-[15px] font-medium text-ember-soft">
+              <span aria-hidden="true" className="h-2 w-2 rounded-full bg-ember shadow-[0_0_0_4px_rgb(255_121_1/0.2)]" />
+              {eyebrow}
+            </p>
+            <div className="mt-6 grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-end lg:gap-16">
+              <div>
+                {kicker ? (
+                  <p data-route-lede className="mb-4 text-[clamp(1.05rem,1.6vw,1.3rem)] leading-[1.5] text-bone/60">
+                    {kicker}
+                  </p>
+                ) : null}
+                <h1
+                  data-route-title
+                  className="text-balance font-display text-[clamp(2.4rem,5.4vw,4.6rem)] font-semibold leading-[1.04] text-bone"
+                >
+                  {title}
+                </h1>
+              </div>
+              {lede || actions ? (
+                <div className="lg:pb-2">
+                  {lede ? (
+                    <p data-route-lede className="max-w-[52ch] text-[15.5px] leading-[1.85] text-sand/75">
+                      {lede}
+                    </p>
+                  ) : null}
+                  {actions ? <div className="mt-7 flex flex-wrap gap-3">{actions}</div> : null}
+                </div>
+              ) : null}
+            </div>
+          </header>
+
+          <div
+            data-route-media
+            className="relative mx-auto mt-12 aspect-[16/10] max-w-6xl overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl shadow-black/40 md:mt-16 md:aspect-[2.4/1]"
+            style={{ backgroundImage: `linear-gradient(135deg, ${section.sky[0]}, ${section.sky[1]})` }}
           >
-            {eyebrow}
-          </p>
-          <div className={align === 'center' ? 'mx-auto' : undefined}>
-            {mark ? (
+            {hero ? (
               <Image
-                data-route-mark
-                src={mark}
+                src={hero}
                 alt=""
-                width={96}
-                height={70}
-                className={`mb-6 h-14 w-auto ${align === 'center' ? 'mx-auto' : ''}`}
+                fill
+                priority
+                className="object-cover opacity-90 mix-blend-luminosity"
+                sizes="(min-width: 1024px) 1200px, 100vw"
               />
             ) : null}
-            <h1
-              data-route-title
-              className="text-balance font-display text-[clamp(2.4rem,5.6vw,5rem)] font-semibold leading-[1.05] text-bone"
-            >
-              {title}
-            </h1>
-            {lede ? (
-              <p
-                data-route-lede
-                className={`mt-8 text-lg leading-relaxed text-sand/75 md:text-xl ${
-                  align === 'center' ? 'mx-auto max-w-2xl' : 'max-w-2xl'
-                }`}
-              >
-                {lede}
-              </p>
-            ) : null}
+            <div className="absolute inset-0 bg-gradient-to-r from-void/60 via-transparent to-void/40" />
+            <div className="absolute inset-0 bg-gradient-to-t from-void/70 via-transparent to-transparent" />
+            <span aria-hidden="true" className="absolute bottom-0 left-0 h-1 w-1/4 bg-ember" />
           </div>
-        </header>
 
-        {/* Hero media card with gradient fallback when no image */}
-        <div
-          data-route-media
-          className="relative mx-auto mt-10 aspect-[16/10] max-w-6xl overflow-hidden rounded-2xl border border-white/10 shadow-2xl shadow-black/40 md:aspect-[2.2/1]"
-          style={{
-            backgroundImage: `linear-gradient(135deg, ${tints[0]}, ${tints[1]})`,
-          }}
-        >
-          {hero ? (
-            <Image
-              src={hero}
-              alt=""
-              fill
-              priority
-              className="object-cover opacity-60 mix-blend-luminosity"
-              sizes="(min-width: 1024px) 1200px, 100vw"
-            />
-          ) : null}
-          {/* Multi-layer gradient overlay for depth */}
-          <div className="absolute inset-0 bg-gradient-to-r from-void via-void/20 to-void/70" />
-          <div className="absolute inset-0 bg-gradient-to-t from-void/80 via-transparent to-transparent" />
-          {/* Decorative grid pattern */}
-          <div className="absolute inset-0 opacity-[0.03]" style={{
-            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }} />
-          {/* Corner accent line */}
-          <div className="absolute bottom-0 left-0 h-px w-1/3 bg-gradient-to-r from-ember/50 to-transparent" />
-          <div className="absolute bottom-0 left-0 h-1/3 w-px bg-gradient-to-t from-ember/50 to-transparent" />
-          <div className="absolute bottom-5 left-5 font-mono text-[10px] uppercase tracking-[0.25em] text-ember/80 md:bottom-8 md:left-8">
-            NEXR / {section.word}
-          </div>
-        </div>
+          <div className="mx-auto mt-16 max-w-6xl md:mt-24">{children}</div>
 
-        <div className="mx-auto mt-14 max-w-6xl md:mt-20">{children}</div>
+          {closing ? <ClosingCta accent={section.accent} tint={section.sky} className="mx-auto mt-20 max-w-6xl md:mt-28" /> : null}
 
-        {/* The end of the page, said plainly: one panel, two real buttons —
-            the way back on the left, the way forward on the right. They used
-            to be two faint lines of mono type that read as captions. */}
-        <footer className="page-end mx-auto mt-20 max-w-4xl md:mt-24">
-          <Link href="/" onClick={requestReturn} className="end-btn group">
-            <ArrowLeft size={15} className="shrink-0 transition-transform group-hover:-translate-x-1" />
-            Back to the experience
-          </Link>
-          <Link href="/contact" className="btn-primary group justify-center">
-            Book a Demo
-            <ArrowUpRight
-              size={14}
-              className="shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-            />
-          </Link>
-        </footer>
-
-        <RoomSignature className="-mx-5 -mb-20 mt-16 sm:-mx-6 md:-mx-10 md:-mb-28 md:mt-20" />
-      </article>
+          <footer className="page-end mx-auto mt-10 max-w-6xl">
+            <Link href="/" onClick={requestReturn} className="end-btn group">
+              <ArrowLeft size={15} className="shrink-0 transition-transform group-hover:-translate-x-1" />
+              Back to the experience
+            </Link>
+            <Link href="/explore" className="end-btn group">
+              Explore every room
+              <ArrowUpRight size={15} className="shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </Link>
+          </footer>
+        </article>
       </GsapRouteMotion>
     </PageFade>
   )
 }
 
-/** Anchored section used for the in-page targets the cards deep-link to. */
-export function Beat({
-  id,
-  heading,
-  accent,
-  children,
-}: {
-  id?: string
-  heading: string
-  accent?: string
-  children: ReactNode
-}) {
+/** A section heading used inside the pages, so every page sets them alike. */
+export function SectionHeading({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <section
-      id={id}
-      data-route-beat
-      className="scroll-mt-32 border-t border-bone/12 py-14 first:border-0 first:pt-0"
+    <h2
+      data-beat-heading
+      className={`text-balance font-display text-[clamp(1.8rem,3.4vw,2.8rem)] font-medium leading-[1.1] text-bone ${className}`}
     >
-      <h2 data-beat-heading className="font-display text-[clamp(1.7rem,3.4vw,2.75rem)] font-medium leading-[1.12] text-bone">
-        {heading}
-      </h2>
-      {accent ? (
-        <p data-beat-accent className="mt-4 font-display text-xl italic text-ember/90">
-          {accent}
-        </p>
-      ) : null}
-      <div data-beat-body className="mt-6 space-y-5 leading-relaxed text-sand/75">
-        {children}
-      </div>
-    </section>
-  )
-}
-
-/** Three-up tile row, used for pillars and credibility statements. */
-export function Tiles({ items }: { items: { title: string; body: string; icon?: string }[] }) {
-  return (
-    <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {items.map((item) => (
-        <li
-          key={item.title}
-          data-beat-item
-          className="group rounded-lg border border-bone/12 bg-ink/60 p-6 transition-all duration-500 hover:border-ember/30 hover:bg-ink/80 hover:shadow-lg hover:shadow-ember/5"
-        >
-          {item.icon ? (
-            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-ember/10 text-ember">
-              <span className="text-lg">{item.icon}</span>
-            </div>
-          ) : null}
-          <h3 className="font-display text-xl text-bone transition-colors group-hover:text-ember">{item.title}</h3>
-          <p className="mt-3 text-sm leading-relaxed text-sand/70">
-            {item.body}
-          </p>
-        </li>
-      ))}
-    </ul>
-  )
-}
-
-/** Stats row with animated numbers */
-export function Stats({ items }: { items: { value: string; label: string }[] }) {
-  return (
-    <div className="grid grid-cols-2 gap-6 py-8 lg:grid-cols-4">
-      {items.map((item) => (
-        <div
-          key={item.label}
-          data-beat-item
-          className="text-center"
-        >
-          <p className="numeral numeral--lg text-4xl md:text-5xl">{item.value}</p>
-          <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.2em] text-sand/60">{item.label}</p>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-/** Image placeholder card — renders a styled gradient card where an image would go */
-export function ImagePlaceholder({
-  label,
-  tint = ['#2a2f26', '#0b0d0a'],
-  aspect = '16/9',
-  className = '',
-}: {
-  label?: string
-  tint?: [string, string]
-  aspect?: string
-  className?: string
-}) {
-  return (
-    <div
-      data-beat-item
-      className={`relative overflow-hidden rounded-xl border border-white/10 ${className}`}
-      style={{
-        aspectRatio: aspect,
-        backgroundImage: `linear-gradient(135deg, ${tint[0]}, ${tint[1]})`,
-      }}
-    >
-      <div className="absolute inset-0 opacity-[0.04]" style={{
-        backgroundImage: 'linear-gradient(rgba(255,255,255,.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.15) 1px, transparent 1px)',
-        backgroundSize: '40px 40px',
-      }} />
-      <div className="absolute inset-0 bg-gradient-to-t from-void/50 to-transparent" />
-      {label ? (
-        <div className="absolute bottom-4 left-4 right-4">
-          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-ember/60">{label}</p>
-        </div>
-      ) : null}
-      {/* Image icon placeholder */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <svg className="h-12 w-12 text-bone/10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-      </div>
-    </div>
-  )
-}
-
-/** Process/step card with number */
-export function StepCard({
-  number,
-  title,
-  children,
-}: {
-  number: number
-  title: string
-  children: ReactNode
-}) {
-  return (
-    <div data-beat-item className="relative flex gap-5">
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-ember/30">
-        <span className="numeral text-lg">{number}</span>
-      </div>
-      <div>
-        <h3 className="font-display text-xl text-bone">{title}</h3>
-        <div className="mt-2 space-y-2 text-sm leading-relaxed text-sand/70">
-          {children}
-        </div>
-      </div>
-    </div>
+      {children}
+    </h2>
   )
 }

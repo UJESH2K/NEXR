@@ -458,9 +458,7 @@ export function Melo() {
                         goBack()
                       }}
                     >
-                      Back to{' '}
-                      <span className="numeral text-[0.95em]">{String(returnTopic.index + 1).padStart(2, '0')}</span>{' '}
-                      {returnTopic.word}
+                      Back to {returnTopic.word}
                     </MenuRow>
                   ) : null}
                   <MenuRow

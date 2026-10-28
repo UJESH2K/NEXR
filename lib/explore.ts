@@ -1,234 +1,163 @@
 /**
- * The six explore rooms.
+ * The explore rooms.
  *
- * Each beat on the home scene ends in one link, and this is what sits on the
- * other side of it: a long-form read for that beat, with the same index, word
- * and accent so arriving feels like walking further into the same building
- * rather than landing on a different site.
- *
- * The copy is the script's, expanded. Where the scene has room for one
- * paragraph, a room here has space for the argument behind it — but nothing is
- * invented that contradicts the approved narrative, and the headline of every
- * room is the headline of its beat.
- *
- * Images are deliberately not all present yet. A gallery item without `src`
- * renders a designed placeholder that names the exact file to drop in, so
- * artwork can be added later without touching a component.
+ * Every word on these pages comes from the NEXR web content document: the
+ * Gap, Belief and Meloworld tabs give their rooms in full, and the VR Wellness
+ * room is built from the VR Wellness block of the Animation page tab plus the
+ * audience cards that tab keeps as they are. Nothing is numbered — the rooms
+ * are named, and the order is simply the order they are listed in.
  */
-
-export type ExploreImage = {
-  /** Shown on the card, and on the placeholder while the file is missing. */
-  label: string
-  /** Where the file goes. Also the src once it exists. */
-  slot: string
-  /** Set once the artwork is in place. Until then the placeholder stands in. */
-  src?: string
-  /** CSS aspect-ratio string. Mixed ratios are what stop the grid looking like a form. */
-  aspect: string
-}
 
 export type ExploreChapter = {
   id: string
-  /** Small line above the heading, matching the scene's kicker treatment. */
-  kicker?: string
   heading: string
-  /**
-   * The short label the "In this room" rail shows for this chapter.
-   *
-   * The source script writes two different texts for the same chapter: a
-   * punchy nav-rail line ("Not everyone knows what they need.") and a longer
-   * in-body heading ("Support doesn't begin with a session."). Falls back to
-   * `heading` when a room doesn't distinguish the two.
-   */
+  /** Shorter label for the "In this room" strip. Falls back to `heading`. */
   navLabel?: string
   paragraphs: string[]
+  /** Optional artwork drawn beside this chapter. */
+  image?: string
 }
 
 export type ExploreHighlight = {
+  /** Anchor id, so a card can be linked to directly. */
+  id?: string
   title: string
   body: string
-}
-
-export type ExploreStat = {
-  value: string
-  label: string
 }
 
 export type ExploreLink = {
   label: string
   href: string
-  /** Only ever approved copy; most links carry none. */
-  note?: string
 }
 
 export type ExploreTopic = {
   slug: string
-  /** Matches the beat's index on the home scene. */
-  index: string
   word: string
+  /** Small line above the hero title. */
   eyebrow: string
+  /** The line under this room's name on the Explore page. */
+  listNote: string
   title: string
-  lede: string
-  /** Hero artwork. Every topic has one already. */
+  /** One paragraph or several. */
+  lede: string | string[]
   hero: string
-  mark?: string
   /**
-   * Accent and background tint, both taken from this room's beat on the home
-   * scene rather than chosen here.
-   *
-   * They used to be chosen here, and they drifted badly: three rooms ended up
-   * mint, lavender and cyan while the scene they opened from was orange, and
-   * every tint was still a green left over from an older palette. A room is
-   * meant to read as the inside of the beat you clicked, which only works if it
-   * is lit by the same colour. If the home palette moves, these move with it.
+   * An intro video beside the hero copy, where the document asks for one.
+   * Until `youtubeId` is set the hero image stands in as the poster.
    */
+  video?: { title: string; youtubeId?: string }
+  mark?: string
+  /** Melo's face for this room, used on the previous/next cards. */
+  face: string
   accent: string
   tint: [string, string]
   chapters: ExploreChapter[]
-  highlights?: { heading: string; items: ExploreHighlight[] }
-  stats?: ExploreStat[]
-  gallery: ExploreImage[]
+  /**
+   * A set of cards under the chapters.
+   *
+   * `layout` picks the component so each room reads differently: a bento grid
+   * for principles, a path for steps, link cards for audiences.
+   */
+  highlights?: {
+    heading: string
+    layout: 'bento' | 'steps' | 'audiences'
+    items: ExploreHighlight[]
+  }
   quote?: string
   deeper: ExploreLink[]
-  cta: { label: string; href: string; note: string }
-  /**
-   * The secondary hero link's label, e.g. "Explore MeloWorld". The source
-   * script varies this per room rather than repeating "Start reading" on
-   * every one; falls back to that when a room doesn't specify its own.
-   */
+  /** Secondary hero link, e.g. "Keep Reading". */
   readMoreLabel?: string
 }
 
 export const EXPLORE_TOPICS: ExploreTopic[] = [
   {
     slug: 'gap',
-    index: '01',
     word: 'The Gap',
-    // S2 SUB PAGE - THE GAP.
     eyebrow: 'Help is closer than ever.',
-    title: 'But why does the first step feel so far away?',
+    listNote: 'Help is closer than ever.',
+    title: 'It’s not always support we lack. It’s a way in',
     lede:
-      'We\u2019ve built more ways for people to access wellbeing support, but the decision to actually use it is still personal. Reaching out can feel uncomfortable, unfamiliar, or simply like something you\u2019re not ready for yet. Sometimes, what stands between a person and support isn\u2019t its availability, but the experience of getting there. The gap isn\u2019t always between people and support. Sometimes, it\u2019s between people and the way support is offered.',
-    hero: '/models/imgs/gap.webp',
+      'Wellbeing support may be available, but taking the first step can still feel daunting. Fear of judgement, privacy concerns, or simply not knowing where to begin can keep people from reaching out. Because access isn’t just about whether support exists. It’s about whether people feel comfortable enough to use it.',
+    hero: '/models/imgs/art/gap-left.webp',
+    face: '/brand/melo/face-1.webp',
     accent: '#ff7901',
     tint: ['#9f6021', '#311c08'],
-    readMoreLabel: 'Start Reading',
+    readMoreLabel: 'Keep Reading',
     chapters: [
       {
-        id: 'engagement',
-        navLabel: 'Not everyone knows what they need.',
-        heading: 'Support doesn\u2019t begin with a session.',
+        id: 'first-step',
+        heading: 'The first step is part of the experience',
         paragraphs: [
-          'It begins much earlier, with the moment someone decides to explore what they\u2019re feeling, look for help, or simply understand what they need. That moment can feel different for everyone. The more thoughtfully we design it, the easier it can be to take the next step.',
+          'Before someone can benefit from support, they need an experience that feels right for them. For some, that begins with a private moment of reflection. For others, it’s exploring what they feel or understanding what they need. When the experience meets people where they are, taking the next step can feel more natural.',
         ],
       },
       {
-        id: 'hesitation',
-        navLabel: 'Why the first step matters.',
-        heading: 'Beyond the first step.',
+        id: 'adapts',
+        heading: 'Support that adapts to you',
         paragraphs: [
-          'Privacy can make it easier to explore. Familiarity can make something new feel less intimidating. A guided experience can help someone understand what they need before deciding what comes next.',
-          'And when the first step feels manageable, the next one doesn\u2019t have to feel so far away.',
-          'Access is not only about availability. It\u2019s also about approachability.',
+          'People have different needs, comfort levels, and ways of seeking support. Yet traditional approaches often expect everyone to follow the same path. At NEXR, we’re changing that with immersive VR experiences, anonymous access, and expert guidance that give people more ways to engage with well-being in a way that feels right for them.',
         ],
+        image: '/models/imgs/art/vr-left.webp',
       },
       {
-        id: 'cost',
-        navLabel: 'What a different approach can change.',
-        kicker: 'When wellbeing becomes easier to approach, it can become easier to use.',
-        heading: 'And that matters beyond the individual.',
+        id: 'ways-in',
+        heading: 'Different needs deserve different ways in',
         paragraphs: [
-          'Early engagement can help people recognise what they need, build healthier ways of responding and seek appropriate support sooner.',
-          'For organisations and institutions, that can mean creating environments where wellbeing isn\u2019t something people turn to only when things become difficult.',
-          'The goal is not simply more programmes. It is more meaningful participation in wellbeing.',
+          'From anonymous spaces to immersive VR experiences and expert guidance, NEXR offers different ways to engage with well-being. Whether someone wants to explore what they’re feeling, practice new skills, or speak with a professional, they can find a starting point that feels right for them.',
+          'Because support works better when the experience works for the person.',
         ],
-      },
-    ],
-    stats: [
-      { value: '76%', label: 'Employees who don\u2019t openly share their struggles' },
-      { value: '<10%', label: 'Typical EAP usage' },
-      { value: '1 in 4', label: 'Employees reporting burnout symptoms' },
-      { value: '0', label: 'names needed to start with NEXR' },
-    ],
-    gallery: [
-      {
-        label: 'The gap, visualised',
-        slot: '/explore/gap/01.webp',
-        aspect: '4/3',
-      },
-      {
-        label: 'Utilisation versus spend',
-        slot: '/explore/gap/02.webp',
-        aspect: '4/3',
-      },
-      {
-        label: 'Where people stop',
-        slot: '/explore/gap/03.webp',
-        aspect: '16/9',
       },
     ],
     deeper: [
-      {
-        label: 'Our approach',
-        href: '/approach#gap',
-      },
-      {
-        label: 'Our belief',
-        href: '/explore/belief',
-      },
+      { label: 'Belief', href: '/explore/belief' },
+      { label: 'Our Approach', href: '/approach' },
     ],
-    cta: {
-      label: 'Book a Demo',
-      href: '/contact',
-      note: 'Discover how NEXR can bring a new approach to your organisation, institution or practice.',
-    },
   },
 
   {
     slug: 'belief',
-    index: '02',
     word: 'Belief',
-    // S3 — SUB PAGE.
     eyebrow: 'Different people. Different ways forward.',
-    title: 'So why should wellbeing always begin in the same place?',
+    listNote: 'Different people. Different ways forward.',
+    title: 'Wellbeing Should Meet You Where You Are',
     lede:
-      'People have different needs, different comfort levels and different ways of responding to challenges.',
-    hero: '/models/imgs/OurApproach.webp',
+      'We all experience life differently. So why should the way we approach well-being be any different? We believe everyone deserves a way to begin that feels comfortable, personal, and right for them.',
+    hero: '/models/imgs/art/approach.webp',
+    face: '/brand/melo/face-2.webp',
     accent: '#ff8118',
     tint: ['#a25f20', '#321c08'],
+    readMoreLabel: 'Our Belief',
     chapters: [
       {
-        id: 'today',
-        navLabel: 'Wellbeing is personal.',
-        heading: 'Start with the person, not the problem.',
+        id: 'one-size',
+        heading: 'The way forward isn’t one-size-fits-all',
         paragraphs: [
-          'How we feel is shaped by what we\u2019re dealing with, where we are, and what life looks like around us. A student navigating a new environment, an employee under pressure, or someone working through a personal challenge may all need something different.',
-          'Instead of asking people to adapt to one model, create more ways for them to engage.',
+          'Some people are ready to talk. Others need time, privacy, or a different way to explore what they’re experiencing. When well-being follows just one path, too many people can be left feeling that it isn’t for them.',
+          'We believe the experience should adapt to the person, not the other way around.',
         ],
       },
       {
-        id: 'natural',
-        navLabel: 'Experience changes participation.',
-        heading: 'People remember what they experience.',
+        id: 'changes-everything',
+        heading: 'A belief that changes everything',
         paragraphs: [
-          'Wellbeing isn\u2019t only about having the right information or putting the right support in place. The way people encounter it can influence whether they pause, participate, return to it, or take something from it.',
-          'A private environment can invite reflection. An immersive experience can turn an idea into something felt. Guided support can turn that experience into understanding.',
-          'When wellbeing feels relevant to real life, it becomes easier to engage with.',
+          'Wellbeing shouldn’t come with a prescribed starting point. It should give people the freedom to find what feels right for them, at their own pace and on their own terms.',
+          'Because taking the first step feels different for everyone. And it should be okay to begin differently.',
         ],
+        image: '/models/imgs/art/clinical.webp',
       },
       {
-        id: 'outcome',
-        navLabel: 'Make wellbeing part of everyday life.',
-        heading: 'Make wellbeing part of the everyday.',
+        id: 'brought-to-life',
+        heading: 'How does NEXR bring this belief to life?',
         paragraphs: [
-          'The most meaningful changes don\u2019t always happen in a single session. They can come from learning to recognise what you\u2019re feeling, practising how you respond, building confidence, or becoming more comfortable asking for support.',
-          'That shift can change the way people experience support, long before support becomes urgent.',
+          'NEXR brings together immersive VR experiences, anonymous access, and expert guidance to make well-being feel more personal, private, and approachable.',
+          'Whether someone wants to explore at their own pace, build practical skills, or connect with an expert, they can find a way in that feels right for them. No single path. No pressure to begin a certain way. Just more room to take the next step.',
         ],
       },
     ],
+    // Kept as it is: the document marks the rest of this page as staying the same.
     highlights: {
-      // FOUR PRINCIPLES — What Guides Us.
       heading: 'What Guides Us',
+      layout: 'bento',
       items: [
         {
           title: 'People First',
@@ -248,346 +177,158 @@ export const EXPLORE_TOPICS: ExploreTopic[] = [
         },
       ],
     },
-    gallery: [
-      // INSIDE BELIEF.
-      {
-        label: 'Designed around people',
-        slot: '/explore/belief/01.webp',
-        aspect: '4/3',
-      },
-      {
-        label: 'Our principles in action',
-        slot: '/explore/belief/02.webp',
-        aspect: '4/3',
-      },
-      {
-        label: 'From reactive to everyday',
-        slot: '/explore/belief/03.webp',
-        aspect: '16/9',
-      },
-    ],
-    quote:
-      'NEXR isn\u2019t reinventing wellbeing. It\u2019s rethinking how people experience it.',
+    quote: 'NEXR isn’t reinventing wellbeing. It’s rethinking how people experience it.',
     deeper: [
-      {
-        label: 'MeloWorld',
-        href: '/explore/meloworld',
-      },
-      {
-        label: 'VR Wellness',
-        href: '/explore/vr-wellness',
-      },
+      { label: 'Explore Our Approach', href: '/approach' },
+      { label: 'MeloWorld', href: '/explore/meloworld' },
     ],
-    cta: {
-      label: 'Book a Demo',
-      href: '/contact',
-      note: 'Discover how NEXR can bring a new approach to your organisation, institution or practice.',
-    },
   },
 
   {
     slug: 'meloworld',
-    index: '03',
     word: 'MeloWorld',
-    // S5 — SUB PAGE.
     eyebrow: 'MeloWorld',
-    title: 'A space built around privacy',
-    lede:
-      'Mellow World gives people a private space to pause, reflect and make sense of what they\u2019re experiencing, without the pressure of being seen or judged. From exploring what\u2019s on their mind to finding the right kind of support, the experience lets them move forward at their own pace.',
-    hero: '/models/imgs/meloworld.webp',
+    listNote: 'A private space',
+    title: 'A space to open up without the pressure',
+    lede: [
+      'MeloWorld offers an immersive, private space where employees and students can pause, work through everyday challenges, and connect with trained professionals.',
+      'Through avatar-led experiences and confidential access to expert support, they can take the first step at their own pace, without the fear of being seen or judged.',
+    ],
+    hero: '/models/imgs/art/meloworld-left.webp',
+    video: { title: 'MeloWorld intro and tutorial' },
     mark: '/brand/meloworld-mark.webp',
+    face: '/brand/melo/face-3.webp',
     accent: '#ff8a2a',
     tint: ['#a65f20', '#341c08'],
-    readMoreLabel: 'Explore MeloWorld',
+    readMoreLabel: 'Explore Meloworld',
     chapters: [
       {
-        id: 'privacy',
-        navLabel: 'Privacy built into the experience.',
-        heading: 'Leave your identity at the door.',
+        id: 'identity',
+        heading: 'Leave your identity at the door',
         paragraphs: [
-          'MeloWorld doesn\u2019t ask people to put their identity forward before they know what they need. They enter through an avatar, with no photograph or public-facing profile, creating space to explore without the pressure of being recognised or having to explain themselves.',
-          'Sometimes, participation starts with knowing you can stay private.',
+          'MeloWorld lets people enter through an avatar, without a photograph or public-facing profile. This creates space to explore what’s on their mind without the added pressure of being recognized or having to explain themselves to others.',
         ],
       },
       {
-        id: 'pace',
-        navLabel: 'Explore at your own pace.',
-        heading: 'There\u2019s no prescribed way to begin.',
+        id: 'your-way-in',
+        heading: 'Your journey. Your way in',
         paragraphs: [
-          'MeloWorld gives people the freedom to move through the experience at their own pace. They can look around, explore different spaces and engage with what feels relevant to them, without being pushed towards a particular next step.',
-          'Professional support is available within the experience when they choose to access it.',
-          'The journey is yours to navigate.',
+          'MeloWorld lets people explore virtual spaces, move at their own pace, and engage with what feels relevant to them. Whether they need a moment to pause, want to work through everyday challenges, or are ready to connect with a professional, they can find their own starting point.',
         ],
+        image: '/models/imgs/art/connect.webp',
       },
       {
-        id: 'visibility',
-        navLabel: 'What organisations and institutions see.',
-        kicker: 'Measure engagement without turning wellbeing into surveillance.',
-        heading: 'Organisations and institutions can understand overall platform engagement without accessing individual identities.',
+        id: 'insight',
+        heading: 'Get insight without intrusion',
         paragraphs: [
-          'That means decision-makers can see how a wellbeing ecosystem is being used while preserving the privacy of the people using it.',
-          'Useful insight at the organisational level. Personal privacy at the individual level.',
+          'Organizations and institutions can understand overall platform engagement without accessing individual identities. Decision-makers gain a clearer picture of how their well-being ecosystem is being used, while the privacy of the people using it remains protected.',
         ],
       },
     ],
     highlights: {
-      // HOW MELOWORLD WORKS.
-      heading: 'How MeloWorld Works',
+      heading: 'How to use MeloWorld?',
+      layout: 'steps',
       items: [
         {
-          title: 'Enter',
-          body: 'Choose an avatar and enter a private virtual environment.',
+          title: 'Step into your own space.',
+          body: 'Choose an avatar and enter a private virtual world where you can begin your well-being journey without the pressure of being seen or recognized.',
         },
         {
-          title: 'Explore',
-          body: 'Move through the space, discover different experiences and take time to understand what feels right.',
+          title: 'Find what feels right for you.',
+          body: 'Move through the virtual space, discover different experiences, and take the time to understand what feels relevant to you. There’s no set path to follow and no need to rush.',
         },
         {
-          title: 'Connect',
-          body: 'When you\u2019re ready, connect with a qualified mental health professional within the platform.',
+          title: 'Take the next step.',
+          body: 'Engage with the experiences that resonate with you, work through everyday challenges, or connect with a trained professional when you’re ready. Move forward at your own pace, in a way that feels comfortable for you.',
         },
       ],
     },
-    gallery: [
-      // INSIDE MELOWORLD.
-      {
-        label: 'The World \u2014 explore virtual spaces designed to make wellbeing feel less clinical and more approachable.',
-        slot: '/explore/meloworld/01.webp',
-        aspect: '4/3',
-      },
-      {
-        label: 'Your Avatar \u2014 choose how you appear in the space while keeping your personal identity private.',
-        slot: '/explore/meloworld/02.webp',
-        aspect: '4/3',
-      },
-      {
-        label: 'Your Session \u2014 move from exploration to professional support when you decide you\u2019re ready.',
-        slot: '/explore/meloworld/03.webp',
-        aspect: '16/9',
-      },
-    ],
-    quote: 'A different way to enter. A meaningful way to connect.',
     deeper: [
-      {
-        label: 'VR Wellness',
-        href: '/explore/vr-wellness',
-      },
-      {
-        label: 'Trust centre',
-        href: '/trust',
-      },
+      { label: 'VR Wellness', href: '/explore/vr-wellness' },
+      { label: 'Trust', href: '/trust' },
     ],
-    cta: {
-      label: 'Book a Demo',
-      href: '/contact',
-      note: 'Discover how NEXR can bring a new approach to your organisation, institution or practice.',
-    },
   },
 
   {
     slug: 'vr-wellness',
-    index: '04',
     word: 'VR Wellness',
-    // S6 — SUB PAGE.
     eyebrow: 'VR Wellness',
-    title: 'A rehearsal space for real life.',
+    listNote: 'For Organizations, Institutes & Healthcare',
+    title: 'A new way to face what life brings.',
     lede:
-      'VR Wellness creates guided environments where people can practise specific wellbeing skills before applying them outside the experience. From regulating emotions to building confidence and gradually facing fears, each experience is designed around a specific goal. A safe space to practise what real life asks of you.',
-    hero: '/models/imgs/vrworld.webp',
+      'Explore immersive VR experiences designed to help you practice relaxation, build confidence, and develop emotional resilience in a guided virtual environment.',
+    hero: '/models/imgs/art/vr-left.webp',
+    face: '/brand/melo/face-4.webp',
     accent: '#ff8422',
     tint: ['#a95e1f', '#361c08'],
-    readMoreLabel: 'Explore VR Wellness',
-    chapters: [
-      {
-        id: 'guided',
-        navLabel: 'More than immersion.',
-        heading: 'Step into the situation.',
-        paragraphs: [
-          'A screen can show you a situation. VR lets you step into it.',
-          'They can experience a scenario, observe their response and practise a different one, within a controlled environment. For certain needs, this can make an abstract idea much more tangible.',
-          'A virtual experience with a real-world purpose.',
-        ],
-      },
-      {
-        id: 'confidence',
-        navLabel: 'Experiences built around real needs.',
-        heading: 'Immersion, with intention.',
-        paragraphs: [
-          'VR Wellness brings together different immersive experiences for different wellbeing goals.',
-          'That could mean slowing down and regulating stress, building confidence, practising communication, gradually working through a fear, or complementing professional support.',
-          'The goal comes first. The technology follows.',
-        ],
-      },
-      {
-        id: 'safety',
-        navLabel: 'Controlled by design.',
-        heading: 'Designed with direction.',
-        paragraphs: [
-          'Every experience can be structured, adjusted and repeated around the person and the purpose of the session.',
-          'Where professional intervention is involved, practitioners remain part of the process, guiding how the experience is introduced and used.',
-          'VR creates the environment. Expertise guides the process.',
-        ],
-      },
-    ],
+    readMoreLabel: 'Explore Solutions',
+    chapters: [],
     highlights: {
-      // WHAT VR WELLNESS CAN SUPPORT.
-      heading: 'Different needs. Different experiences.',
+      heading: 'For Organizations, Institutes & Healthcare',
+      layout: 'audiences',
       items: [
         {
-          title: 'Relaxation & Recovery',
-          body: 'Immersive environments designed to help people slow down, practise relaxation and create space to recover.',
+          id: 'workplaces',
+          title: 'Workplaces',
+          body: 'Create more approachable ways for employees to explore wellbeing, build healthier habits and access professional support.',
         },
         {
-          title: 'Emotional Regulation',
-          body: 'Guided experiences that help people practise ways of responding to stress and difficult emotions.',
+          id: 'education',
+          title: 'Educational Institutes',
+          body: 'Give students safe, engaging ways to understand their wellbeing, build emotional skills and access support when they need it.',
         },
         {
-          title: 'Confidence & Social Situations',
-          body: 'Controlled environments where people can practise situations that may feel difficult or unfamiliar.',
-        },
-        {
-          title: 'Fears & Phobias',
-          body: 'Gradual exposure to specific situations under appropriate professional guidance, where clinically suitable.',
-        },
-        {
-          title: 'Learning & Development',
-          body: 'Immersive scenarios that allow students, employees and other learners to practise skills in a safe, repeatable environment.',
+          id: 'healthcare',
+          title: 'Healthcare',
+          body: 'Extend the toolkit available to mental health professionals with immersive environments and digital experiences that can complement existing care.',
         },
       ],
     },
-    gallery: [
-      // INSIDE VR WELLNESS.
-      {
-        label: 'Immersive Environments',
-        slot: '/explore/vr-wellness/01.webp',
-        aspect: '4/3',
-      },
-      {
-        label: 'Guided Experiences',
-        slot: '/explore/vr-wellness/02.webp',
-        aspect: '4/3',
-      },
-      {
-        label: 'Measurable Practice',
-        slot: '/explore/vr-wellness/03.webp',
-        aspect: '16/9',
-      },
-    ],
-    quote: 'The goal isn\u2019t to escape reality. It\u2019s to practise for it.',
     deeper: [
-      {
-        label: 'MeloWorld',
-        href: '/explore/meloworld',
-      },
-      {
-        label: 'The evidence',
-        href: '/explore/clinical',
-      },
+      { label: 'MeloWorld', href: '/explore/meloworld' },
+      { label: 'Trust', href: '/trust' },
     ],
-    cta: {
-      label: 'Book a Demo',
-      href: '/contact',
-      note: 'Discover how NEXR can bring a new approach to your organisation, institution or practice.',
-    },
-  },
-
-  {
-    slug: 'clinical',
-    index: '05',
-    // S7 — WHERE NEXR FITS. The PDF marks this room's own sub-page content
-    // "pending" — it gives the home-scene block only, not a distinct long-form
-    // page. Rather than invent the missing chapters, this room carries exactly
-    // that block and nothing past it, so nothing shown here is fabricated.
-    // Replace this comment and the fields below once that content exists.
-    word: 'Who It’s For',
-    eyebrow: 'Who It’s For',
-    title: 'Designed for people. Built for organisations.',
-    lede:
-      'NEXR adapts to the people and environments it serves, bringing new ways to engage with wellbeing into everyday spaces.',
-    hero: '/models/imgs/clinicallygrounded.webp',
-    accent: '#ff7d16',
-    tint: ['#ad5d1f', '#381c08'],
-    chapters: [],
-    gallery: [
-      {
-        label: 'Workplaces',
-        slot: '/explore/clinical/01.webp',
-        aspect: '4/3',
-      },
-      {
-        label: 'Educational Institutes',
-        slot: '/explore/clinical/02.webp',
-        aspect: '4/3',
-      },
-      {
-        label: 'Healthcare',
-        slot: '/explore/clinical/03.webp',
-        aspect: '16/9',
-      },
-    ],
-    deeper: [
-      {
-        label: 'Trust centre',
-        href: '/trust',
-      },
-      {
-        label: 'Start the conversation',
-        href: '/explore/contact',
-      },
-    ],
-    cta: {
-      label: 'Book a Demo',
-      href: '/contact',
-      note: 'Discover how NEXR can bring a new approach to your organisation, institution or practice.',
-    },
-  },
-
-  {
-    slug: 'contact',
-    index: '06',
-    // CLOSING CTA — common for all sub pages. As with the "Who It's For" room,
-    // the PDF gives no distinct long-form content for this room specifically —
-    // only the shared closing block every room ends on. Chapters stay empty
-    // rather than inventing a walkthrough script nobody has written yet.
-    word: 'Let’s Talk',
-    eyebrow: 'Let’s Talk',
-    title: 'The next way into wellbeing starts here.',
-    lede:
-      'Discover how NEXR can bring a new approach to your organisation, institution or practice.',
-    hero: '/models/imgs/letsconnect.webp',
-    accent: '#ff7609',
-    tint: ['#b05c1e', '#391c08'],
-    chapters: [],
-    gallery: [
-      {
-        label: 'Book a Demo',
-        slot: '/explore/contact/01.webp',
-        aspect: '4/3',
-      },
-      {
-        label: 'Connect with us',
-        slot: '/explore/contact/02.webp',
-        aspect: '16/9',
-      },
-    ],
-    quote: 'Better wellbeing starts when the way in feels right.',
-    deeper: [
-      {
-        label: 'Contact',
-        href: '/contact',
-      },
-      {
-        label: 'Trust centre',
-        href: '/trust',
-      },
-    ],
-    cta: {
-      label: 'Book a Demo',
-      href: '/contact',
-      note: 'Discover how NEXR can bring a new approach to your organisation, institution or practice.',
-    },
   },
 ]
+
+/**
+ * The Explore page list: the four rooms, then Let's Talk, which goes straight
+ * to the contact page rather than to a room of its own.
+ */
+export type ExploreIndexItem = {
+  key: string
+  word: string
+  note: string
+  href: string
+  image: string
+}
+
+export const EXPLORE_INDEX: ExploreIndexItem[] = [
+  ...EXPLORE_TOPICS.map((topic) => ({
+    key: topic.slug,
+    word: topic.word,
+    note: topic.listNote,
+    href: `/explore/${topic.slug}`,
+    image: topic.hero,
+  })),
+  {
+    key: 'contact',
+    word: 'Let’s Talk',
+    note: 'Book a Demo',
+    href: '/contact',
+    image: '/models/imgs/art/connect.webp',
+  },
+]
+
+/**
+ * The closing block every sub page ends on — the Let's Talk copy from the
+ * Animation page tab, so the call to action reads the same everywhere.
+ */
+export const CLOSING = {
+  heading: 'Make space for a better kind of wellbeing',
+  body: 'Discover how NEXR brings immersive VR experiences, anonymous access, and expert guidance together to make wellbeing more private, engaging, and accessible across workplaces, educational institutions, and healthcare settings.',
+  action: 'Book A Demo',
+}
 
 export const EXPLORE_SLUGS = EXPLORE_TOPICS.map((topic) => topic.slug)
 

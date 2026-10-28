@@ -1,21 +1,28 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, ArrowUpRight } from 'lucide-react'
-import { EXPLORE_TOPICS } from '@/lib/explore'
+import { EXPLORE_INDEX, EXPLORE_TOPICS } from '@/lib/explore'
 import { setCursor, resetCursor } from '@/lib/cursorStore'
-import { RoomSignature, RoomSky } from '@/components/site/RoomSky'
+import { requestReturn } from '@/lib/returnStore'
+import { RoomSky } from '@/components/site/RoomSky'
+import { ClosingCta } from '@/components/site/ClosingCta'
+import {
+  HoverSlider,
+  HoverSliderImage,
+  HoverSliderImageWrap,
+  TextStaggerHover,
+  useIsActiveSlide,
+  useSlideTrigger,
+} from '@/components/ui/animated-slideshow'
 
 /**
- * The index of the six rooms.
+ * The Explore page.
  *
- * Built as a hover list rather than a card grid on purpose: six rooms is few
- * enough that a list can give each one a full line, and the preview panel means
- * the artwork is shown at a usable size instead of six thumbnails competing.
- * The panel follows the hovered row, so moving down the list feels like turning
- * pages.
+ * A hover slider: the room names roll over letter by letter as the pointer
+ * (or keyboard focus) reaches them, and the picture beside the list wipes to
+ * that room. The words are the Explore tab of the content document.
  */
 
 const EASE = [0.16, 1, 0.3, 1] as const
@@ -25,144 +32,160 @@ const hoverable = {
   onMouseLeave: () => resetCursor(),
 }
 
-export function ExploreIndex() {
-  const [hovered, setHovered] = useState(0)
-  const preview = EXPLORE_TOPICS[hovered]
+function Row({ index }: { index: number }) {
+  const item = EXPLORE_INDEX[index]
+  const active = useIsActiveSlide(index)
+  const trigger = useSlideTrigger(index)
 
   return (
-    <div className="safe-bottom pointer-events-auto relative isolate min-h-svh bg-abyss px-5 pb-20 pt-28 sm:px-6 md:px-10 md:pb-24 md:pt-32">
+    <motion.li
+      initial={{ opacity: 0, y: 22 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7, ease: EASE, delay: 0.15 + index * 0.06 }}
+      className="border-b border-white/10"
+    >
+      <Link
+        href={item.href}
+        aria-label={`${item.word}. ${item.note}`}
+        {...trigger}
+        onMouseEnter={() => {
+          trigger.onMouseEnter()
+          setCursor({ active: true })
+        }}
+        onMouseLeave={resetCursor}
+        className="group flex items-center gap-5 py-6 md:py-7"
+      >
+        <span className="min-w-0 flex-1">
+          <TextStaggerHover
+            index={index}
+            text={item.word}
+            className="font-display text-[clamp(2.1rem,5vw,4rem)] font-semibold leading-[1.02] tracking-[-0.01em] text-bone"
+          />
+          <span
+            aria-hidden="true"
+            className={`mt-2 block text-[15px] leading-relaxed transition-colors duration-500 ${
+              active ? 'text-sand/80' : 'text-sand/45'
+            }`}
+          >
+            {item.note}
+          </span>
+        </span>
+        <span
+          aria-hidden="true"
+          className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full border transition-all duration-500 ${
+            active
+              ? 'border-ember bg-ember text-ink'
+              : 'border-white/15 text-bone/40 group-hover:border-white/30'
+          }`}
+        >
+          <ArrowUpRight size={18} className={`transition-transform duration-500 ${active ? 'rotate-0' : '-rotate-45'}`} />
+        </span>
+      </Link>
+    </motion.li>
+  )
+}
+
+/** The caption under the picture, following whichever room is lit. */
+function Caption() {
+  return (
+    <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-void/90 via-void/40 to-transparent p-6 md:p-8">
+      <AnimatePresence mode="wait">
+        {EXPLORE_INDEX.map((item, i) => (
+          <CaptionLine key={item.key} index={i} />
+        ))}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+function CaptionLine({ index }: { index: number }) {
+  const active = useIsActiveSlide(index)
+  const item = EXPLORE_INDEX[index]
+  if (!active) return null
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -6 }}
+      transition={{ duration: 0.35, ease: EASE }}
+      className="flex items-center gap-3"
+    >
+      <span className="h-2 w-2 shrink-0 rounded-full bg-ember shadow-[0_0_0_4px_rgb(255_121_1/0.2)]" />
+      <span className="font-display text-xl text-bone">{item.word}</span>
+    </motion.div>
+  )
+}
+
+export function ExploreIndex() {
+  return (
+    <div className="safe-bottom pointer-events-auto relative isolate min-h-svh bg-abyss pb-20 pt-28 md:pb-24 md:pt-32">
       <RoomSky sky={EXPLORE_TOPICS[0].tint} accent={EXPLORE_TOPICS[0].accent} />
-      <div className="mx-auto max-w-6xl">
+
+      <div className="mx-auto max-w-6xl px-5 sm:px-6 md:px-10">
         <Link
           href="/"
+          onClick={requestReturn}
           {...hoverable}
-          className="group inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.22em] text-bone/70 transition-colors hover:text-ember"
+          className="group inline-flex items-center gap-2 text-[13px] text-bone/60 transition-colors hover:text-ember"
         >
-          <ArrowLeft size={12} className="transition-transform group-hover:-translate-x-1" />
-          The experience
+          <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-1" />
+          Back to the experience
         </Link>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 32, filter: 'blur(10px)' }}
-          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-          transition={{ duration: 1, ease: EASE }}
-          className="mt-8 font-display text-[clamp(2.4rem,6vw,4.6rem)] font-semibold leading-[1.05] text-bone"
-        >
-          Six ways in. One way forward.
-        </motion.h1>
+        <div className="mt-8 grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+          <motion.h1
+            initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            transition={{ duration: 1, ease: EASE }}
+            className="text-balance font-display text-[clamp(2.4rem,6vw,4.6rem)] font-semibold leading-[1.04] text-bone"
+          >
+            Find your way into wellbeing
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, ease: EASE, delay: 0.15 }}
+            className="max-w-[46ch] text-[15.5px] leading-[1.85] text-sand/70 lg:pb-3"
+          >
+            Explore five rooms, each designed around a different way to engage with wellbeing.
+            Start with what matters to you, and discover an approach that feels right.
+          </motion.p>
+        </div>
 
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, ease: EASE, delay: 0.15 }}
-          className="mt-6 max-w-xl text-[15px] leading-[1.85] text-sand/70"
-        >
-          Every beat of the experience opens into a room of its own. Read them in
-          order, or start wherever the question you arrived with lives.
-        </motion.p>
-
-        <div className="mt-10 grid gap-12 md:mt-16 lg:grid-cols-[1fr_0.72fr] lg:items-start">
-          <ul data-tour="explore-list" className="border-t border-white/10">
-            {EXPLORE_TOPICS.map((topic, i) => (
-              <motion.li
-                key={topic.slug}
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, ease: EASE, delay: 0.1 + i * 0.07 }}
-                className="border-b border-white/10"
-                onMouseEnter={() => setHovered(i)}
-                onFocus={() => setHovered(i)}
-              >
-                <Link
-                  href={`/explore/${topic.slug}`}
-                  {...hoverable}
-                  className="group flex items-center gap-4 py-6 sm:gap-6 sm:py-7"
-                >
-                  {/* The accent only lights up on the hovered row, so the
-                      column reads as a list with a cursor rather than as six
-                      numbers all asking for attention. */}
-                  <span
-                    className="numeral numeral--lg text-[13px] transition-opacity duration-500"
-                    style={{
-                      ['--numeral-accent' as string]:
-                        hovered === i ? topic.accent : 'rgba(244,243,236,0.45)',
-                      opacity: hovered === i ? 1 : 0.75,
-                    }}
-                  >
-                    {topic.index}
-                  </span>
-
-                  <span className="min-w-0 flex-1">
-                    <span className="block font-display text-[clamp(1.5rem,3.2vw,2.4rem)] leading-tight text-bone transition-transform duration-500 group-hover:translate-x-2">
-                      {topic.word}
-                    </span>
-                    <span className="mt-1 block max-w-xl text-sm leading-relaxed text-sand/55">
-                      {topic.eyebrow}
-                    </span>
-                  </span>
-
-                  <ArrowUpRight
-                    size={18}
-                    className="shrink-0 text-bone/30 transition-all duration-500 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-ember"
-                  />
-                </Link>
-              </motion.li>
+        <HoverSlider className="mt-12 grid gap-10 md:mt-16 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+          <ul data-tour="explore-list" className="order-2 border-t border-white/10 lg:order-1">
+            {EXPLORE_INDEX.map((item, i) => (
+              <Row key={item.key} index={i} />
             ))}
           </ul>
 
-          {/* The preview. Keyed on the slug so each change re-runs the fade,
-              which is what makes the list feel like it is driving something. */}
-          <div className="hidden lg:block">
-            <div className="sticky top-32">
-              <motion.div
-                key={preview.slug}
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, ease: EASE }}
-                className="relative aspect-[4/5] overflow-hidden rounded-3xl border border-white/10"
-                style={{
-                  backgroundImage: `linear-gradient(150deg, ${preview.tint[0]}, ${preview.tint[1]})`,
-                }}
-              >
-                <img
-                  src={preview.hero}
-                  alt=""
-                  className="h-full w-full object-cover opacity-70 mix-blend-luminosity"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-void via-void/25 to-transparent" />
-                <div className="absolute inset-x-6 bottom-6">
-                  <p
-                    className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.26em] text-bone/70"
-                    style={{ ['--numeral-accent' as string]: preview.accent }}
-                  >
-                    <span className="numeral">{preview.index}</span>
-                    <span className="text-bone/25">/</span>
-                    {preview.word}
-                  </p>
-                  <p className="mt-3 font-display text-xl leading-snug text-bone">
-                    {preview.title}
-                  </p>
-                </div>
-              </motion.div>
-            </div>
+          <div className="order-1 lg:order-2">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.97 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.9, ease: EASE, delay: 0.2 }}
+              className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#a65f20] to-[#311c08] shadow-2xl shadow-black/50 lg:sticky lg:top-32"
+            >
+              <HoverSliderImageWrap className="aspect-[16/10] lg:aspect-[4/5]">
+                {EXPLORE_INDEX.map((item, i) => (
+                  <HoverSliderImage
+                    key={item.key}
+                    index={i}
+                    imageUrl={item.image}
+                    alt=""
+                    loading="eager"
+                    decoding="async"
+                    className="size-full object-cover mix-blend-luminosity brightness-125"
+                  />
+                ))}
+              </HoverSliderImageWrap>
+              <Caption />
+            </motion.div>
           </div>
-        </div>
+        </HoverSlider>
 
-        <div className="mt-20 flex flex-wrap items-center gap-6 border-t border-white/10 pt-10">
-          <Link href="/contact" {...hoverable} className="btn-primary group">
-            Book a demo
-            <ArrowUpRight
-              size={13}
-              className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-            />
-          </Link>
-          <p className="text-sm text-sand/55">
-            Healthier organisations begin with people who feel safe enough to
-            seek support.
-          </p>
-        </div>
+        <ClosingCta className="mt-20 md:mt-28" />
       </div>
-      <RoomSignature className="-mx-5 -mb-20 mt-16 sm:-mx-6 md:-mx-10 md:-mb-24 md:mt-20" />
     </div>
   )
 }

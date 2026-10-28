@@ -1,11 +1,15 @@
 import type { Metadata } from 'next'
+
+import { pageMeta } from '@/lib/seo'
 import { ExploreIndex } from '@/components/explore/ExploreIndex'
 
-export const metadata: Metadata = {
-  title: 'Explore — NEXR',
+export const metadata: Metadata = pageMeta({
+  title: 'Explore',
   description:
-    'Six rooms off the NEXR experience: the wellbeing gap, our belief, MeloWorld, VR Wellness, the clinical grounding, and starting a conversation.',
-}
+    'Explore five rooms, each designed around a different way to engage with wellbeing. Start with what matters to you, and discover an approach that feels right.',
+  path: '/explore',
+  image: '/models/imgs/gap.png',
+})
 
 export default function ExplorePage() {
   return <ExploreIndex />

@@ -1,36 +1,26 @@
+import Link from 'next/link'
 import { PageShell } from '@/components/site/PageShell'
 
 /**
- * Next's built-in 404 renders on white, which is jarring inside a black site.
- * Routing it through PageShell keeps the page dark and gives visitors a way
- * back into the experience.
+ * Next's built-in 404 renders on white, which is jarring inside a dark site.
+ * Routing it through PageShell keeps the page dark and gives a way back.
  */
 export default function NotFound() {
   return (
     <PageShell
-      eyebrow="404"
+      eyebrow="Page not found"
       beatId="nexr"
-      align="center"
+      image="/models/imgs/art/approach.webp"
       title="This page doesn’t exist."
-      lede="The link may be out of date. Everything NEXR does is one scroll away from the home experience."
+      lede="The link may be out of date. Head back to the experience, or pick a room to explore."
+      closing={false}
+      actions={
+        <Link href="/explore" className="btn-primary">
+          Explore
+        </Link>
+      }
     >
-      <p className="leading-relaxed text-sand/75">
-        Try the orbit on the{' '}
-        <a
-          href="/"
-          className="text-ember underline decoration-ember/40 underline-offset-4"
-        >
-          home page
-        </a>
-        , or head straight to the{' '}
-        <a
-          href="/trust"
-          className="text-ember underline decoration-ember/40 underline-offset-4"
-        >
-          Trust Centre
-        </a>
-        .
-      </p>
+      <span />
     </PageShell>
   )
 }

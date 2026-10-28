@@ -14,7 +14,7 @@ import { setCursor, resetCursor } from '@/lib/cursorStore'
  * The scene deliberately keeps one half of the frame empty so the figure has
  * air on at least one side. That worked while every beat was a headline and a
  * paragraph — but two beats carry more than that: the credibility beat has three
- * statements, and the closing beat has a quote and a call to action. Stacked
+ * statements, and the closing beat has the page's own call to action. Stacked
  * under the body copy they turned the text column into a wall while the other
  * half of the screen sat unused.
  *
@@ -156,7 +156,7 @@ export function BeatAside({
     )
   }
 
-  if (section.quote) {
+  if (section.closing) {
     return (
       <div
         className="story-col story-col--mid absolute hidden lg:block"
@@ -167,15 +167,11 @@ export function BeatAside({
             Book A Demo
           </p>
 
-          <p className="mt-5 font-display text-[17px] italic leading-[1.55] text-bone/85">
-            &lsquo;{section.quote}&rsquo;
-          </p>
-
           <Link
             href="/contact"
             onMouseEnter={() => setCursor({ active: true })}
             onMouseLeave={resetCursor}
-            className="btn-primary group mt-7 w-full justify-center"
+            className="btn-primary group mt-5 w-full justify-center"
           >
             Book A Demo
             <ArrowUpRight
@@ -190,7 +186,7 @@ export function BeatAside({
             onMouseLeave={resetCursor}
             className="mt-4 flex items-center justify-center gap-2 font-mono text-[9px] uppercase tracking-[0.22em] text-bone/40 transition-colors hover:text-ember"
           >
-            Or explore all six rooms
+            Or explore every room
           </Link>
 
           <span

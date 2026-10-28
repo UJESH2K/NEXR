@@ -1551,29 +1551,44 @@ html[data-returning] .overlay-layer {
   color: var(--color-ember-soft);
 }
 
-/* The wordmark as a sign-off at the foot of each sub page (RoomSignature):
-   only its upper part shows, fading to nothing before the page edge cuts it. */
-.room-signature {
-  position: relative;
-  overflow: hidden;
-  height: clamp(5rem, 17vw, 15rem);
+/*
+ * The wordmark as a sign-off, now at the foot of the footer rather than the
+ * foot of the article.
+ *
+ * It used to end the page content, where it worked because the page edge cut
+ * it: only the tops of the letters showed and they faded out before the cut.
+ * Once every interior page gained a real footer the cut stopped being the page
+ * edge and became a hard line in the middle of the screen, with a band of half
+ * a word stranded above the footer and nothing to explain it.
+ *
+ * So it moved inside the footer and down past its bottom edge. The clip is the
+ * end of the document again, the word sits behind the legal line rather than
+ * above it, and at this weight it is a watermark — it never competes with a
+ * link, because it is barely there at all.
+ */
+.footer-signature {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  /* Pushed down so only the upper third of the glyphs is inside the footer.
+     The footer's own overflow does the cutting. */
+  transform: translateY(34%);
   pointer-events: none;
   user-select: none;
+  text-align: center;
+  line-height: 0.8;
 }
 
-.room-signature span {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  transform: translateX(-50%);
+.footer-signature span {
+  display: inline-block;
   white-space: nowrap;
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: clamp(6.5rem, 24vw, 22rem);
+  font-size: clamp(5rem, 20vw, 18rem);
   line-height: 0.8;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.02em;
   color: transparent;
-  background: linear-gradient(to bottom, rgb(255 196 162 / 0.16), rgb(255 196 162 / 0) 78%);
+  background: linear-gradient(to bottom, rgb(255 196 162 / 0.13), rgb(255 196 162 / 0) 72%);
   -webkit-background-clip: text;
   background-clip: text;
 }
@@ -1776,7 +1791,7 @@ html[data-returning] .overlay-layer {
   transition-delay: 0s, 0s, 0s;
 }
 
-.beatpill li button {
+.beatpill li :is(button, a) {
   position: relative;
   z-index: 1;
   display: block;
@@ -1789,20 +1804,20 @@ html[data-returning] .overlay-layer {
 }
 
 @media (min-width: 1024px) {
-  .beatpill li button {
+  .beatpill li :is(button, a) {
     height: 32px;
   }
 }
 
 /* Whatever the marker is behind is dark-on-orange. */
-.beatpill li[data-lit="true"] button {
+.beatpill li[data-lit="true"] :is(button, a) {
   color: var(--color-ink);
 }
 
 /* The global focus ring is drawn 3px outside its control, and the capsule
    clips to its own edge — so on a name it would come back as two orange arcs.
    Inside the button it stays whole. */
-.beatpill li button:focus-visible,
+.beatpill li :is(button, a):focus-visible,
 .beatpill__handle:focus-visible {
   outline-offset: -2px;
 }
@@ -1839,17 +1854,17 @@ html[data-returning] .overlay-layer {
 }
 
 @media (hover: hover) {
-  .beatpill li[data-lit="false"] button:hover {
+  .beatpill li[data-lit="false"] :is(button, a):hover {
     color: var(--color-bone);
   }
 
-  .beatpill li button:hover .beatpill__label i {
+  .beatpill li :is(button, a):hover .beatpill__label i {
     transform: translate3d(0, -30px, 0);
   }
 }
 
 @media (hover: hover) and (min-width: 1024px) {
-  .beatpill li button:hover .beatpill__label i {
+  .beatpill li :is(button, a):hover .beatpill__label i {
     transform: translate3d(0, -32px, 0);
   }
 }
@@ -1926,18 +1941,18 @@ html[data-returning] .overlay-layer {
 
 /* Keyboard focus opens it on every width that shows the row, pointer or not. */
 @media (min-width: 1024px) {
-  .beatpill:has(button:focus-visible) li {
+  .beatpill:has(:is(button, a):focus-visible) li {
     grid-template-columns: 1fr;
     opacity: 1;
     visibility: visible;
     transition-delay: 0s, 0s, 0s;
   }
 
-  .beatpill:has(button:focus-visible) .beatpill__count {
+  .beatpill:has(:is(button, a):focus-visible) .beatpill__count {
     grid-template-columns: 0fr;
   }
 
-  .beatpill:has(button:focus-visible) .beatpill__read {
+  .beatpill:has(:is(button, a):focus-visible) .beatpill__read {
     opacity: 0;
   }
 }
@@ -2105,4 +2120,107 @@ html[data-returning] .overlay-layer {
 
 .page-end .btn-primary {
   min-height: 48px;
+}
+
+/* ── secondary button ─────────────────────────────────────────────────── */
+
+/* The quiet partner to .btn-primary: same height, same pill, same type, so a
+   pair of them always lines up. */
+.btn-ghost {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgb(244 243 236 / 0.18);
+  padding: 0.85rem 1.4rem;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: rgb(244 243 236 / 0.8);
+  transition: border-color 0.35s ease, color 0.35s ease, background-color 0.35s ease;
+}
+
+.btn-ghost:hover {
+  border-color: rgb(255 121 1 / 0.55);
+  background-color: rgb(255 121 1 / 0.06);
+  color: var(--color-ember);
+}
+
+/* ── room chapter strip ───────────────────────────────────────────────── */
+
+.room-strip-wrap {
+  width: 100%;
+  max-width: var(--room-measure);
+  margin-top: calc(var(--room-rhythm) * 0.25);
+  padding-inline: var(--room-gutter);
+}
+
+.room-strip {
+  width: max-content;
+  max-width: 100%;
+  scrollbar-width: none;
+}
+
+.room-strip::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── room cards ───────────────────────────────────────────────────────── */
+
+.bento-card,
+.audience-card {
+  transition: border-color 0.5s ease, background-color 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bento-card:hover,
+.audience-card:hover {
+  border-color: rgb(244 243 236 / 0.22);
+  background-color: rgb(22 16 11 / 0.8);
+  transform: translateY(-3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bento-card:hover,
+  .audience-card:hover {
+    transform: none;
+  }
+}
+
+/* ── the site navigation capsule (NavPill) ───────────────────────────── */
+
+/* Same capsule as the beat navigator, sitting in the header row instead of
+   floating over the scene. Its names stay in the tab order while folded —
+   focusing one opens the row — because on a page that is not a route the
+   capsule shows "Menu" and no name has any width to start from. */
+.beatpill--site li {
+  visibility: visible;
+}
+
+.beatpill__count > .beatpill__menu {
+  display: block;
+  font-family: var(--font-sans);
+  letter-spacing: 0;
+  padding-right: 12px;
+  font-size: 13.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: rgb(244 243 236 / 0.8);
+}
+
+.beatpill--site:focus-within li {
+  grid-template-columns: 1fr;
+  opacity: 1;
+}
+
+.beatpill--site:focus-within .beatpill__count {
+  grid-template-columns: 0fr;
+}
+
+@media (hover: hover) and (min-width: 1024px) {
+  .beatpill--site:hover .beatpill__count {
+    grid-template-columns: 0fr;
+  }
 }

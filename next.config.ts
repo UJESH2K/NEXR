@@ -37,6 +37,29 @@ const nextConfig: NextConfig = {
   experimental: {
     scrollRestoration: false,
   },
+  /*
+   * The "Who It's For" room was removed from the Explore index by the script.
+   * Its URL may already be linked or indexed, and a 404 throws away whatever
+   * standing it had — a permanent redirect passes that on to the index, which
+   * lists every room that still exists.
+   */
+  async redirects() {
+    return [
+      { source: '/explore/clinical', destination: '/explore', permanent: true },
+      // Let's Talk is the contact page, not a room of its own.
+      { source: '/explore/contact', destination: '/contact', permanent: true },
+      // The product pages were thinner copies of their explore rooms; the
+      // rooms carry the content document in full, so they are the one route.
+      { source: '/platform/meloworld', destination: '/explore/meloworld', permanent: true },
+      { source: '/platform/vr-wellness', destination: '/explore/vr-wellness', permanent: true },
+      // The audience pages had one line each; the same cards live on the VR
+      // Wellness room, anchored.
+      { source: '/for/workplaces', destination: '/explore/vr-wellness#workplaces', permanent: true },
+      { source: '/for/education', destination: '/explore/vr-wellness#education', permanent: true },
+      { source: '/for/healthcare', destination: '/explore/vr-wellness#healthcare', permanent: true },
+      { source: '/scroll-demo', destination: '/', permanent: false },
+    ]
+  },
 }
 
 export default nextConfig

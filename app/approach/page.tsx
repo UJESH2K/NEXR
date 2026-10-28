@@ -1,117 +1,92 @@
 import type { Metadata } from 'next'
-import { Beat, PageShell, Tiles, Stats, ImagePlaceholder } from '@/components/site/PageShell'
-import { sectionById } from '@/lib/sections'
+import Link from 'next/link'
+import { ArrowUpRight, Glasses, ShieldCheck, UserRound } from 'lucide-react'
 
-export const metadata: Metadata = {
-  title: 'Our Approach — NEXR',
+import { pageMeta } from '@/lib/seo'
+import { PageShell, SectionHeading } from '@/components/site/PageShell'
+import { Contrast, FeatureLink, PillarTabs } from '@/components/site/PageBlocks'
+
+export const metadata: Metadata = pageMeta({
+  title: 'Our Approach',
   description:
-    'Why awareness alone has not increased use of workplace wellbeing support, and the people-adaptive philosophy behind NEXR.',
-}
+    'Not everyone finds support in the same way. We combine immersive VR experiences, anonymity, and expert guidance to give people more choice in how they engage with wellbeing.',
+  path: '/approach',
+  image: '/models/imgs/OurApproach.png',
+})
 
-const PRINCIPLES = [
-  {
-    title: 'Private by design',
-    body: 'Anonymity is how psychological safety gets created. Nobody should have to choose between getting help and protecting their privacy.',
-    icon: '🔒',
-  },
-  {
-    title: 'Accessible first',
-    body: 'The wider platform runs on the phones and laptops people already own. No headset purchase, no queue, no waiting room.',
-    icon: '📱',
-  },
-  {
-    title: 'Immersive engagement',
-    body: 'Interactive, guided and safe experiences — not metaverse hype. Engaging enough to become part of everyday life.',
-    icon: '🌀',
-  },
-  {
-    title: 'Clinically grounded',
-    body: 'Established psychological practice, delivered by trained professionals and tested in clinical contexts.',
-    icon: '⚕️',
-  },
-]
-
-const STATS = [
-  { value: '76%', label: 'Employees hide struggles' },
-  { value: '40%', label: 'EAP utilisation rate' },
-  { value: '3×', label: 'ROI on wellbeing spend' },
-  { value: '100%', label: 'Anonymous by default' },
-]
-
-/** This page's own beat, so its placeholders match the scene rather than a colour chosen by hand. */
-const PAGE_TINT = sectionById('approach').sky
-
+/**
+ * Our Approach. Every line is from the content document: the Our Approach
+ * block of the Animation page tab, with the three things it names drawn out
+ * using the document's own words for each of them.
+ */
 export default function ApproachPage() {
   return (
     <PageShell
       eyebrow="Our Approach"
       beatId="approach"
-      title="The barrier isn't always the support. It's the way in."
-      lede="For decades, wellbeing has been designed around systems, appointments and treatments. We believe it should be designed around people."
+      image="/models/imgs/art/approach.webp"
+      kicker="Wellbeing doesn’t need another rulebook."
+      title="Different people. Different needs. A more human approach."
+      lede="Not everyone finds support in the same way. We combine immersive VR experiences, anonymity, and expert guidance to give people more choice in how they engage with wellbeing."
+      actions={
+        <Link href="#how" className="btn-ghost group">
+          Discover Our Approach
+          <ArrowUpRight size={14} className="rotate-90 transition-transform group-hover:translate-y-0.5" />
+        </Link>
+      }
     >
-      <Beat id="gap" heading="The workplace wellbeing gap">
-        <p>
-          Organisations today invest more in employee wellbeing than ever
-          before. Yet burnout continues to rise, wellbeing programmes remain
-          underused, and many employees hesitate to seek support because of
-          stigma, fear of judgement or concerns around privacy.
-        </p>
-        <p>
-          The issue is not a lack of therapists, apps or awareness. Work is
-          faster, pressure is higher and burnout is normalised — everyone talks
-          about mental health, but few ask for help. People hesitate because of
-          judgement, visibility and stigma. Confidentiality concerns are what
-          drive low utilisation of the support companies have already paid for.
-        </p>
-      </Beat>
+      <section data-route-beat>
+        <Contrast
+          less="Less pressure to take a prescribed path."
+          more="More freedom to find what feels right for them."
+        />
+      </section>
 
-      <Stats items={STATS} />
+      <section id="how" data-route-beat className="scroll-mt-32 pt-20 md:pt-28">
+        <SectionHeading className="max-w-[22ch]">
+          Immersive VR experiences, anonymity, and expert guidance
+        </SectionHeading>
+        <div className="mt-10">
+          <PillarTabs
+            tabs={[
+              {
+                id: 'vr',
+                label: 'Immersive VR experiences',
+                icon: <Glasses size={19} strokeWidth={1.6} />,
+                body: 'Explore immersive VR experiences designed to help you practice relaxation, build confidence, and develop emotional resilience in a guided virtual environment.',
+                image: '/models/imgs/art/vr-left.webp',
+                link: { label: 'VR Wellness', href: '/explore/vr-wellness' },
+              },
+              {
+                id: 'anonymity',
+                label: 'Anonymity',
+                icon: <UserRound size={19} strokeWidth={1.6} />,
+                body: 'MeloWorld lets people enter through an avatar, without a photograph or public-facing profile. This creates space to explore what’s on their mind without the added pressure of being recognized or having to explain themselves to others.',
+                image: '/models/imgs/art/meloworld-left.webp',
+                link: { label: 'MeloWorld', href: '/explore/meloworld' },
+              },
+              {
+                id: 'guidance',
+                label: 'Expert guidance',
+                icon: <ShieldCheck size={19} strokeWidth={1.6} />,
+                body: 'Share what’s on your mind in an immersive VR environment, speak with professionals through virtual characters, and get guidance anonymously, without the pressure of revealing your identity or fear of being judged.',
+                image: '/models/imgs/art/clinical.webp',
+                link: { label: 'Our Standards', href: '/trust' },
+              },
+            ]}
+          />
+        </div>
+      </section>
 
-      <Beat id="belief" heading="Stop making people fit wellbeing. Make wellbeing fit people." accent="Support should adapt to people, not the other way around.">
-        <p>
-          Traditional wellbeing asks people to adapt to support.{' '}
-          <span className="serif-accent text-bone">
-            Support should adapt to people.
-          </span>
-        </p>
-        <p>
-          At NEXR, we believe workplace wellbeing should feel natural, private
-          and engaging. When support is designed around people instead of
-          processes, organisations create healthier cultures and employees are
-          more likely to begin their wellbeing journey.
-        </p>
-        <p>
-          The answer is a psychologically safe environment: anonymous,
-          immersive, clinically guided and evidence-backed. Employees feel safer,
-          companies build healthier cultures, and wellbeing becomes proactive
-          rather than reactive — daily, intentional resilience-building before a
-          crisis arrives.
-        </p>
-      </Beat>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <ImagePlaceholder label="Workplace wellbeing gap — visual" tint={PAGE_TINT} aspect="4/3" />
-        <ImagePlaceholder label="People-first design philosophy" tint={PAGE_TINT} aspect="4/3" />
-      </div>
-
-      <Beat heading="Design principles">
-        <Tiles items={PRINCIPLES} />
-      </Beat>
-
-      <Beat heading="Our north star">
-        <p className="serif-accent text-2xl text-bone">
-          NEXR isn't reinventing mental wellness. It's reinventing how people
-          access it.
-        </p>
-        <p>
-          We don't just make wellbeing accessible. We make it engaging enough to
-          become part of everyday life.
-        </p>
-      </Beat>
-
-      <div className="mt-10">
-        <ImagePlaceholder label="NEXR north star vision" tint={PAGE_TINT} aspect="21/9" />
-      </div>
+      <section data-route-beat className="pt-20 md:pt-28">
+        <FeatureLink
+          title="Wellbeing Should Meet You Where You Are"
+          body="We all experience life differently. So why should the way we approach well-being be any different? We believe everyone deserves a way to begin that feels comfortable, personal, and right for them."
+          image="/models/imgs/art/approach.webp"
+          href="/explore/belief"
+          label="Our Belief"
+        />
+      </section>
     </PageShell>
   )
 }

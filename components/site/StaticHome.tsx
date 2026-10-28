@@ -35,7 +35,7 @@ export function StaticHome() {
             }
           >
             <p className="eyebrow">
-              {section.index} / {section.word}
+              {section.word}
             </p>
 
             {section.kicker ? (
@@ -85,12 +85,6 @@ export function StaticHome() {
                   </li>
                 ))}
               </ul>
-            ) : null}
-
-            {section.quote ? (
-              <p className="serif-accent mt-9 max-w-xl border-l border-ember/40 pl-5 text-lg leading-relaxed text-sand/70">
-                &lsquo;{section.quote}&rsquo;
-              </p>
             ) : null}
 
             {/* The closing beat's call to action is the page's primary one, so
