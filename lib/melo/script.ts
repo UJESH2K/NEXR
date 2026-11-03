@@ -6,6 +6,8 @@ import {
   type ExploreTopic,
 } from '@/lib/explore'
 import { sectionById } from '@/lib/sections'
+import { APPROACH } from '@/lib/content/approach'
+import { TRUST } from '@/lib/content/trust'
 import type { MeloBubble, MeloPose } from './store'
 
 /**
@@ -181,12 +183,12 @@ type PageEntry = { label: string; message: string; pose: MeloPose }
 const PAGES: Record<string, PageEntry> = {
   '/approach': {
     label: 'Our Approach',
-    message: 'Different people. Different needs. A more human approach.',
+    message: APPROACH.title,
     pose: 2,
   },
   '/trust': {
     label: 'Built on Trust',
-    message: 'Feel safe enough to take the first step.',
+    message: TRUST.title,
     pose: 4,
   },
   '/contact': { label: 'Let’s Talk', message: CLOSING.headline, pose: 6 },

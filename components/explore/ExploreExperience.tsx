@@ -94,7 +94,7 @@ function HeroMedia({ topic }: { topic: ExploreTopic }) {
 
 /** A paragraph short enough to be a closing line is set as one. */
 const isCoda = (paragraph: string, i: number, all: string[]) =>
-  all.length > 1 && i === all.length - 1 && paragraph.length < 130
+  all.length > 1 && i === all.length - 1 && paragraph.length <= 110
 
 function Paragraphs({ chapter, accent }: { chapter: ExploreChapter; accent: string }) {
   return (
@@ -355,14 +355,16 @@ function Audiences({ topic }: { topic: ExploreTopic }) {
               </span>
               <h3 className="mt-7 font-display text-[1.5rem] leading-snug text-bone">{item.title}</h3>
               <p className="mt-3 flex-1 text-[14.5px] leading-[1.75] text-sand/70">{item.body}</p>
-              <Link
-                href="/contact"
-                {...hoverable}
-                className="mt-8 inline-flex items-center gap-2 self-start rounded-full border border-white/15 px-4 py-2.5 text-[13px] font-medium text-bone/85 transition-colors hover:border-ember hover:text-ember"
-              >
-                Book a demo
-                <ArrowUpRight size={14} />
-              </Link>
+              {item.cta ? (
+                <Link
+                  href={item.cta.href}
+                  {...hoverable}
+                  className="mt-8 inline-flex items-center gap-2 self-start rounded-full border border-white/15 px-4 py-2.5 text-[13px] font-medium text-bone/85 transition-colors hover:border-ember hover:text-ember"
+                >
+                  {item.cta.label}
+                  <ArrowUpRight size={14} />
+                </Link>
+              ) : null}
               <span
                 aria-hidden="true"
                 className="absolute inset-x-0 top-0 h-px origin-left scale-x-0 transition-transform duration-700 group-hover:scale-x-100"

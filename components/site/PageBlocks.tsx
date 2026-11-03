@@ -3,14 +3,15 @@
 import Link from 'next/link'
 import { useId, useState, type FormEvent, type ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowUpRight, Check, Mail, Plus } from 'lucide-react'
+import { ArrowUpRight, Check, Mail } from 'lucide-react'
 import { setCursor, resetCursor } from '@/lib/cursorStore'
 import { CONTACT_EMAIL } from '@/lib/contact'
 
 /**
- * The interactive pieces the interior pages are built from. Each page uses a
- * different one, so Approach, Trust and Let's Talk do not read as the same
- * template with different words in it.
+ * The pieces the interior pages are built from. Each page uses a different
+ * one (tabs and a contrast pair on Approach, safeguard rows on Trust, the demo
+ * form on Let's Talk), so they do not read as one template with different
+ * words in it.
  */
 
 const EASE = [0.16, 1, 0.3, 1] as const
@@ -31,7 +32,7 @@ export type PillarTab = {
   link: { label: string; href: string }
 }
 
-export function PillarTabs({ tabs }: { tabs: PillarTab[] }) {
+export function PillarTabs({ tabs, label = 'Options' }: { tabs: PillarTab[]; label?: string }) {
   const [active, setActive] = useState(0)
   const base = useId()
   const tab = tabs[active]
@@ -39,7 +40,7 @@ export function PillarTabs({ tabs }: { tabs: PillarTab[] }) {
   return (
     <div data-beat-item className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:gap-10">
       <div>
-        <div role="tablist" aria-label="Our approach" className="flex flex-col gap-2">
+        <div role="tablist" aria-label={label} className="flex flex-col gap-2">
           {tabs.map((t, i) => {
             const selected = i === active
             return (
@@ -158,69 +159,42 @@ export function Contrast({ less, more }: { less: string; more: string }) {
   )
 }
 
-/* ── accordion ──────────────────────────────────────────────────────────── */
+export type SafeguardItem = { id: string; title: string; body: string; icon: ReactNode }
 
-export type AccordionItem = { id: string; title: string; body: string; icon: ReactNode }
+/* ── safeguards, all visible ────────────────────────────────────────────── */
 
-export function Accordion({ items }: { items: AccordionItem[] }) {
-  const [open, setOpen] = useState<string | null>(items[0]?.id ?? null)
-  const base = useId()
-
+/**
+ * A short set of promises that should all be read, so nothing is folded
+ * away: each row is the icon and title on the left, the explanation on the
+ * right, and a line of the accent fills in as the pointer passes.
+ */
+export function SafeguardList({ items }: { items: SafeguardItem[] }) {
   return (
-    <ul className="divide-y divide-white/10 overflow-hidden rounded-[1.75rem] border border-white/10 bg-ink/50">
-      {items.map((item) => {
-        const expanded = open === item.id
-        return (
-          <li key={item.id} data-beat-item>
-            <h3>
-              <button
-                type="button"
-                id={`${base}-${item.id}-btn`}
-                aria-expanded={expanded}
-                aria-controls={`${base}-${item.id}`}
-                onClick={() => setOpen(expanded ? null : item.id)}
-                {...hoverable}
-                className="flex w-full items-center gap-4 px-6 py-6 text-left md:px-8"
-              >
-                <span
-                  aria-hidden="true"
-                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border transition-colors duration-500 ${
-                    expanded ? 'border-ember bg-ember/10 text-ember' : 'border-white/15 text-bone/55'
-                  }`}
-                >
-                  {item.icon}
-                </span>
-                <span className={`flex-1 font-display text-[clamp(1.2rem,2vw,1.5rem)] leading-snug transition-colors ${expanded ? 'text-bone' : 'text-bone/75'}`}>
-                  {item.title}
-                </span>
-                <Plus
-                  aria-hidden="true"
-                  size={18}
-                  className={`shrink-0 transition-transform duration-500 ${expanded ? 'rotate-45 text-ember' : 'text-bone/45'}`}
-                />
-              </button>
-            </h3>
-            <AnimatePresence initial={false}>
-              {expanded ? (
-                <motion.div
-                  id={`${base}-${item.id}`}
-                  role="region"
-                  aria-labelledby={`${base}-${item.id}-btn`}
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.45, ease: EASE }}
-                  className="overflow-hidden"
-                >
-                  <p className="max-w-[64ch] px-6 pb-7 pl-[5.5rem] text-[15px] leading-[1.8] text-sand/75 md:px-8 md:pl-[6rem]">
-                    {item.body}
-                  </p>
-                </motion.div>
-              ) : null}
-            </AnimatePresence>
-          </li>
-        )
-      })}
+    <ul className="overflow-hidden rounded-[1.75rem] border border-white/10 bg-ink/50">
+      {items.map((item, i) => (
+        <li
+          key={item.id}
+          data-beat-item
+          className={`safeguard group relative grid gap-4 px-6 py-7 md:grid-cols-[0.9fr_1.1fr] md:gap-10 md:px-9 md:py-9 ${
+            i > 0 ? 'border-t border-white/10' : ''
+          }`}
+        >
+          <div className="flex items-center gap-4">
+            <span
+              aria-hidden="true"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-ember/40 bg-ember/10 text-ember"
+            >
+              {item.icon}
+            </span>
+            <h3 className="font-display text-[clamp(1.25rem,2vw,1.55rem)] leading-snug text-bone">{item.title}</h3>
+          </div>
+          <p className="max-w-[58ch] text-[15px] leading-[1.8] text-sand/75">{item.body}</p>
+          <span
+            aria-hidden="true"
+            className="absolute bottom-0 left-0 h-px w-full origin-left scale-x-0 bg-ember/60 transition-transform duration-700 group-hover:scale-x-100"
+          />
+        </li>
+      ))}
     </ul>
   )
 }
@@ -325,8 +299,8 @@ export function DemoForm() {
           Setting
           <select id={`${base}-setting`} name="setting" defaultValue="Workplace" className={`${field} appearance-none`}>
             <option>Workplace</option>
-            <option>Educational Institute</option>
-            <option>Healthcare</option>
+            <option>Educational Institution</option>
+            <option>Healthcare Provider</option>
           </select>
         </label>
       </div>

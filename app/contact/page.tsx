@@ -15,8 +15,8 @@ export const metadata: Metadata = pageMeta({
 
 const SETTINGS = [
   { label: 'Workplaces', icon: BriefcaseBusiness, href: '/explore/vr-wellness#workplaces' },
-  { label: 'Educational Institutes', icon: GraduationCap, href: '/explore/vr-wellness#education' },
-  { label: 'Healthcare', icon: Stethoscope, href: '/explore/vr-wellness#healthcare' },
+  { label: 'Educational Institutions', icon: GraduationCap, href: '/explore/vr-wellness#education' },
+  { label: 'Healthcare Providers', icon: Stethoscope, href: '/explore/vr-wellness#healthcare' },
 ]
 
 /**

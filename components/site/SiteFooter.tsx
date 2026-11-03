@@ -43,8 +43,8 @@ const COMPANY = [
 
 const AUDIENCES = [
   { label: 'Workplaces', href: '/explore/vr-wellness#workplaces' },
-  { label: 'Educational Institutes', href: '/explore/vr-wellness#education' },
-  { label: 'Healthcare', href: '/explore/vr-wellness#healthcare' },
+  { label: 'Educational Institutions', href: '/explore/vr-wellness#education' },
+  { label: 'Healthcare Providers', href: '/explore/vr-wellness#healthcare' },
 ]
 
 const hoverable = {

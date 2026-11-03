@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, ArrowUpRight } from 'lucide-react'
-import { EXPLORE_INDEX, EXPLORE_TOPICS } from '@/lib/explore'
+import { EXPLORE_INDEX, EXPLORE_INTRO, EXPLORE_TOPICS } from '@/lib/explore'
 import { setCursor, resetCursor } from '@/lib/cursorStore'
 import { requestReturn } from '@/lib/returnStore'
 import { RoomSky } from '@/components/site/RoomSky'
@@ -139,7 +139,7 @@ export function ExploreIndex() {
             transition={{ duration: 1, ease: EASE }}
             className="text-balance font-display text-[clamp(2.4rem,6vw,4.6rem)] font-semibold leading-[1.04] text-bone"
           >
-            Find your way into wellbeing
+            {EXPLORE_INTRO.title}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 18 }}
@@ -147,8 +147,7 @@ export function ExploreIndex() {
             transition={{ duration: 0.9, ease: EASE, delay: 0.15 }}
             className="max-w-[46ch] text-[15.5px] leading-[1.85] text-sand/70 lg:pb-3"
           >
-            Explore five rooms, each designed around a different way to engage with wellbeing.
-            Start with what matters to you, and discover an approach that feels right.
+            {EXPLORE_INTRO.body}
           </motion.p>
         </div>
 

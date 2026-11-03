@@ -12,7 +12,8 @@ import { scroll } from '@/lib/scrollStore'
  * itself, after React mounted, and the frame before that was a glimpse of the
  * bare site. Now it finds the curtain that is already on screen, fills its
  * ring from the real download progress, and lifts it away when the scene is
- * ready. Nothing re-renders per frame: progress goes straight to the DOM.
+ * ready. Nothing re-renders per frame: progress goes straight to the DOM as
+ * the `--p` custom property, which is how full the doorway is with light.
  *
  * It exists for two reasons, and the second is the less obvious one:
  *
@@ -22,8 +23,8 @@ import { scroll } from '@/lib/scrollStore'
  *      scene and the DOM fallback, and for those frames whatever it renders is
  *      visible. The curtain covers that window.
  *
- * The ring is eased toward the real number rather than set to it. Loaders
- * report in jumps (0, 0, 0, 71, 100), and a ring that jumps looks broken even
+ * The light is eased toward the real number rather than set to it. Loaders
+ * report in jumps (0, 0, 0, 71, 100), and light that jumps looks broken even
  * when it is telling the truth.
  */
 
@@ -33,7 +34,8 @@ const MIN_VISIBLE = 2000
 const MIN_VISIBLE_RETURN = 900
 /** Give up waiting on the loader after this and reveal anyway. */
 const MAX_VISIBLE = 14000
-const LIFT_MS = 1000
+/** The door opening, then the light dissolving into the room. */
+const LIFT_MS = 1500
 
 /** Set once the first reveal has happened; later mounts are returns. */
 let revealedOnce = false
@@ -57,7 +59,7 @@ export function Preloader({ waitForAssets = true }: { waitForAssets?: boolean })
     window.clearTimeout(pendingHide)
     const curtain = document.getElementById('nexr-curtain')
     if (!curtain) return
-    const fill = curtain.querySelector<SVGCircleElement>('.curtain__fill')
+    const setLight = (v: number) => curtain.style.setProperty('--p', (Math.min(v, 100) / 100).toFixed(4))
 
     // First load on the home page: the curtain has been up since first paint,
     // so time is measured from navigation start. Any other arrival — back from
@@ -69,15 +71,15 @@ export function Preloader({ waitForAssets = true }: { waitForAssets?: boolean })
 
     // Carry on from wherever the CSS crawl had got to before this took over.
     let value = 0
-    if (fill && !returning) {
-      const offset = parseFloat(getComputedStyle(fill).strokeDashoffset)
-      if (Number.isFinite(offset)) value = 100 - offset
+    if (!returning) {
+      const crawled = parseFloat(getComputedStyle(curtain).getPropertyValue('--p'))
+      if (Number.isFinite(crawled)) value = crawled * 100
     }
 
     curtain.classList.remove('is-gone', 'is-leaving')
     curtain.classList.toggle('is-replay', returning)
     curtain.classList.add('is-driven')
-    if (fill) fill.style.strokeDashoffset = String(100 - value)
+    setLight(value)
 
     let raf = 0
     let finished = false
@@ -88,22 +90,26 @@ export function Preloader({ waitForAssets = true }: { waitForAssets?: boolean })
       const { progress: p, total: t, waitForAssets: waiting } = live.current
       // Before any asset has registered, total is 0 and progress is a
       // meaningless 100; fall back to a time-based crawl until then.
-      const real = !waiting ? 100 : t > 0 ? p : Math.max(value, Math.min(elapsed / 40, 55))
-      value += (real - value) * 0.08
-      if (fill) fill.style.strokeDashoffset = String(100 - Math.min(value, 100))
+      // A slow creep toward 80% keeps the light moving while a big file is in
+      // flight (the loader only reports when it lands); the real figure takes
+      // over whenever it is ahead. The light never falls back.
+      const creep = 80 * (1 - Math.exp(-elapsed / 4500))
+      const real = !waiting ? 100 : Math.max(creep, t > 0 ? p : 0)
+      value = Math.max(value, value + (real - value) * 0.08)
+      setLight(value)
 
       const settled = waiting ? t > 0 && p >= 100 : true
       if ((settled && elapsed >= minimum && value > 96) || elapsed > MAX_VISIBLE) {
         finished = true
         revealedOnce = true
-        if (fill) fill.style.strokeDashoffset = '0'
+        setLight(100)
         timers.push(
           window.setTimeout(() => curtain.classList.add('is-leaving'), 160),
           // Lets the hero copy wait for the curtain instead of animating in
           // underneath it.
           window.setTimeout(() => {
             scroll.entered = true
-          }, 460),
+          }, 950),
           window.setTimeout(() => curtain.classList.add('is-gone'), 160 + LIFT_MS + 60),
         )
         return

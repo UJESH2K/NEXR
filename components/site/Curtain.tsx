@@ -1,49 +1,50 @@
 /**
  * The load curtain, as plain server-rendered HTML.
  *
- * It used to be a client component portalled into <body> after React mounted,
- * which meant the browser's first paint — header, logo, buttons — came before
- * it. That frame is the "glimpse" of the site before the loading screen. Being
- * in the server HTML puts the curtain in the very first paint, before any
- * script has run, on any connection speed.
+ * A doorway in a dark room that fills with warm light from the floor up as the
+ * scene downloads — the site's whole idea ("it's a way in") before a word of
+ * it is read. When the scene is ready the door opens toward the visitor: the
+ * light floods the frame and dissolves into the room behind it.
  *
- * Everything that moves here is CSS (see `.curtain` in globals.css), so it is
- * already animating before JavaScript arrives. Preloader then takes it over:
- * it drives the ring from the real download progress and lifts the curtain
- * away when the scene is ready. On routes other than the home page, an inline
- * script in the layout marks the page before first paint and CSS keeps the
- * curtain hidden.
+ * Being in the server HTML puts it in the very first paint, before any script
+ * has run. Everything that moves is CSS (`.curtain` in globals.css); until
+ * Preloader takes over, the light creeps up on its own so a slow connection
+ * never sees a dead screen. Preloader then drives `--p` (0 to 1) from the real
+ * download progress and adds the classes that open the door.
  *
- * No hooks, no state: it is static markup, and nothing about it changes until
- * Preloader touches it after hydration.
+ * The line under the door is the home page's own opening headline.
  */
+const LINE = ['Step', 'into', 'wellbeing.', 'On', 'your', 'terms.']
+
 export function Curtain() {
   return (
     <div id="nexr-curtain" className="curtain" role="status" aria-label="Loading NEXR">
-      <div className="curtain__glow" aria-hidden="true" />
       <div className="curtain__grain" aria-hidden="true" />
 
-      <div className="curtain__body">
-        <div className="curtain__mark" aria-hidden="true">
-          <svg className="curtain__orbit" viewBox="0 0 140 140">
-            <circle cx="70" cy="70" r="68" pathLength={100} />
-          </svg>
-          <svg className="curtain__ring" viewBox="0 0 120 120">
-            <circle className="curtain__track" cx="60" cy="60" r="56" pathLength={100} />
-            <circle className="curtain__fill" cx="60" cy="60" r="56" pathLength={100} />
-          </svg>
-          {/* eslint-disable-next-line @next/next/no-img-element -- must paint before any JS */}
-          <img src="/brand/meloworld-mark.webp" alt="" width={192} height={139} fetchPriority="high" />
+      <div className="curtain__stage" aria-hidden="true">
+        <div className="curtain__halo" />
+        <div className="curtain__door">
+          <div className="curtain__light" />
+          <div className="curtain__frame" />
         </div>
+        <div className="curtain__floor" />
+        <div className="curtain__horizon" />
+      </div>
 
-        <p className="curtain__word" aria-hidden="true">
+      <div className="curtain__copy" aria-hidden="true">
+        <p className="curtain__word">
           <span>N</span>
           <span>E</span>
           <span>X</span>
           <span>R</span>
         </p>
-
-        <p className="curtain__label">Loading the room</p>
+        <p className="curtain__line">
+          {LINE.map((word, i) => (
+            <span key={word} style={{ animationDelay: `${0.75 + i * 0.09}s` }}>
+              {word}
+            </span>
+          ))}
+        </p>
       </div>
     </div>
   )
