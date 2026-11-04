@@ -1,6 +1,7 @@
 'use client'
 
 import { HomeScrollDriver } from '@/components/overlay/HomeScrollDriver'
+import { HomeGuide } from '@/components/overlay/HomeGuide'
 import { PanelDetail } from '@/components/overlay/PanelDetail'
 import { SceneHud } from '@/components/overlay/SceneHud'
 import { StoryOverlay } from '@/components/overlay/StoryOverlay'
@@ -34,6 +35,7 @@ export default function HomePage() {
           <HomeScrollDriver />
           <StoryOverlay />
           <SceneHud />
+          <HomeGuide />
           <PanelDetail />
         </>
       )}

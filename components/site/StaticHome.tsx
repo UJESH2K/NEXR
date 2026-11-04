@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { ArrowUpRight } from 'lucide-react'
 import { SECTIONS } from '@/lib/sections'
 
 /**
@@ -87,20 +88,20 @@ export function StaticHome() {
               </ul>
             ) : null}
 
-            {/* The closing beat's call to action is the page's primary one, so
-                it gets the filled button; the rest are quiet text links, the
-                same hierarchy the scene uses. */}
-            <Link
-              href={section.cta.route}
-              className={
-                i === SECTIONS.length - 1
-                  ? 'btn mt-9'
-                  : 'mt-8 inline-flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.24em] text-bone/60 transition-colors hover:text-ember'
-              }
-            >
-              {section.cta.label}
-              {i === SECTIONS.length - 1 ? null : <> &rarr;</>}
-            </Link>
+            {/* The same solid button the scene uses on every beat, so the way
+                into each page reads as something to press. */}
+            <div className="mt-9">
+              <Link href={section.cta.route} className="btn-cta group">
+                <span>{section.cta.label}</span>
+                <span className="btn-cta__icon" aria-hidden="true">
+                  <ArrowUpRight
+                    size={15}
+                    strokeWidth={2.2}
+                    className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  />
+                </span>
+              </Link>
+            </div>
           </section>
         )
       })}

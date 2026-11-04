@@ -14,7 +14,7 @@
  * someone leaned over and pointed.
  */
 
-export type DoodleDirection = 'left-down' | 'up-right' | 'down-right'
+export type DoodleDirection = 'left-down' | 'up-right' | 'down-right' | 'into-left'
 
 /** Line and arrowhead per direction, all in a 132 × 74 box. */
 const PATHS: Record<DoodleDirection, { line: string; head: string }> = {
@@ -28,6 +28,13 @@ const PATHS: Record<DoodleDirection, { line: string; head: string }> = {
   'up-right': {
     line: 'M6 66c15-26 38-44 70-47',
     head: 'M76 19l-15 5M76 19l-11 10',
+  },
+  // Starts on the right a little above the tip, loops once, and lands
+  // pointing left at the very left edge of the box — so the box can sit flush against the right side of
+  // a button and the tip touches it. Used beside each beat's call to action.
+  'into-left': {
+    line: 'M122 22c-5 10-17 13-24 8-6-5 0-13 7-9 8 5 2 20-14 26-22 8-50 9-82 7',
+    head: 'M9 54l13-8M9 54l13 8',
   },
   // Starts top-left, falls to the right. Used above the social links.
   'down-right': {
@@ -58,6 +65,7 @@ export function DoodleArrow({
     >
       <path
         d={path.line}
+        pathLength={1}
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
@@ -65,6 +73,7 @@ export function DoodleArrow({
       />
       <path
         d={path.head}
+        pathLength={1}
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Chakra_Petch, DM_Mono, Manrope, Playfair_Display } from 'next/font/google'
+import { Caveat, Chakra_Petch, DM_Mono, Manrope, Playfair_Display } from 'next/font/google'
 import { CanvasHost } from '@/components/r3f/CanvasHost'
 import { ChromeScrim } from '@/components/site/ChromeScrim'
 import { RouteBackdrop } from '@/components/site/RouteBackdrop'
@@ -43,6 +43,17 @@ const chakra = Chakra_Petch({
   subsets: ['latin'],
   weight: ['600', '700'],
   variable: '--font-chakra',
+  display: 'swap',
+})
+
+/**
+ * Handwriting, for the notes beside the doodled arrows on the home scene. It
+ * only ever sets a few words at a time, so one weight is enough.
+ */
+const caveat = Caveat({
+  subsets: ['latin'],
+  weight: ['600'],
+  variable: '--font-caveat',
   display: 'swap',
 })
 
@@ -140,7 +151,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${manrope.variable} ${dmMono.variable} ${playfair.variable} ${chakra.variable}`}
+      className={`${manrope.variable} ${dmMono.variable} ${playfair.variable} ${chakra.variable} ${caveat.variable}`}
       suppressHydrationWarning
     >
       {/* The background here matters: it is what fills the frame between the

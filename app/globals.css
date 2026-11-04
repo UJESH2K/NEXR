@@ -30,6 +30,7 @@
   --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-dm-mono), ui-monospace, monospace;
   --font-display: var(--font-playfair), Georgia, serif;
+  --font-hand: var(--font-caveat), 'Segoe Print', 'Bradley Hand', cursive;
   /* Numerals only — see the .numeral rule near the foot of this file. */
   --font-numeral: var(--font-chakra), var(--font-dm-mono), ui-monospace, monospace;
 
@@ -762,10 +763,10 @@ html[data-route='page'] .curtain:not(.is-driven) {
      11px, so the padding alone does not get there on every zoom level. */
   min-height: 44px;
   overflow: hidden;
-  border: 1px solid rgb(190 209 168 / 0.34);
+  border: 1px solid rgb(255 150 70 / 0.45);
   border-radius: 999px;
   background:
-    linear-gradient(180deg, rgb(63 79 56 / 0.5), rgb(27 36 25 / 0.62));
+    linear-gradient(180deg, rgb(48 28 14 / 0.72), rgb(20 12 7 / 0.82));
   color: var(--color-bone);
   font-family: var(--font-mono);
   font-size: 11px;
@@ -782,13 +783,13 @@ html[data-route='page'] .curtain:not(.is-driven) {
 }
 
 .btn-primary:hover {
-  border-color: rgb(255 121 1 / 0.55);
+  border-color: rgb(255 121 1 / 0.85);
   background:
-    linear-gradient(180deg, rgb(37 52 42 / 0.92), rgb(15 22 15 / 0.95));
+    linear-gradient(180deg, rgb(70 38 16 / 0.92), rgb(28 16 8 / 0.95));
   color: var(--color-ember);
   box-shadow:
-    inset 0 1px 0 rgb(232 229 218 / 0.1),
-    0 10px 34px rgb(9 14 9 / 0.5);
+    inset 0 1px 0 rgb(255 220 190 / 0.12),
+    0 10px 34px rgb(20 10 4 / 0.5);
 }
 
 /* No transform in the hover state, deliberately: the Explore button's magnet
@@ -2281,5 +2282,423 @@ html[data-returning] .overlay-layer {
 @media (hover: hover) and (min-width: 1024px) {
   .beatpill--site:hover .beatpill__count {
     grid-template-columns: 0fr;
+  }
+}
+
+
+/* ── the beat buttons ─────────────────────────────────────────────────── */
+
+/* Solid, warm and raised, with the arrow in its own dark disc, so on every
+   beat the way into the page reads as a button to press rather than a line
+   of small print. */
+.beat-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.btn-cta {
+  position: relative;
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  gap: 0.9rem;
+  border-radius: 999px;
+  padding: 0.4rem 0.4rem 0.4rem 1.35rem;
+  background: linear-gradient(180deg, #ff9a42, #ff7901 60%, #ec6a00);
+  color: #1c0f06;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow:
+    inset 0 1px 0 rgb(255 232 205 / 0.6),
+    0 10px 28px rgb(255 121 1 / 0.32),
+    0 2px 6px rgb(20 10 4 / 0.35);
+  transition:
+    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.35s ease,
+    filter 0.35s ease;
+}
+
+.btn-cta__icon {
+  display: flex;
+  height: 36px;
+  width: 36px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #1c0f06;
+  color: #ffb06a;
+}
+
+.btn-cta:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+  box-shadow:
+    inset 0 1px 0 rgb(255 232 205 / 0.7),
+    0 16px 36px rgb(255 121 1 / 0.42),
+    0 3px 8px rgb(20 10 4 / 0.35);
+}
+
+.btn-cta:focus-visible {
+  outline: 2px solid #ffd2a8;
+  outline-offset: 4px;
+}
+
+/* While the arrow is pointing, a soft ring keeps leaving the button. */
+.beat-cta[data-pointing='true'] .btn-cta::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  border: 2px solid rgb(255 150 70 / 0.7);
+  animation: cta-ring 1.8s cubic-bezier(0.2, 0.7, 0.3, 1) infinite;
+  pointer-events: none;
+}
+
+@keyframes cta-ring {
+  from { transform: scale(1); opacity: 0.9; }
+  to   { transform: scale(1.28, 1.6); opacity: 0; }
+}
+
+/* ── the doodled arrow beside it ──────────────────────────────────────── */
+
+/* Flush against the button's right side. The arrow's tip sits 73% of the
+   way down its box (see DoodleArrow, 'into-left'), so lifting the box by that
+   much puts the tip on the button's centre line. The note hangs level with
+   the arrow's tail, just above the button and clear of the copy over it. */
+.cta-doodle {
+  position: absolute;
+  left: calc(100% + 2px);
+  top: 50%;
+  display: flex;
+  align-items: flex-start;
+  /* Absolutely placed against a box only as wide as the button, so without
+     this it would shrink to its narrowest and break the note word by word. */
+  width: max-content;
+  pointer-events: none;
+  transform: translateY(-73%);
+  color: #ffc28a;
+  filter: drop-shadow(0 2px 6px rgb(20 10 4 / 0.45));
+  animation: cta-doodle-bob 2.6s ease-in-out 1.4s infinite;
+}
+
+.cta-doodle__arrow {
+  display: block;
+  width: 112px;
+  height: auto;
+  flex-shrink: 0;
+}
+
+.cta-doodle .doodle-line {
+  stroke-width: 2.4;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: cta-draw 0.9s cubic-bezier(0.45, 0, 0.2, 1) forwards;
+}
+
+.cta-doodle .doodle-head {
+  stroke-width: 2.4;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: cta-draw 0.3s ease-out 0.85s forwards;
+}
+
+.cta-doodle__note {
+  margin: 0.45rem 0 0 0.15rem;
+  font-family: var(--font-hand);
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 0.95;
+  white-space: nowrap;
+  color: #ffd9b5;
+  transform: rotate(-6deg);
+  transform-origin: left bottom;
+  opacity: 0;
+  animation: cta-note 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.55s forwards;
+}
+
+.cta-doodle__touch,
+.scroll-cue__touch {
+  display: none;
+}
+
+@media (hover: none) {
+  .cta-doodle__desk,
+  .scroll-cue__desk {
+    display: none;
+  }
+  .cta-doodle__touch,
+  .scroll-cue__touch {
+    display: inline;
+  }
+}
+
+/* A phone has a button's width or so to the right of the button, not a
+   column, so the arrow shrinks and the note wraps onto two short lines. */
+@media (max-width: 639px) {
+  .cta-doodle__arrow {
+    width: 52px;
+  }
+  .cta-doodle__note {
+    max-width: 4.9rem;
+    margin-top: -0.35rem;
+    font-size: 18px;
+    white-space: normal;
+  }
+}
+
+.cta-doodle[data-tight='true'] .cta-doodle__note {
+  display: none;
+}
+
+/* Phones: a little less tracking on the beat buttons buys the arrow and its
+   note the room they need beside even the longest label. */
+@media (max-width: 639px) {
+  .btn-cta {
+    gap: 0.6rem;
+    padding-left: 1rem;
+    font-size: 10.5px;
+    letter-spacing: 0.11em;
+  }
+  .btn-cta__icon {
+    height: 34px;
+    width: 34px;
+  }
+}
+
+@keyframes cta-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes cta-note {
+  from { opacity: 0; transform: rotate(-6deg) translateY(6px); }
+  to   { opacity: 1; transform: rotate(-6deg); }
+}
+
+@keyframes cta-doodle-bob {
+  0%, 100% { translate: 0 0; }
+  50% { translate: -5px 0; }
+}
+
+/* ── the scroll cue ───────────────────────────────────────────────────── */
+
+.scroll-cue {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  color: var(--color-bone);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.scroll-cue:focus-visible {
+  outline: 2px solid #ffd2a8;
+  outline-offset: 4px;
+  border-radius: 999px;
+}
+
+/* The opening cue: centred on the rock, where nothing else is drawn until
+   the first scroll. Mouse on top, words, then two falling chevrons. */
+.scroll-cue--hero {
+  left: 50%;
+  bottom: clamp(22px, 4.5vh, 44px);
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 26px 12px;
+  border-radius: 28px;
+  border: 1px solid rgb(255 196 162 / 0.28);
+  background: rgb(22 12 6 / 0.55);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 18px 40px rgb(20 10 4 / 0.45), 0 0 0 1px rgb(255 121 1 / 0.08);
+  transform: translateX(-50%);
+  transition: border-color 0.35s ease, background-color 0.35s ease;
+}
+
+.scroll-cue--hero:hover {
+  border-color: rgb(255 150 70 / 0.7);
+  background: rgb(40 20 8 / 0.7);
+}
+
+/* A slow halo behind the capsule, the one thing on screen that pulses. */
+.scroll-cue__ring {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  border: 1px solid rgb(255 150 70 / 0.55);
+  animation: cue-ring 2.4s cubic-bezier(0.2, 0.7, 0.3, 1) infinite;
+  pointer-events: none;
+}
+
+@keyframes cue-ring {
+  from { transform: scale(1); opacity: 0.85; }
+  to   { transform: scale(1.12, 1.3); opacity: 0; }
+}
+
+.scroll-cue__mouse {
+  position: relative;
+  display: block;
+  width: 24px;
+  height: 38px;
+  border: 2px solid rgb(244 243 236 / 0.85);
+  border-radius: 14px;
+}
+
+.scroll-cue__wheel {
+  position: absolute;
+  left: 50%;
+  top: 7px;
+  width: 4px;
+  height: 8px;
+  margin-left: -2px;
+  border-radius: 2px;
+  background: var(--color-ember);
+  animation: cue-wheel 1.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+@keyframes cue-wheel {
+  0%   { transform: translateY(0); opacity: 1; }
+  70%  { transform: translateY(13px); opacity: 0; }
+  71%  { transform: translateY(0); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.scroll-cue__swipe {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  color: var(--color-ember);
+}
+
+.scroll-cue__swipe svg {
+  margin-top: -9px;
+  animation: cue-climb 1.5s ease-in-out infinite;
+}
+
+.scroll-cue__swipe svg:first-child {
+  margin-top: 0;
+  animation-delay: 0.18s;
+}
+
+@media (hover: none) {
+  .scroll-cue__mouse {
+    display: none;
+  }
+  .scroll-cue__swipe {
+    display: flex;
+  }
+}
+
+.scroll-cue__label {
+  color: rgb(244 243 236 / 0.92);
+}
+
+.scroll-cue__chevrons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--color-ember);
+}
+
+.scroll-cue__chevrons svg {
+  margin-top: -8px;
+  animation: cue-fall 1.5s ease-in-out infinite;
+}
+
+.scroll-cue__chevrons svg:first-child {
+  margin-top: 0;
+}
+
+.scroll-cue__chevrons svg:last-child {
+  animation-delay: 0.18s;
+}
+
+@keyframes cue-fall {
+  0%, 100% { transform: translateY(-2px); opacity: 0.35; }
+  50% { transform: translateY(3px); opacity: 1; }
+}
+
+@keyframes cue-climb {
+  0%, 100% { transform: translateY(2px); opacity: 0.35; }
+  50% { transform: translateY(-3px); opacity: 1; }
+}
+
+/* The nudge on later beats: a small capsule in the bottom-right corner,
+   beside the progress line, clear of the big word at the foot of the frame. */
+.scroll-cue--nudge {
+  right: clamp(44px, 4.4vw, 84px);
+  bottom: clamp(24px, 4vh, 40px);
+  gap: 8px;
+  padding: 10px 14px 10px 18px;
+  border-radius: 999px;
+  border: 1px solid rgb(255 196 162 / 0.3);
+  background: rgb(22 12 6 / 0.6);
+  backdrop-filter: blur(10px);
+  font-size: 10px;
+}
+
+.scroll-cue--nudge .scroll-cue__chevrons svg {
+  margin-top: -9px;
+}
+
+.scroll-cue--nudge .scroll-cue__chevrons svg:first-child {
+  margin-top: 0;
+}
+
+/* On a phone the copy owns the lower half of the frame — on the busiest beat
+   it starts not far below the middle — so both cues move up to the right edge,
+   level with the figure's chest, where there is only sky on every beat. */
+@media (max-width: 1023px) {
+  .scroll-cue--hero,
+  .scroll-cue--nudge {
+    left: auto;
+    right: 14px;
+    bottom: auto;
+    top: 27%;
+    transform: none;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 10px;
+    border-radius: 22px;
+    font-size: 9.5px;
+    letter-spacing: 0.16em;
+    white-space: normal;
+    text-align: center;
+  }
+  .scroll-cue__label {
+    max-width: 4.6rem;
+    line-height: 1.35;
+  }
+  .scroll-cue--hero .scroll-cue__chevrons {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta-doodle,
+  .cta-doodle__note,
+  .cta-doodle .doodle-line,
+  .cta-doodle .doodle-head,
+  .scroll-cue__ring,
+  .scroll-cue__wheel,
+  .scroll-cue__swipe svg,
+  .scroll-cue__chevrons svg,
+  .beat-cta[data-pointing='true'] .btn-cta::after {
+    animation: none !important;
+  }
+  .cta-doodle .doodle-line,
+  .cta-doodle .doodle-head {
+    stroke-dashoffset: 0;
+  }
+  .cta-doodle__note {
+    opacity: 1;
   }
 }

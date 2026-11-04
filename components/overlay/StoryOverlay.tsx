@@ -2,13 +2,15 @@
 
 import Link from 'next/link'
 import { ArrowUpRight } from 'lucide-react'
-import { useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 
 import { SECTIONS, type Section } from '@/lib/sections'
 import { useScrollSnapshot } from '@/lib/useScrollSnapshot'
 import { setCursor, resetCursor } from '@/lib/cursorStore'
 import { BeatAside } from './BeatAside'
 import { AudienceDoodle, audienceFromHref } from '@/components/ui/AudienceDoodle'
+import { DoodleArrow } from '@/components/ui/DoodleArrow'
+import { useHintsVisible } from '@/lib/hintStore'
 
 /**
  * The words: the per-beat copy.
@@ -88,21 +90,70 @@ function Beat({ section, visible, index }: { section: Section; visible: boolean;
             exclusive at every width, never both. */}
         {section.tiles ? <AudienceTabs tiles={section.tiles} /> : null}
 
-        <Link
-          href={section.cta.route}
-          {...hoverable}
-          className="btn-ghost group pointer-events-auto mt-6 lg:mt-8"
-        >
-          {section.cta.label}
-          <ArrowUpRight
-            size={14}
-            className="shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-          />
-        </Link>
+        <BeatCta section={section} visible={visible} />
       </div>
 
       {/* The far side of the figure, so she stands between the two columns. */}
       <BeatAside section={section} side="right" />
+    </div>
+  )
+}
+
+/**
+ * The beat's way in: a solid button, so it reads as something to press rather
+ * than a caption, and — when the visitor has sat still on this beat for a few
+ * seconds — a doodled arrow that sketches itself toward it with a handwritten
+ * note. The arrow is only drawn for the beat on screen, and it is mounted only
+ * while the hint is up, so every appearance draws in fresh.
+ */
+function BeatCta({ section, visible }: { section: Section; visible: boolean }) {
+  const hints = useHintsVisible()
+  const pointing = hints && visible
+  const doodle = useRef<HTMLSpanElement>(null)
+  const [tight, setTight] = useState(false)
+
+  // The arrow sits to the right of the button, and the longest label on the
+  // narrowest phone leaves no room for the note after it. Measured rather
+  // than guessed, because the room depends on the label, the font and the
+  // screen: if the note would run off the edge, keep the arrow and drop the
+  // words, so nothing is ever cut in half.
+  useLayoutEffect(() => {
+    if (!pointing) return
+    const node = doodle.current
+    if (!node) return
+    const check = () => {
+      setTight(false)
+      requestAnimationFrame(() => {
+        const right = node.getBoundingClientRect().right
+        setTight(right > window.innerWidth - 8)
+      })
+    }
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [pointing])
+
+  return (
+    <div className="beat-cta mt-6 lg:mt-8" data-pointing={pointing ? 'true' : 'false'}>
+      <Link href={section.cta.route} {...hoverable} className="btn-cta group pointer-events-auto">
+        <span>{section.cta.label}</span>
+        <span className="btn-cta__icon" aria-hidden="true">
+          <ArrowUpRight
+            size={15}
+            strokeWidth={2.2}
+            className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+          />
+        </span>
+      </Link>
+      {pointing ? (
+        <span ref={doodle} className="cta-doodle" data-tight={tight ? 'true' : 'false'} aria-hidden="true">
+          <DoodleArrow direction="into-left" className="cta-doodle__arrow" />
+          <span className="cta-doodle__note">
+            <span className="cta-doodle__desk">Click to learn more</span>
+            <span className="cta-doodle__touch">Tap to learn more</span>
+          </span>
+        </span>
+      ) : null}
     </div>
   )
 }
