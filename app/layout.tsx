@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Caveat, Chakra_Petch, DM_Mono, Manrope, Playfair_Display } from 'next/font/google'
+import { Caveat, Chakra_Petch, DM_Mono, Dancing_Script, Manrope, Playfair_Display } from 'next/font/google'
 import { CanvasHost } from '@/components/r3f/CanvasHost'
 import { ChromeScrim } from '@/components/site/ChromeScrim'
 import { RouteBackdrop } from '@/components/site/RouteBackdrop'
@@ -54,6 +54,18 @@ const caveat = Caveat({
   subsets: ['latin'],
   weight: ['600'],
   variable: '--font-caveat',
+  display: 'swap',
+})
+
+/**
+ * A flowing script for the one-off "Scroll down" that greets a visitor on the
+ * home scene. It appears nowhere else, which is the point: a voice the eye has
+ * not seen yet is a voice it goes to look at.
+ */
+const dancing = Dancing_Script({
+  subsets: ['latin'],
+  weight: ['700'],
+  variable: '--font-dancing',
   display: 'swap',
 })
 
@@ -151,7 +163,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${manrope.variable} ${dmMono.variable} ${playfair.variable} ${chakra.variable} ${caveat.variable}`}
+      className={`${manrope.variable} ${dmMono.variable} ${playfair.variable} ${chakra.variable} ${caveat.variable} ${dancing.variable}`}
       suppressHydrationWarning
     >
       {/* The background here matters: it is what fills the frame between the
